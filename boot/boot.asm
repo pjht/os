@@ -30,7 +30,7 @@ load_kernel:
 [bits 32]
 BEGIN_PM:
     call KERNEL_OFFSET ; Give control to the kernel
-    jmp $ ; Stay here when the kernel returns control to us (if ever)
+    jmp $
 
 
 BOOT_DRIVE db 0 ; It is a good idea to store it in memory because 'dl' may get overwritten

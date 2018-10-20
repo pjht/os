@@ -39,5 +39,5 @@ debug: os-image.bin kernel.elf
 	nasm $< -f bin -o $@
 
 clean:
-	rm -rf *.bin *.dis *.o os-image.bin *.elf
+	rm -rf *.bin *.dis *.o os-image.bin *.elf boot/boot.bin
 	rm -rf */*.o

@@ -4,3 +4,8 @@ void memory_copy(char *source,char *dest,int nbytes) {
       *(dest+i)=*(source+i);
     }
 }
+
+void memory_set(char *dest, char val, int len) {
+    char *temp = (char *)dest;
+    for ( ; len != 0; len--) *temp++ = val;
+}
