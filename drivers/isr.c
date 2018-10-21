@@ -4,7 +4,7 @@
 #include "../libc/string.h"
 #include <stdint.h>
 #include "ports.h"
-
+void irq_handler(registers_t r);
 isr_t interrupt_handlers[256];
 
 /* Can't do this with a loop because we need the address
@@ -42,7 +42,7 @@ void isr_install() {
     set_idt_gate(29,(uint32_t)isr29);
     set_idt_gate(30,(uint32_t)isr30);
     set_idt_gate(31,(uint32_t)isr31);
-
+    set_idt_gate(80,(uint32_t)isr80);
     // Remap the PIC
     port_byte_out(0x20,0x11);
     port_byte_out(0xA0,0x11);
@@ -117,14 +117,40 @@ char *exception_messages[] = {
 };
 
 void isr_handler(registers_t r) {
-    write_string("Received interrupt no ");
-    char s[3];
-    int_to_ascii(r.int_no, s);
-    write_string(s);
-    write_string(". (");
-    write_string(exception_messages[r.int_no]);
-    write_string(")\n");
-    asm volatile("hlt");
+    if (r.int_no==80) {
+      switch (r.eax) {
+        case 0:
+          write_string((char*)r.ebx);
+          break;
+        case 1:
+          screen_backspace();
+          break;
+        case 2:
+          register_interrupt_handler((uint8_t)r.ebx,(isr_t)r.ecx);
+          break;
+        case 3:
+          r.eax=port_byte_in((unsigned short)r.ebx);
+          break;
+        break;
+        default: {
+          char num[10];
+          int_to_ascii(r.eax, num);
+          write_string("PANIC: Invalid syscall no ");
+          write_string(num);
+          write_string("\n");
+          asm volatile("hlt");
+        }
+      }
+    } else {
+      write_string("Received interrupt no ");
+      char s[3];
+      int_to_ascii(r.int_no, s);
+      write_string(s);
+      write_string(". (");
+      write_string(exception_messages[r.int_no]);
+      write_string(")\n");
+      asm volatile("hlt");
+    }
 }
 
 
@@ -137,7 +163,6 @@ void irq_handler(registers_t r) {
      * or they will not send another interrupt again */
     if (r.int_no >= 40) port_byte_out(0xA0,0x20); /* slave */
     port_byte_out(0x20,0x20); /* master */
-
     /* Handle the interrupt in a more modular way */
     if (interrupt_handlers[r.int_no] != 0) {
         isr_t handler = interrupt_handlers[r.int_no];

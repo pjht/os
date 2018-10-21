@@ -42,6 +42,7 @@ void write_string(const char *string) {
       if (c=='\n') {
         x=0;
         y++;
+        set_cursor_offset(get_offset(x,y));
         continue;
       }
       if (x==80) {
@@ -50,9 +51,9 @@ void write_string(const char *string) {
       }
       if (y==25) {
         for (int i=1;i<VGA_HEIGHT;i++) {
-          memory_copy(get_offset(0,i)+VIDEO_MEMORY,get_offset(0,i-1)+VIDEO_MEMORY,VGA_WIDTH*2);
+          memory_copy((char*)get_offset(0,i)+VIDEO_MEMORY,(char *)get_offset(0,i-1)+VIDEO_MEMORY,VGA_WIDTH*2);
         }
-        char *last_line=get_offset(0,VGA_HEIGHT-1)+VIDEO_MEMORY;
+        char* last_line=(char*)get_offset(0,VGA_HEIGHT-1)+VIDEO_MEMORY;
         for(int i=0;i<VGA_WIDTH*2;i++) {
           last_line[i]=0;
         }
@@ -65,12 +66,21 @@ void write_string(const char *string) {
     }
 }
 
+void screen_backspace() {
+  if (x>0) {
+    x--;
+    video_memory[get_offset(x,y)]=' ';
+    video_memory[get_offset(x,y)+1]=color;
+    set_cursor_offset(get_offset(x,y));
+  }
+}
+
 void clear_screen() {
   int x=0;
   int y=0;
   while (y<25) {
     video_memory[get_offset(x,y)]=' ';
-    video_memory[get_offset(x,y)]=BLACK;
+    video_memory[get_offset(x,y)+1]=color;
     x++;
     if(x==80) {
       x=0;
@@ -82,18 +92,19 @@ void clear_screen() {
   set_cursor_offset(0);
 }
 
+
 int get_cursor_offset() {
-  // port_byte_out(SCREEN_CTRL,14);
-  // int offset=port_byte_in(SCREEN_DATA)<<8;
-  // port_byte_out(SCREEN_CTRL,15);
-  // offset+=port_byte_in(SCREEN_DATA);
-  // return offset*2;
+  port_byte_out(SCREEN_CTRL,14);
+  int offset=port_byte_in(SCREEN_DATA)<<8;
+  port_byte_out(SCREEN_CTRL,15);
+  offset+=port_byte_in(SCREEN_DATA);
+  return offset*2;
 }
 
 void set_cursor_offset(int offset) {
-  // offset/=2;
-  // port_byte_out(SCREEN_CTRL,14);
-  // port_byte_out(SCREEN_DATA,(unsigned char)(offset>>8));
-  // port_byte_out(SCREEN_CTRL,15);
-  // port_byte_out(SCREEN_DATA,(unsigned char)(offset&0xff));
+  offset/=2;
+  port_byte_out(SCREEN_CTRL,14);
+  port_byte_out(SCREEN_DATA,(unsigned char)(offset>>8));
+  port_byte_out(SCREEN_CTRL,15);
+  port_byte_out(SCREEN_DATA,(unsigned char)(offset&0xff));
 }

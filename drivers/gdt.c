@@ -6,6 +6,7 @@
 //
 
 #include "gdt.h"
+#include "../libc/memory.h"
 #include <stdint.h>
 
 static void gdt_set_gate(int32_t num,uint32_t base,uint32_t limit,uint8_t access,uint8_t gran);
@@ -16,7 +17,7 @@ gdt_ptr_t   gdt_ptr;
 tss_entry_t tss_entry;
 
 void init_gdt() {
-    gdt_ptr.limit=(sizeof(gdt_entry_t)*5)-1;
+    gdt_ptr.limit=(sizeof(gdt_entry_t)*6)-1;
     gdt_ptr.base =(uint32_t)&gdt_entries;
 
     gdt_set_gate(0, 0, 0, 0, 0);                // Null segment
@@ -50,7 +51,7 @@ static void write_tss(int32_t num, uint16_t ss0, uint32_t esp0) {
    gdt_set_gate(num, base, limit, 0xE9, 0x00);
 
    // Ensure the descriptor is initially zero.
-   memory_set(&tss_entry, 0, sizeof(tss_entry));
+   memory_set((char*)&tss_entry, 0, sizeof(tss_entry));
    tss_entry.ss0  = ss0;  // Set the kernel stack segment.
    tss_entry.esp0 = esp0; // Set the kernel stack pointer.
 

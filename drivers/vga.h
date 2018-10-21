@@ -26,5 +26,6 @@ typedef enum {
 void init_vga(VGA_COLOR txt,VGA_COLOR bg);
 void write_string(const char *string);
 void clear_screen();
+void screen_backspace();
 
 #endif

@@ -15,8 +15,7 @@ isr_common_stub:
 	mov gs, ax
 
     ; 2. Call C handler
-	call isr_handler
-
+	call isr_handler	
     ; 3. Restore state
 	pop eax
 	mov ds, ax
@@ -90,6 +89,7 @@ global isr28
 global isr29
 global isr30
 global isr31
+global isr80
 ; IRQs
 global irq0
 global irq1
@@ -324,6 +324,13 @@ isr31:
     cli
     push byte 0
     push byte 31
+    jmp isr_common_stub
+
+; 80: Syscalls
+isr80:
+    cli
+    push byte 0
+    push byte 80
     jmp isr_common_stub
 
 ; IRQ handlers

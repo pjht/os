@@ -2,14 +2,9 @@
 #include "../drivers/isr.h"
 #include "../drivers/idt.h"
 #include "../drivers/gdt.h"
-/*
-pop %eax; \
-or $0x200,%eax; \
-push %eax; \
-*/
+#include "syscalls.h"
+#include "keyboard.h"
 void switch_to_user_mode() {
-  // set_kernel_stack(0x80000);
-  // Set up a stack structure for switching to user mode.
   asm volatile("  \
     cli; \
     mov $0x23, %ax; \
@@ -22,6 +17,9 @@ void switch_to_user_mode() {
     pushl $0x23; \
     pushl %eax; \
     pushf; \
+    pop %eax; \
+    or $0x200,%eax; \
+    push %eax; \
     pushl $0x1B; \
     push $1f; \
     iret; \
@@ -31,13 +29,19 @@ void switch_to_user_mode() {
 
 
 void main() {
-  init_vga(GRAY,BLACK);
+  init_vga(WHITE,BLACK);
   write_string("Initialized VGA\n");
   isr_install();
   asm volatile("sti");
   write_string("Setup interrupts\n");
   init_gdt();
   write_string("Setup new GDT\n");
+  init_keyboard();
   switch_to_user_mode();
-  write_string("User mode!\n");
+  syscall_write_string("User mode!\n");
+}
+
+void user_input(char* str) {
+  syscall_write_string(str);
+  return;
 }
