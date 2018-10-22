@@ -2,6 +2,7 @@
 #include "../drivers/isr.h"
 #include "../drivers/idt.h"
 #include "../drivers/gdt.h"
+#include "../drivers/paging.h"
 #include "../drivers/keyboard.h"
 #include "../libc/string.h"
 #include "syscalls.h"
@@ -40,20 +41,25 @@ void main() {
   write_string("Setup interrupts\n");
   init_gdt();
   write_string("Setup new GDT\n");
+  init_paging();
+  write_string("Setup paging\n");
   init_keyboard();
   write_string("Keyboard initialized\n");
   switch_to_user_mode();
+  volatile int x=*((int*)0xffff0000);
   syscall_write_string("MYOS V 1.0\n");
   syscall_write_string(">");
   char buf[256];
   do {
     syscall_gets(buf);
+    syscall_write_string(buf);
   } while (buf[0]=='\0');
   syscall_write_string(buf);
   syscall_write_string("HALTING");
 }
 
 void user_input(char* str) {
+  write_string("GOT INPUT\n");
   line=str;
 }
 
@@ -62,6 +68,7 @@ void kgets(char* buf) {
     buf[0]='\0';
     return;
   }
+  write_string("NOT ZERO\n");
   strcpy(buf,line);
   line=0;
 }

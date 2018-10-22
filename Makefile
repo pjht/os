@@ -1,6 +1,6 @@
 C_SOURCES = $(wildcard kernel/*.c drivers/*.c libc/*.c)
 HEADERS = $(wildcard kernel/*.h drivers/*.h libc/*.h)
-OBJ = ${C_SOURCES:.c=.o drivers/interrupt.o}
+OBJ = ${C_SOURCES:.c=.o drivers/interrupt.o drivers/paging_helpers.o}
 
 CC = /usr/local/bin/i386-elf-gcc
 GDB = /usr/local/bin/i386-elf-gdb

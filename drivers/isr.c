@@ -146,6 +146,33 @@ void isr_handler(registers_t r) {
       write_string(". (");
       write_string(exception_messages[r.int_no]);
       write_string(")\n");
+      if (r.int_no==14) {
+        write_string("Details:\n");
+        if (r.err_code==0) {
+          write_string("Kernel process tried to read a non-present page entry ");
+        } else if (r.err_code==1) {
+          write_string("Kernel process tried to read a page and caused a protection fault ");
+        } else if (r.err_code==2) {
+          write_string("Kernel process tried to write to a non-present page entry ");
+        } else if (r.err_code==3) {
+          write_string("Kernel process tried to write a page and caused a protection fault ");
+        } else if (r.err_code==4) {
+          write_string("User process tried to read a non-present page entry ");
+        } else if (r.err_code==5) {
+          write_string("User process tried to read a page and caused a protection fault ");
+        } else if (r.err_code==6) {
+          write_string("User process tried to write to a non-present page entry ");
+        } else if (r.err_code==7) {
+          write_string("User process tried to write a page and caused a protection fault ");
+        }
+        uint32_t addr;
+        asm("movl %%cr2,%0" : "=r"(addr));
+        char str[15];
+        hex_to_ascii(addr,str);
+        write_string("(Phys address ");
+        write_string(str);
+        write_string(")\n");
+      }
       asm volatile("hlt");
     }
 }
