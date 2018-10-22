@@ -1,4 +1,4 @@
-int strlen(char* str) {
+int strlen(const char* str) {
   int i;
   for (i=0;str[i]!='\0';i++) {
     continue;
@@ -33,13 +33,21 @@ void int_to_ascii(int n,char* str) {
     reverse(str);
 }
 
-void append(char s[], char n) {
+void append(char* s, char n) {
     int len = strlen(s);
     s[len] = n;
     s[len+1] = '\0';
 }
 
-void backspace(char s[]) {
+void backspace(char* s) {
     int len = strlen(s);
     s[len-1] = '\0';
+}
+
+char* strcpy(char* dest,const char* src) {
+  int i;
+  for (i=0;i<strlen(src);i++) {
+    dest[i]=src[i];
+  }
+  dest[i]='\0';
 }

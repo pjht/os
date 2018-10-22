@@ -6,7 +6,6 @@
 
 void syscall_write_string(char* str);
 void syscall_screen_backspace();
-void syscall_register_interrupt_handler(uint8_t n,isr_t handler);
-unsigned char syscall_port_byte_in(unsigned short port);
+void syscall_gets(char* buf);
 
 #endif

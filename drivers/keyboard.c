@@ -3,7 +3,7 @@
 #include "../drivers/vga.h"
 #include "../drivers/isr.h"
 #include "../libc/string.h"
-#include "kernel.h"
+#include "../kernel/kernel.h"
 #include <stdint.h>
 
 #define BACKSPACE 0x0E
@@ -40,13 +40,7 @@ int caps=0;
 int shift=0;
 
 static void keyboard_callback(registers_t regs) {
-    /* The PIC leaves us the scancode in port 0x60 */
     uint8_t scancode=port_byte_in(0x60);
-    // char s[10];
-    // int_to_ascii(scancode,s);
-    // write_string("Scancode ");
-    // write_string(s);
-    // write_string("\n");
     if (scancode==BACKSPACE) {
       backspace(key_buffer);
       screen_backspace();

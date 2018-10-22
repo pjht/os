@@ -2,6 +2,7 @@
 #include "idt.h"
 #include "vga.h"
 #include "../libc/string.h"
+#include "../kernel/kernel.h"
 #include <stdint.h>
 #include "ports.h"
 void irq_handler(registers_t r);
@@ -126,11 +127,7 @@ void isr_handler(registers_t r) {
           screen_backspace();
           break;
         case 2:
-          register_interrupt_handler((uint8_t)r.ebx,(isr_t)r.ecx);
-          break;
-        case 3:
-          r.eax=port_byte_in((unsigned short)r.ebx);
-          break;
+          kgets((char*)r.ebx);
         break;
         default: {
           char num[10];

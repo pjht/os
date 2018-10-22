@@ -2,5 +2,5 @@
 #define KERNEL_H
 
 void user_input(char* str);
-
+void kgets(char* buf);
 #endif
