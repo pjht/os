@@ -4,6 +4,7 @@
 #define SCREEN_CTRL 0x3d4
 #define SCREEN_DATA 0x3d5
 #define VIDEO_MEMORY 0xb8000
+#define VIDEO_MEMORY_PG1 0xb8fa0
 static char* video_memory;
 static char x;
 static char y;
@@ -37,6 +38,13 @@ void init_vga(VGA_COLOR txt,VGA_COLOR bg) {
 void write_string(const char *string) {
     char c;
     while(*string!=0) {
+      if (y==25) {
+        memory_copy(VIDEO_MEMORY+get_offset(0,1),VIDEO_MEMORY_PG1,get_offset(0,24));
+        clear_screen();
+        memory_copy(VIDEO_MEMORY_PG1,VIDEO_MEMORY,get_offset(0,25));
+        x=0;
+        y=24;
+      }
       c=*string;
       string++;
       if (c=='\n') {
@@ -45,23 +53,13 @@ void write_string(const char *string) {
         set_cursor_offset(get_offset(x,y));
         continue;
       }
+      video_memory[get_offset(x,y)]=c;
+      video_memory[get_offset(x,y)+1]=color;
+      x++;
       if (x==80) {
         x=0;
         y++;
       }
-      if (y==25) {
-        for (int i=1;i<VGA_HEIGHT;i++) {
-          memory_copy((char*)get_offset(0,i)+VIDEO_MEMORY,(char *)get_offset(0,i-1)+VIDEO_MEMORY,VGA_WIDTH*2);
-        }
-        char* last_line=(char*)get_offset(0,VGA_HEIGHT-1)+VIDEO_MEMORY;
-        for(int i=0;i<VGA_WIDTH*2;i++) {
-          last_line[i]=0;
-        }
-        y-=2;
-      }
-      video_memory[get_offset(x,y)]=c;
-      video_memory[get_offset(x,y)+1]=color;
-      x++;
       set_cursor_offset(get_offset(x,y));
     }
 }

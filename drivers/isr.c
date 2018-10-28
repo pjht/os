@@ -3,8 +3,10 @@
 #include "vga.h"
 #include "../libc/string.h"
 #include "../kernel/kernel.h"
+#include "paging.h"
 #include <stdint.h>
 #include "ports.h"
+#include "serial.h"
 void irq_handler(registers_t r);
 isr_t interrupt_handlers[256];
 
@@ -139,39 +141,56 @@ void isr_handler(registers_t r) {
         }
       }
     } else {
-      write_string("Received interrupt no ");
+      serial_write_string(SERIAL_COM1_BASE,"Received interrupt no ");
       char s[3];
       int_to_ascii(r.int_no, s);
-      write_string(s);
-      write_string(". (");
-      write_string(exception_messages[r.int_no]);
-      write_string(")\n");
+      serial_write_string(SERIAL_COM1_BASE,s);
+      serial_write_string(SERIAL_COM1_BASE,". (");
+      serial_write_string(SERIAL_COM1_BASE,exception_messages[r.int_no]);
+      serial_write_string(SERIAL_COM1_BASE,")\n");
       if (r.int_no==14) {
-        write_string("Details:\n");
-        if (r.err_code==0) {
-          write_string("Kernel process tried to read a non-present page entry ");
-        } else if (r.err_code==1) {
-          write_string("Kernel process tried to read a page and caused a protection fault ");
-        } else if (r.err_code==2) {
-          write_string("Kernel process tried to write to a non-present page entry ");
-        } else if (r.err_code==3) {
-          write_string("Kernel process tried to write a page and caused a protection fault ");
-        } else if (r.err_code==4) {
-          write_string("User process tried to read a non-present page entry ");
-        } else if (r.err_code==5) {
-          write_string("User process tried to read a page and caused a protection fault ");
-        } else if (r.err_code==6) {
-          write_string("User process tried to write to a non-present page entry ");
-        } else if (r.err_code==7) {
-          write_string("User process tried to write a page and caused a protection fault ");
-        }
         uint32_t addr;
-        asm("movl %%cr2,%0" : "=r"(addr));
-        char str[15];
+        asm("movl %%cr2,%0": "=r"(addr));
+        if (r.err_code==0) {
+          serial_write_string(SERIAL_COM1_BASE,"Kernel process tried to read a non-present page entry ");
+        } else if (r.err_code==1) {
+          serial_write_string(SERIAL_COM1_BASE,"Kernel process tried to read a page and caused a protection fault ");
+        } else if (r.err_code==2) {
+          serial_write_string(SERIAL_COM1_BASE,"Kernel process tried to write to a non-present page entry ");
+        } else if (r.err_code==3) {
+          serial_write_string(SERIAL_COM1_BASE,"Kernel process tried to write a page and caused a protection fault ");
+        } else if (r.err_code==4) {
+          serial_write_string(SERIAL_COM1_BASE,"User process tried to read a non-present page entry ");
+        } else if (r.err_code==5) {
+          serial_write_string(SERIAL_COM1_BASE,"User process tried to read a page and caused a protection fault ");
+        } else if (r.err_code==6) {
+          serial_write_string(SERIAL_COM1_BASE,"User process tried to write to a non-present page entry ");
+        } else if (r.err_code==7) {
+          serial_write_string(SERIAL_COM1_BASE,"User process tried to write a page and caused a protection fault ");
+        }
+        char str[20];
+        str[0]='\0';
         hex_to_ascii(addr,str);
-        write_string("(Phys address ");
-        write_string(str);
-        write_string(")\n");
+        serial_write_string(SERIAL_COM1_BASE,"at address ");
+        serial_write_string(SERIAL_COM1_BASE,str);
+        serial_write_string(SERIAL_COM1_BASE,"\n");
+        if ((r.err_code&1)==0) {
+          int dir_entry=(addr&0xFFC00000)>>22;
+          int table_entry=(addr&0x3FF000)>12;
+          if (dir_entry_present(dir_entry)) {
+            set_table_entry(dir_entry,table_entry,((dir_entry*1024)+table_entry)*0x1000,1,1,1);
+            for(int page=0;page<1024;page++) {
+              asm volatile("invlpg (%0)"::"r"(((dir_entry*1024)+page)*0x1000):"memory");
+            }
+          } else {
+            for(int page=0;page<1024;page++) {
+              set_table_entry(dir_entry,page,0x0,1,1,0);
+            }
+            set_table_entry(dir_entry,table_entry,((dir_entry*1024)+table_entry)*0x1000,1,1,1);
+            set_directory_entry(dir_entry,dir_entry,1,1,1);
+          }
+          return;
+        }
       }
       asm volatile("hlt");
     }
