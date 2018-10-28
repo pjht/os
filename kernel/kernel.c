@@ -45,10 +45,10 @@ void main() {
   write_string("Setup interrupts\n");
   init_gdt();
   write_string("Setup new GDT\n");
-  init_paging();
-  write_string("Setup paging\n");
   init_keyboard();
   write_string("Keyboard initialized\n");
+  init_paging();
+  write_string("Setup paging\n");
   switch_to_user_mode();
   syscall_write_string("MYOS V 1.0\n");
   int mb=8;
