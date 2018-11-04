@@ -3,7 +3,7 @@
 #include "vga.h"
 #include "../libc/string.h"
 #include "../kernel/kernel.h"
-#include "paging.h"
+//#include "paging.h"
 #include <stdint.h>
 #include "ports.h"
 #include "serial.h"
@@ -174,23 +174,24 @@ void isr_handler(registers_t r) {
         serial_write_string(SERIAL_COM1_BASE,"at address ");
         serial_write_string(SERIAL_COM1_BASE,str);
         serial_write_string(SERIAL_COM1_BASE,"\n");
-        if ((r.err_code&1)==0) {
-          int dir_entry=(addr&0xFFC00000)>>22;
-          int table_entry=(addr&0x3FF000)>12;
-          if (dir_entry_present(dir_entry)) {
-            set_table_entry(dir_entry,table_entry,((dir_entry*1024)+table_entry)*0x1000,1,1,1);
-            for(int page=0;page<1024;page++) {
-              asm volatile("invlpg (%0)"::"r"(((dir_entry*1024)+page)*0x1000):"memory");
-            }
-          } else {
-            for(int page=0;page<1024;page++) {
-              set_table_entry(dir_entry,page,0x0,1,1,0);
-            }
-            set_table_entry(dir_entry,table_entry,((dir_entry*1024)+table_entry)*0x1000,1,1,1);
-            set_directory_entry(dir_entry,dir_entry,1,1,1);
-          }
-          return;
-        }
+        asm volatile("hlt");
+        // if ((r.err_code&1)==0) {
+        //   int dir_entry=(addr&0xFFC00000)>>22;
+        //   int table_entry=(addr&0x3FF000)>12;
+        //   if (dir_entry_present(dir_entry)) {
+        //     set_table_entry(dir_entry,table_entry,((dir_entry*1024)+table_entry)*0x1000,1,1,1);
+        //     for(int page=0;page<1024;page++) {
+        //       asm volatile("invlpg (%0)"::"r"(((dir_entry*1024)+page)*0x1000):"memory");
+        //     }
+        //   } else {
+        //     for(int page=0;page<1024;page++) {
+        //       set_table_entry(dir_entry,page,0x0,1,1,0);
+        //     }
+        //     set_table_entry(dir_entry,table_entry,((dir_entry*1024)+table_entry)*0x1000,1,1,1);
+        //     set_directory_entry(dir_entry,dir_entry,1,1,1);
+        //   }
+        //   return;
+        // }
       }
       asm volatile("hlt");
     }

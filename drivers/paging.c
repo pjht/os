@@ -1,23 +1,37 @@
 #include <stdint.h>
 #include "paging_helpers.h"
-
-uint32_t *page_directory [1024] __attribute__((aligned(4096)));
-uint32_t *page_tables [1024][1024] __attribute__((aligned(4096)));
-
-#define INIT_DIR_ENTRIES 2
-
-void set_directory_entry(int entry, int table_no, char usr, char wren, char p) {
-    int flags=p&1;
-    flags=flags|((wren&1)<<1);
-    flags=flags|((usr&1)<<2);
-    page_directory[entry]=((uint32_t)&(page_tables[table_no]))|flags;
+#include "paging.h"
+uint32_t page_directory [1024] __attribute__((aligned(4096)));
+uint32_t page_tables [1048576] __attribute__((aligned(4096)));
+void* next_kern_virt=(void*)KERN_VIRT_START;
+void* next_kern_phys=(void*)KERN_PHYS_START;
+void alloc_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,char wr,uint32_t* page_directory,uint32_t* page_tables) {
+  uint32_t virt_addr=(uint32_t)virt_addr_ptr;
+  uint32_t phys_addr=(uint32_t)phys_addr_ptr;
+  int dir_entry=(virt_addr&0xFFC00000)>>22;
+  int table_entry=(virt_addr&0x3FF000)>>12;
+  int flags=1;
+  flags=flags|((wr&1)<<1);
+  flags=flags|((usr&1)<<2);
+  for (int i=0;i<num_pages;i++) {
+    page_tables[(dir_entry*1024)+table_entry]=phys_addr|flags;
+    table_entry++;
+    if (table_entry==1024) {
+      table_entry=0;
+      page_directory[dir_entry]=((uint32_t)&(page_tables[table_entry]))|flags;
+      dir_entry++;
+    } else if (i==num_pages) {
+      page_directory[dir_entry]=((uint32_t)&(page_tables[table_entry]))|flags;
+    }
+  }
 }
 
-void set_table_entry(int dir_entry, int page, uint32_t base_addr, char usr, char wren, char p) {
-    int flags=p&1;
-    flags=flags|((wren&1)<<1);
-    flags=flags|((usr&1)<<2);
-    page_tables[dir_entry][page]=(base_addr)|flags;
+void* alloc_kern_pages(int num_pages,char wr) {
+  void* starting=next_kern_virt;
+  alloc_pages(next_kern_virt,next_kern_phys,num_pages,0,wr,page_directory,page_tables);
+  next_kern_virt+=num_pages*4096;
+  next_kern_phys+=num_pages*4096;
+  return starting;
 }
 
 int dir_entry_present(int entry) {
@@ -25,20 +39,18 @@ int dir_entry_present(int entry) {
   return dir_entry&1;
 }
 
-void init_paging() {
-  for(int i=0;i<1024;i++) {
-    set_directory_entry(i,0,0,0,0);
-  }
-  char s[20];
-  for(int dir=0;dir<INIT_DIR_ENTRIES;dir++) {
-    for(int page=0;page<1024;page++) {
-      set_table_entry(dir,page,((dir*1024)+page)*0x1000,1,1,1);
-    }
-  }
-  for(int i=0;i<INIT_DIR_ENTRIES;i++) {
-    set_directory_entry(i,i,1,1,1);
-  }
-  set_directory_entry(0,0,1,1,1);
-  load_page_directory(page_directory);
-  enable_paging();
+void* virt_to_phys(void* virt_addr_ptr) {
+  uint32_t virt_addr=(uint32_t)virt_addr_ptr;
+  int dir_num=(virt_addr&0xFFC00000)>>22;
+  int table_num=(virt_addr&0x3FF000)>>12;
+  int offset=(virt_addr&0xFFF);
+  uint32_t table_entry=page_tables[(dir_num*1024)+table_num];
+  table_entry=table_entry*0xFFFFF000;
+  return (void*)(table_entry+offset);
+
+}
+
+void initialize_paging() {
+  alloc_kern_pages(NUM_KERN_DIRS*1024,1);
+  load_page_directory(virt_to_phys(page_directory));
 }

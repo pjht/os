@@ -1,28 +1,21 @@
 #include "ports.h"
 #include "vga.h"
 #include "../libc/memory.h"
+
 #define SCREEN_CTRL 0x3d4
 #define SCREEN_DATA 0x3d5
-#define VIDEO_MEMORY 0xb8000
-#define VIDEO_MEMORY_PG1 0xb8fa0
+#define VIDEO_MEMORY 0xc00b8000
+#define VIDEO_MEMORY_PG1 0xc00b8fa0
 static char* video_memory;
 static char x;
 static char y;
 static char color;
 
 
-int get_cursor_offset();
 void set_cursor_offset(int offset);
 
 int get_offset(int x,int y) {
   return 2*(y*VGA_WIDTH+x);
-}
-int get_offset_y(int offset) {
-  return offset/(2*VGA_WIDTH);
-}
-
-int get_offset_x(int offset) {
-  return (offset-(get_offset_y(offset)*2*VGA_WIDTH))/2;
 }
 
 void init_vga(VGA_COLOR txt,VGA_COLOR bg) {
@@ -39,9 +32,9 @@ void write_string(const char *string) {
     char c;
     while(*string!=0) {
       if (y==25) {
-        memory_copy(VIDEO_MEMORY+get_offset(0,1),VIDEO_MEMORY_PG1,get_offset(0,24));
+        memory_copy((char*)(VIDEO_MEMORY+get_offset(0,1)),(char*)VIDEO_MEMORY_PG1,get_offset(0,24));
         clear_screen();
-        memory_copy(VIDEO_MEMORY_PG1,VIDEO_MEMORY,get_offset(0,25));
+        memory_copy((char*)VIDEO_MEMORY_PG1,(char*)VIDEO_MEMORY,get_offset(0,25));
         x=0;
         y=24;
       }
@@ -88,15 +81,6 @@ void clear_screen() {
   x=0;
   y=0;
   set_cursor_offset(0);
-}
-
-
-int get_cursor_offset() {
-  port_byte_out(SCREEN_CTRL,14);
-  int offset=port_byte_in(SCREEN_DATA)<<8;
-  port_byte_out(SCREEN_CTRL,15);
-  offset+=port_byte_in(SCREEN_DATA);
-  return offset*2;
 }
 
 void set_cursor_offset(int offset) {
