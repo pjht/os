@@ -4,12 +4,27 @@
 #include "../drivers/gdt.h"
 #include "../drivers/keyboard.h"
 #include "../libc/string.h"
+#include "../libc/memory.h"
 #include "syscalls.h"
 #include "multiboot.h"
+
+typedef struct {
+    char filename[100];
+    char mode[8];
+    char uid[8];
+    char gid[8];
+    char size[12];
+    char mtime[12];
+    char chksum[8];
+    char typeflag[1];
+} tar_header;
+
 #define MMAP_ENTRIES 5
 #define VIRT_OFFSET 0xC0000000
 uint32_t total_mb;
 uint32_t mem_map[MMAP_ENTRIES+1][2];
+tar_header *headers[32];
+char* tar_file;
 void switch_to_user_mode() {
   asm volatile("  \
     cli; \
@@ -107,6 +122,16 @@ void print_memory() {
   }
 }
 
+uint32_t getsize(const char *in) {
+    uint32_t size=0;
+    uint32_t j;
+    uint32_t count=1;
+    for (j=11;j > 0;j--,count*=8) {
+      size+=((in[j-1]-'0')*count);
+    }
+    return size;
+}
+
 void main(multiboot_info_t* mbd, uint32_t magic) {
   uint32_t tmp_mbd=(uint32_t)mbd;
   tmp_mbd+=VIRT_OFFSET;
@@ -117,8 +142,6 @@ void main(multiboot_info_t* mbd, uint32_t magic) {
     write_string("Multiboot magic number is incorrect. Halting.");
     halt();
   }
-  get_memory(mbd);
-  print_memory();
 	serial_full_configure(SERIAL_COM1_BASE,12);
 	write_string("Initialized COM1 at 9600 baud\n");
 	isr_install();
@@ -126,18 +149,47 @@ void main(multiboot_info_t* mbd, uint32_t magic) {
   write_string("Setup interrupts\n");
   init_gdt();
   write_string("Setup new GDT\n");
+  if ((mbd->flags&MULTIBOOT_INFO_CMDLINE)!=0) {
+    write_string("Command line:");
+    write_string((char*)(mbd->cmdline+VIRT_OFFSET));
+    write_string("\n");
+  }
+  get_memory(mbd);
+  print_memory();
   if ((mbd->flags&MULTIBOOT_INFO_MODS)!=0) {
     uint32_t mods_count=mbd->mods_count;
     if (mods_count>0) {
       while (mods_count>0) {
         multiboot_module_t* mods_addr=(multiboot_module_t*)(mbd->mods_addr+VIRT_OFFSET);
-        write_string("Module:");
-        write_string(mods_addr->cmdline);
-        write_string("\n");
-        mods_addr++;
+        if (strcmp((char*)(mods_addr->cmdline+VIRT_OFFSET),"initrd.tar")==0) {
+          tar_file=mods_addr->mod_start+VIRT_OFFSET;
+        };
         mods_count--;
       }
     }
+  }
+  for (uint32_t i=0;;i++) {
+      tar_header* header=(tar_header*)tar_file;
+      if (header->filename[0]=='\0') {
+        break;
+      }
+      uint32_t size=getsize(header->size);
+      headers[i]=header;
+      tar_file+=((size/512)+1)*512;
+      if (size%512) {
+        tar_file+=512;
+      }
+  }
+  for (int i=0;i<32;i++) {
+    if (headers[i]==0) {
+      break;
+    }
+    write_string("Got file ");
+    write_string(headers[i]->filename);
+    write_string("\n");
+    write_string("Contents:\n");
+    write_string((char*)(((uint32_t)headers[i])+512));
+    write_string("\n");
   }
 	// init_keyboard();
 	// write_string("Keyboard initialized\n");
