@@ -1,8 +1,7 @@
 #ifndef SERIAL_H
 #define SERIAL_H
+#include <stdint.h>
 
-#define SERIAL_COM1_BASE 0x3F8      /* COM1 base port */
-
-void serial_full_configure(unsigned short com, unsigned short divisor);
-void serial_write_string(unsigned short com, char *str);
+void serial_configure(uint32_t com, uint32_t rate);
+void serial_write_string(uint32_t com, char *str);
 #endif

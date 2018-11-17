@@ -1,14 +1,47 @@
 #include "string.h"
+#include <stddef.h>
+#include <stdint.h>
 
-int strlen(const char* str) {
-  int i;
-  for (i=0;str[i]!='\0';i++) {
-    continue;
-  }
+void* memcpy(void* dest_ptr,const void* source_ptr,size_t len) {
+    char* source=(char*)source_ptr;
+    char* dest=(char*)dest_ptr;
+    for(size_t i=0;i<len;i++) {
+      dest[i]=source[i];
+    }
+    return dest_ptr;
+}
+
+void* memset(void *dest_ptr,int val,size_t len) {
+    uint8_t* dest=(char*)dest_ptr;
+    for (size_t i=0;i<len;i++){
+      dest[i]=(uint8_t)val;
+    }
+    return dest_ptr;
+}
+
+int strcmp(const char* s1,const char* s2) {
+    int i;
+    for (i = 0; s1[i] == s2[i]; i++) {
+        if (s1[i] == '\0') return 0;
+    }
+    return s1[i] - s2[i];
+}
+
+size_t strlen(const char* str) {
+  size_t i;
+  for (i=0;str[i]!='\0';i++);
   return i;
 }
 
-void reverse(char* str) {
+char* strcpy(char* dest,const char* src) {
+  int i;
+  for (i=0;i<strlen(src);i++) {
+    dest[i]=src[i];
+  }
+  dest[i]='\0';
+}
+
+char* strrev(char* str) {
     char chr;
     int j;
     for (int i=0,j=strlen(str)-1;i<j;i++,j--) {
@@ -16,6 +49,7 @@ void reverse(char* str) {
       str[i]=str[j];
       str[j]=chr;
     }
+    return str;
 }
 
 void int_to_ascii(int n,char* str) {
@@ -32,7 +66,7 @@ void int_to_ascii(int n,char* str) {
       str[i++] = '-';
     }
     str[i]='\0';
-    reverse(str);
+    strrev(str);
 }
 
 void hex_to_ascii(int n, char* str) {
@@ -64,20 +98,4 @@ void append(char* s, char n) {
 void backspace(char* s) {
     int len = strlen(s);
     s[len-1] = '\0';
-}
-
-char* strcpy(char* dest,const char* src) {
-  int i;
-  for (i=0;i<strlen(src);i++) {
-    dest[i]=src[i];
-  }
-  dest[i]='\0';
-}
-
-int strcmp(char* s1, char* s2) {
-    int i;
-    for (i = 0; s1[i] == s2[i]; i++) {
-        if (s1[i] == '\0') return 0;
-    }
-    return s1[i] - s2[i];
 }

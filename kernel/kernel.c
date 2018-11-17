@@ -1,13 +1,14 @@
-#include "../drivers/vga.h"
+#include "../drivers/screen.h"
 #include "../drivers/serial.h"
-#include "../drivers/isr.h"
-#include "../drivers/gdt.h"
 #include "../drivers/keyboard.h"
 #include "../libc/string.h"
-#include "../libc/memory.h"
-#include "syscalls.h"
+#include "../libc/stdlib.h"
+#include "../cpu/cpu_init.h"
+#include "../cpu/syscalls.h"
 #include "multiboot.h"
-
+#include "kernel.h"
+#include <stdint.h>
+#define VIRT_OFFSET 0xC0000000
 typedef struct {
     char filename[100];
     char mode[8];
@@ -17,14 +18,13 @@ typedef struct {
     char mtime[12];
     char chksum[8];
     char typeflag[1];
-} tar_header;
+} __attribute__((packed)) tar_header;
 
-#define MMAP_ENTRIES 5
-#define VIRT_OFFSET 0xC0000000
 uint32_t total_mb;
 uint32_t mem_map[MMAP_ENTRIES+1][2];
 tar_header *headers[32];
 char* tar_file;
+
 void switch_to_user_mode() {
   asm volatile("  \
     cli; \
@@ -133,28 +133,25 @@ uint32_t getsize(const char *in) {
 }
 
 void main(multiboot_info_t* mbd, uint32_t magic) {
+  cpu_init();
   uint32_t tmp_mbd=(uint32_t)mbd;
   tmp_mbd+=VIRT_OFFSET;
   mbd=(multiboot_info_t*)tmp_mbd;
-	init_vga(WHITE,BLACK);
-  write_string("Initialized VGA\n");
   if (magic!=MULTIBOOT_BOOTLOADER_MAGIC) {
-    write_string("Multiboot magic number is incorrect. Halting.");
     halt();
   }
-	serial_full_configure(SERIAL_COM1_BASE,12);
+  get_memory(mbd);
+	init_screen();
+  write_string("Initialized screen\n");
+	serial_configure(1,9600);
 	write_string("Initialized COM1 at 9600 baud\n");
-	isr_install();
-	asm volatile("sti");
-  write_string("Setup interrupts\n");
-  init_gdt();
-  write_string("Setup new GDT\n");
+  init_keyboard();
+  write_string("Keyboard initialized\n");
   if ((mbd->flags&MULTIBOOT_INFO_CMDLINE)!=0) {
     write_string("Command line:");
     write_string((char*)(mbd->cmdline+VIRT_OFFSET));
     write_string("\n");
   }
-  get_memory(mbd);
   print_memory();
   if ((mbd->flags&MULTIBOOT_INFO_MODS)!=0) {
     uint32_t mods_count=mbd->mods_count;
@@ -180,22 +177,11 @@ void main(multiboot_info_t* mbd, uint32_t magic) {
         tar_file+=512;
       }
   }
-  for (int i=0;i<32;i++) {
-    if (headers[i]==0) {
-      break;
-    }
-    write_string("Got file ");
-    write_string(headers[i]->filename);
-    write_string("\n");
-    write_string("Contents:\n");
-    write_string((char*)(((uint32_t)headers[i])+512));
-    write_string("\n");
-  }
-	// init_keyboard();
-	// write_string("Keyboard initialized\n");
 	// switch_to_user_mode();
 	// syscall_write_string("MYOS V 1.0\n");
-	// while (1) {};
+  // for(;;) {
+  //   1+1;
+  // }
 }
 
 void user_input(char* buf) {};

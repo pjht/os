@@ -1,10 +1,16 @@
-C_SOURCES = $(wildcard kernel/*.c drivers/*.c libc/*.c)
-HEADERS = $(wildcard kernel/*.h drivers/*.h libc/*.h)
-OBJ = ${C_SOURCES:.c=.o kernel/boot.o drivers/interrupt.o drivers/paging_helpers.o}
-
-CC = /usr/local/bin/i386-elf-gcc
-GDB = /usr/local/bin/i386-elf-gdb
+PLAT=i386
+C_SOURCES = $(wildcard kernel/*.c drivers/$(PLAT)/*.c libc/*.c cpu/$(PLAT)/*.c)
+OBJ = $(C_SOURCES:.c=.o kernel/boot.o $(shell cat psinfo/$(PLAT)/o.txt))
+CC = $(shell cat psinfo/$(PLAT)/cc.txt)
+GDB = $(shell cat psinfo/$(PLAT)/gdb.txt)
 CFLAGS = -g
+
+run: os.iso
+	qemu-system-i386 -m 2G -d int -d cpu_reset -D qemu.log -boot d -cdrom os.iso
+
+debug: os.iso kernel/kernel.elf
+	qemu-system-i386 -s -boot d -cdrom os.iso &
+	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file kernel/kernel.elf"
 
 os.iso: kernel/kernel.elf initrd/*
 	cp kernel/kernel.elf iso/boot
@@ -12,22 +18,11 @@ os.iso: kernel/kernel.elf initrd/*
 		tar -c -f "../iso/boot/initrd.tar" *
 	grub-mkrescue -o $@ iso
 
-# Used for debugging purposes
-kernel/kernel.elf: ${OBJ}
+kernel/kernel.elf: $(OBJ)
 	i386-elf-ld -T linker.ld -o $@ $^
 
-run: os.iso
-	qemu-system-i386 -m 2G -d int -d cpu_reset -D qemu.log -boot d -cdrom os.iso
-
-# Open the connection to qemu and load our kernel-object file with symbols
-debug: os.iso kernel/kernel.elf
-	qemu-system-i386  -s -no-reboot -no-shutdown -boot d -cdrom os.iso &
-	${GDB} -ex "target remote localhost:1234" -ex "symbol-file kernel/kernel.elf"
-
-# Generic rules for wildcards
-# To make an object, always compile from its .c
-%.o: %.c ${HEADERS}
-	${CC} ${CFLAGS} -ffreestanding -c $< -o $@
+%.o: %.c h_files
+	$(CC) $(CFLAGS) -ffreestanding -c $< -o $@
 
 %.o: %.asm
 	nasm $< -f elf -o $@
@@ -35,9 +30,9 @@ debug: os.iso kernel/kernel.elf
 %.o: %.s
 	i386-elf-as $< -o $@
 
-%.bin: %.asm
-	nasm $< -f bin -o $@
+h_files: cpu/$(PLAT)/memory.h
+	rm -f cpu/memory.h
+	cp cpu/$(PLAT)/memory.h cpu/memory.h
 
 clean:
-	rm -rf */*.bin */*.o os.iso */*.elf iso/boot/initrd.tar
-	rm -rf */*.o
+	rm -rf */*/*.o */*.o cpu/memory.h os.iso */*.elf iso/boot/initrd.tar

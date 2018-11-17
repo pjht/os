@@ -1,13 +1,9 @@
-//
-// descriptor_tables.c - Initialises the GDT and IDT, and defines the
-//                       default ISR and IRQ handler.
-//                       Based on code from Bran's kernel development tutorials.
-//                       Rewritten for JamesM's kernel development tutorials.
-//
-
 #include "gdt.h"
-#include "../libc/memory.h"
+#include "seg_upd.h"
+#include "../../libc/string.h"
 #include <stdint.h>
+
+extern uint32_t int_stack_top;
 
 static void gdt_set_gate(int32_t num,uint32_t base,uint32_t limit,uint8_t access,uint8_t gran);
 static void write_tss(int32_t num, uint16_t ss0, uint32_t esp0);
@@ -19,14 +15,14 @@ tss_entry_t tss_entry;
 void init_gdt() {
     gdt_ptr.limit=(sizeof(gdt_entry_t)*6)-1;
     gdt_ptr.base =(uint32_t)&gdt_entries;
-
     gdt_set_gate(0, 0, 0, 0, 0);                // Null segment
     gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Code segment
     gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Data segment
     gdt_set_gate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // User mode code segment
     gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // User mode data segment
-    write_tss(5, 0x10, 0x80000);
+    write_tss(5, 0x10, int_stack_top);
     asm volatile("lgdt (%%eax)"::"a"((uint32_t)&gdt_ptr));
+    seg_upd();
     asm volatile("mov $0x2B, %ax; \
       ltr %ax; \
     ");
@@ -51,7 +47,7 @@ static void write_tss(int32_t num, uint16_t ss0, uint32_t esp0) {
    gdt_set_gate(num, base, limit, 0xE9, 0x00);
 
    // Ensure the descriptor is initially zero.
-   memory_set((char*)&tss_entry, 0, sizeof(tss_entry));
+   memset((void*)&tss_entry,0,sizeof(tss_entry));
    tss_entry.ss0  = ss0;  // Set the kernel stack segment.
    tss_entry.esp0 = esp0; // Set the kernel stack pointer.
 
@@ -63,8 +59,4 @@ static void write_tss(int32_t num, uint16_t ss0, uint32_t esp0) {
    // to switch to kernel mode from ring 3.
    tss_entry.cs   = 0x0b;
    tss_entry.ss = tss_entry.ds = tss_entry.es = tss_entry.fs = tss_entry.gs = 0x13;
-}
-
-void set_kernel_stack(uint32_t stack) {
-   tss_entry.esp0 = stack;
 }

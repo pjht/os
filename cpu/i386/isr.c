@@ -1,12 +1,12 @@
 #include "isr.h"
 #include "idt.h"
-#include "vga.h"
-#include "../libc/string.h"
-#include "../kernel/kernel.h"
-//#include "paging.h"
-#include <stdint.h>
 #include "ports.h"
-#include "serial.h"
+//#include "paging.h"
+#include "../../drivers/screen.h"
+#include "../../drivers/serial.h"
+#include "../../libc/string.h"
+#include "../../kernel/kernel.h"
+#include <stdint.h>
 void irq_handler(registers_t r);
 isr_t interrupt_handlers[256];
 
@@ -141,39 +141,39 @@ void isr_handler(registers_t r) {
         }
       }
     } else {
-      serial_write_string(SERIAL_COM1_BASE,"Received interrupt no ");
+      serial_write_string(1,"Received interrupt no ");
       char s[3];
       int_to_ascii(r.int_no, s);
-      serial_write_string(SERIAL_COM1_BASE,s);
-      serial_write_string(SERIAL_COM1_BASE,". (");
-      serial_write_string(SERIAL_COM1_BASE,exception_messages[r.int_no]);
-      serial_write_string(SERIAL_COM1_BASE,")\n");
+      serial_write_string(1,s);
+      serial_write_string(1,". (");
+      serial_write_string(1,exception_messages[r.int_no]);
+      serial_write_string(1,")\n");
       if (r.int_no==14) {
         uint32_t addr;
         asm("movl %%cr2,%0": "=r"(addr));
         if (r.err_code==0) {
-          serial_write_string(SERIAL_COM1_BASE,"Kernel process tried to read a non-present page entry ");
+          serial_write_string(1,"Kernel process tried to read a non-present page entry ");
         } else if (r.err_code==1) {
-          serial_write_string(SERIAL_COM1_BASE,"Kernel process tried to read a page and caused a protection fault ");
+          serial_write_string(1,"Kernel process tried to read a page and caused a protection fault ");
         } else if (r.err_code==2) {
-          serial_write_string(SERIAL_COM1_BASE,"Kernel process tried to write to a non-present page entry ");
+          serial_write_string(1,"Kernel process tried to write to a non-present page entry ");
         } else if (r.err_code==3) {
-          serial_write_string(SERIAL_COM1_BASE,"Kernel process tried to write a page and caused a protection fault ");
+          serial_write_string(1,"Kernel process tried to write a page and caused a protection fault ");
         } else if (r.err_code==4) {
-          serial_write_string(SERIAL_COM1_BASE,"User process tried to read a non-present page entry ");
+          serial_write_string(1,"User process tried to read a non-present page entry ");
         } else if (r.err_code==5) {
-          serial_write_string(SERIAL_COM1_BASE,"User process tried to read a page and caused a protection fault ");
+          serial_write_string(1,"User process tried to read a page and caused a protection fault ");
         } else if (r.err_code==6) {
-          serial_write_string(SERIAL_COM1_BASE,"User process tried to write to a non-present page entry ");
+          serial_write_string(1,"User process tried to write to a non-present page entry ");
         } else if (r.err_code==7) {
-          serial_write_string(SERIAL_COM1_BASE,"User process tried to write a page and caused a protection fault ");
+          serial_write_string(1,"User process tried to write a page and caused a protection fault ");
         }
         char str[20];
         str[0]='\0';
         hex_to_ascii(addr,str);
-        serial_write_string(SERIAL_COM1_BASE,"at address ");
-        serial_write_string(SERIAL_COM1_BASE,str);
-        serial_write_string(SERIAL_COM1_BASE,"\n");
+        serial_write_string(1,"at address ");
+        serial_write_string(1,str);
+        serial_write_string(1,"\n");
         asm volatile("hlt");
         // if ((r.err_code&1)==0) {
         //   int dir_entry=(addr&0xFFC00000)>>22;

@@ -1,15 +1,18 @@
-#include "ports.h"
-#include "vga.h"
-#include "../libc/memory.h"
+#include "../../cpu/i386/ports.h"
+#include "../screen.h"
+#include "../../libc/string.h"
 
 #define SCREEN_CTRL 0x3d4
 #define SCREEN_DATA 0x3d5
 #define VIDEO_MEMORY 0xc00b8000
 #define VIDEO_MEMORY_PG1 0xc00b8fa0
+#define COLOR 0xF
+#define VGA_WIDTH 80
+#define VGA_HEIGHT 25
+
 static char* video_memory;
 static char x;
 static char y;
-static char color;
 
 
 void set_cursor_offset(int offset);
@@ -18,13 +21,10 @@ int get_offset(int x,int y) {
   return 2*(y*VGA_WIDTH+x);
 }
 
-void init_vga(VGA_COLOR txt,VGA_COLOR bg) {
+void init_screen() {
   video_memory=(char*)VIDEO_MEMORY;
   x=0;
   y=0;
-  color=(int)bg;
-  color=color<<4;
-  color=color|txt;
   clear_screen();
 }
 
@@ -32,9 +32,9 @@ void write_string(const char *string) {
     char c;
     while(*string!=0) {
       if (y==25) {
-        memory_copy((char*)(VIDEO_MEMORY+get_offset(0,1)),(char*)VIDEO_MEMORY_PG1,get_offset(0,24));
+        memcpy((void*)(VIDEO_MEMORY+get_offset(0,1)),(void*)VIDEO_MEMORY_PG1,get_offset(0,24));
         clear_screen();
-        memory_copy((char*)VIDEO_MEMORY_PG1,(char*)VIDEO_MEMORY,get_offset(0,25));
+        memcpy((void*)VIDEO_MEMORY_PG1,(void*)VIDEO_MEMORY,get_offset(0,25));
         x=0;
         y=24;
       }
@@ -47,7 +47,7 @@ void write_string(const char *string) {
         continue;
       }
       video_memory[get_offset(x,y)]=c;
-      video_memory[get_offset(x,y)+1]=color;
+      video_memory[get_offset(x,y)+1]=COLOR;
       x++;
       if (x==80) {
         x=0;
@@ -61,7 +61,7 @@ void screen_backspace() {
   if (x>0) {
     x--;
     video_memory[get_offset(x,y)]=' ';
-    video_memory[get_offset(x,y)+1]=color;
+    video_memory[get_offset(x,y)+1]=COLOR;
     set_cursor_offset(get_offset(x,y));
   }
 }
@@ -71,7 +71,7 @@ void clear_screen() {
   int y=0;
   while (y<25) {
     video_memory[get_offset(x,y)]=' ';
-    video_memory[get_offset(x,y)+1]=color;
+    video_memory[get_offset(x,y)+1]=COLOR;
     x++;
     if(x==80) {
       x=0;

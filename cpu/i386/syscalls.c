@@ -1,5 +1,4 @@
-#include "../drivers/isr.h"
-#include <stdint.h>
+#include "isr.h"
 
 void syscall_write_string(char* str) {
   asm volatile("int $80"::"a"(0),"b"(str));

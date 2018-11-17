@@ -4,5 +4,6 @@
 *.elf
 */*.o
 bochsout.txt
-oldkernel/*
 stuff/*
+cpu/memory.h
+os.iso
