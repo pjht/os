@@ -191,8 +191,8 @@ void main(multiboot_info_t* mbd) {
     }
   }
   timer_init();
-  klog("INFO","Waiting for 1 second");
-  wait(1000);
+  // klog("INFO","Waiting for 1 second");
+  // wait(1000);
   pci_init();
   tasking_init();
   // uint32_t pid=fork();
