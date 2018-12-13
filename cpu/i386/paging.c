@@ -57,7 +57,7 @@ void* virt_to_phys(void* virt_addr_ptr) {
   int table_num=(virt_addr&0x3FF000)>>12;
   int offset=(virt_addr&0xFFF);
   uint32_t table_entry=page_tables[(dir_num*1024)+table_num];
-  table_entry=table_entry*0xFFFFF000;
+  table_entry=table_entry&0xFFFFF000;
   return (void*)(table_entry+offset);
 
 }

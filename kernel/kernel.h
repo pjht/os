@@ -7,6 +7,6 @@
 extern uint32_t total_mb;
 extern uint32_t mem_map[MMAP_ENTRIES+1][2];
 
-void user_input(char* str);
-void kgets(char* buf);
+void got_key(char key);
+
 #endif

@@ -1,6 +1,7 @@
 #include "string.h"
 #include <stddef.h>
 #include <stdint.h>
+#include "stdlib.h"
 
 void* memcpy(void* dest_ptr,const void* source_ptr,size_t len) {
     char* source=(char*)source_ptr;
@@ -12,9 +13,9 @@ void* memcpy(void* dest_ptr,const void* source_ptr,size_t len) {
 }
 
 void* memset(void *dest_ptr,int val,size_t len) {
-    uint8_t* dest=(char*)dest_ptr;
+    char* dest=(char*)dest_ptr;
     for (size_t i=0;i<len;i++){
-      dest[i]=(uint8_t)val;
+      dest[i]=(char)val;
     }
     return dest_ptr;
 }
@@ -39,6 +40,7 @@ char* strcpy(char* dest,const char* src) {
     dest[i]=src[i];
   }
   dest[i]='\0';
+  return dest;
 }
 
 char* strrev(char* str) {
@@ -98,4 +100,38 @@ void append(char* s, char n) {
 void backspace(char* s) {
     int len = strlen(s);
     s[len-1] = '\0';
+}
+
+char* strtok_str=NULL;
+size_t strtok_index;
+
+char strtok_delim_check(char* delim) {
+  for (int i=0;i<strlen(delim);i++) {
+    if (strtok_str[strtok_index]==delim[i]||strtok_str[strtok_index]=='\0') {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+char* strtok(char* str, const char* delim) {
+  if (str!=NULL) {
+    strtok_str=str;
+    strtok_index=0;
+  }
+  if (!strtok_str || strtok_index>strlen(strtok_str)) {
+    return NULL;
+  }
+  char* tok=malloc(sizeof(char)*32);
+  tok[0]='\0';
+  size_t max_len=32;
+  for (;strtok_delim_check(delim);strtok_index++) {
+    if (strlen(tok)+1==max_len) {
+      tok=realloc(tok,sizeof(char)*(max_len+32));
+      max_len+=32;
+    }
+    append(tok,strtok_str[strtok_index]);
+  }
+  strtok_index++;
+  return tok;
 }

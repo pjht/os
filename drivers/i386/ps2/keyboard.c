@@ -1,9 +1,11 @@
-#include "../keyboard.h"
-#include "../../cpu/i386/ports.h"
-#include "../screen.h"
-#include "../../cpu/i386/isr.h"
-#include "../../libc/string.h"
-#include "../../kernel/kernel.h"
+#include "keyboard.h"
+#include "../ps2.h"
+#include "../../screen.h"
+#include "../../../libc/stdio.h"
+#include "../../../cpu/i386/isr.h"
+#include "../../../libc/string.h"
+#include "../../../kernel/kernel.h"
+#include "../../../kernel/klog.h"
 #include <stdint.h>
 
 #define BACKSPACE 0x0E
@@ -13,7 +15,6 @@
 #define RSHIFT 0x36
 #define LSHIFTUP 0xAA
 #define RSHIFTUP 0xB6
-static char key_buffer[256];
 
 const char *sc_name[] = { "ERROR", "Esc", "1", "2", "3", "4", "5", "6",
     "7", "8", "9", "0", "-", "=", "Backspace", "Tab", "Q", "W", "E",
@@ -40,10 +41,10 @@ int caps=0;
 int shift=0;
 
 static void keyboard_callback(registers_t regs) {
-    uint8_t scancode=port_byte_in(0x60);
+    uint8_t scancode=ps2_read_data();
     if (scancode==BACKSPACE) {
-      backspace(key_buffer);
-      screen_backspace();
+      // screen_backspace();
+      // got_key('\b');
     } else if (scancode==CAPS) {
       caps=!caps;
     } else if (scancode==LSHIFT || scancode==RSHIFT) {
@@ -51,11 +52,9 @@ static void keyboard_callback(registers_t regs) {
     } else if (scancode==LSHIFTUP || scancode==RSHIFTUP) {
       shift=0;
     } else if (scancode==ENTER) {
-      write_string("\n");
-      append(key_buffer,'\n');
-      user_input(key_buffer);
-      key_buffer[0]='\0';
-    } else if (scancode <=58) {
+      screen_write_string("\n");
+      got_key('\n');
+    } else if (scancode<=58) {
       char letter;
       if (shift) {
         letter=sc_shift_ascii[(int)scancode];
@@ -65,11 +64,14 @@ static void keyboard_callback(registers_t regs) {
         letter=sc_ascii[(int)scancode];
       }
       char str[2]={letter,'\0'};
-      append(key_buffer,letter);
-      write_string(str);
+      screen_write_string(str);
+      got_key(letter);
     }
 }
 
-void init_keyboard() {
-  register_interrupt_handler(IRQ1, keyboard_callback);
+void init_keyboard(char port) {
+  ps2_send_cmd_w_data_to_device(port,0xF0,1);
+  ps2_send_cmd_to_device(port,0xF4);
+  register_interrupt_handler(PS2_PORT_INT(port), keyboard_callback);
+  klog("INFO","Registered keyboard driver on PS/2 port %d",port);
 }

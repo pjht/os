@@ -1,4 +1,4 @@
-#ifndef CPU_RAM_H
+#ifndef CPU_MEMORY_H
 #define CPU_MEMORY_H
 
 #include <stdint.h>

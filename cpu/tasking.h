@@ -2,7 +2,8 @@
 #define TASKING_H
 #include <stdint.h>
 
-void init_tasking();
-void fork();
+void tasking_init();
+uint32_t fork();
+void yield();
 
 #endif

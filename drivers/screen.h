@@ -1,9 +1,9 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
-void init_screen();
-void write_string(const char *string);
-void clear_screen();
+void screen_init();
+void screen_write_string(const char *string);
+void screen_clear();
 void screen_backspace();
 
 #endif

@@ -48,6 +48,8 @@ boot_page_table4:
 .global _start
 .type _start, @function
 _start:
+	cmp $0x2BADB002, %eax
+	jnz no_multiboot
 	# Physical address of boot_page_tables.
 	# TODO: I recall seeing some assembly that used a macro to do the
 	#       conversions to and from physical. Maybe this should be done in this
@@ -115,11 +117,12 @@ _start:
 	mov $stack_top, %esp
 
 	# Enter the high-level kernel.
-	push %eax
+	add $0xC0000000, %ebx
 	push %ebx
 	call main
 
 	# Infinite loop if the system has nothing more to do.
+	no_multiboot:
 	cli
 1:	hlt
 	jmp 1b

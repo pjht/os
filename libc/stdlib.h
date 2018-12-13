@@ -6,6 +6,7 @@
 #define EXIT_FAILURE 1
 
 void* malloc(size_t size);
+void* realloc(void *mem, size_t new_sz);
 void free(void* mem);
 
 #endif
