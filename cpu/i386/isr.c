@@ -2,11 +2,11 @@
 #include "idt.h"
 #include "ports.h"
 //#include "paging.h"
-#include "../../drivers/screen.h"
 //#include "../../drivers/serial.h"
 #include "../../libc/string.h"
 #include "../halt.h"
 #include "../../kernel/kernel.h"
+#include "../../kernel/klog.h"
 #include <stdint.h>
 void irq_handler(registers_t r);
 isr_t interrupt_handlers[256];
@@ -121,72 +121,51 @@ char *exception_messages[] = {
 };
 
 void isr_handler(registers_t r) {
-    if (r.int_no==80) {
-      switch (r.eax) {
-        default: {
-          char num[10];
-          int_to_ascii(r.eax, num);
-          screen_write_string("PANIC: Invalid syscall no ");
-          screen_write_string(num);
-          screen_write_string("\n");
-          asm volatile("hlt");
-        }
+  switch (r.int_no) {
+    case 13:
+      1;
+      break;
+    case 14: {
+      uint32_t addr;
+      asm("movl %%cr2,%0": "=r"(addr));
+      if (r.err_code==0) {
+        klog("PANIC","Kernel process tried to read a non-present page entry at address %x",addr);
+      } else if (r.err_code==1) {
+        klog("PANIC","Kernel process tried to read a page and caused a protection fault at address %x",addr);
+      } else if (r.err_code==2) {
+        klog("PANIC","Kernel process tried to write to a non-present page entry at address %x",addr);
+      } else if (r.err_code==3) {
+        klog("PANIC","Kernel process tried to write a page and caused a protection fault at address %x",addr);
+      } else if (r.err_code==4) {
+        klog("PANIC","User process tried to read a non-present page entry at address %x",addr);
+      } else if (r.err_code==5) {
+        klog("PANIC","User process tried to read a page and caused a protection fault at address %x",addr);
+      } else if (r.err_code==6) {
+        klog("PANIC","User process tried to write to a non-present page entry at address %x",addr);
+      } else if (r.err_code==7) {
+        klog("PANIC","User process tried to write a page and caused a protection fault at address %x",addr);
       }
-    } else {
-      // serial_write_string(1,"Received interrupt no ");
-      // char s[3];
-      // int_to_ascii(r.int_no, s);
-      // serial_write_string(1,s);
-      // serial_write_string(1,". (");
-      // serial_write_string(1,exception_messages[r.int_no]);
-      // serial_write_string(1,")\n");
-      if (r.int_no==14) {
-        uint32_t addr;
-        asm("movl %%cr2,%0": "=r"(addr));
-        // if (r.err_code==0) {
-        //   serial_write_string(1,"Kernel process tried to read a non-present page entry ");
-        // } else if (r.err_code==1) {
-        //   serial_write_string(1,"Kernel process tried to read a page and caused a protection fault ");
-        // } else if (r.err_code==2) {
-        //   serial_write_string(1,"Kernel process tried to write to a non-present page entry ");
-        // } else if (r.err_code==3) {
-        //   serial_write_string(1,"Kernel process tried to write a page and caused a protection fault ");
-        // } else if (r.err_code==4) {
-        //   serial_write_string(1,"User process tried to read a non-present page entry ");
-        // } else if (r.err_code==5) {
-        //   serial_write_string(1,"User process tried to read a page and caused a protection fault ");
-        // } else if (r.err_code==6) {
-        //   serial_write_string(1,"User process tried to write to a non-present page entry ");
-        // } else if (r.err_code==7) {
-        //   serial_write_string(1,"User process tried to write a page and caused a protection fault ");
-        // }
-        // char str[20];
-        // str[0]='\0';
-        // hex_to_ascii(addr,str);
-        // serial_write_string(1,"at address ");
-        // serial_write_string(1,str);
-        // serial_write_string(1,"\n");
-        // write_string("PANIC: Page fault!");
-        // if ((r.err_code&1)==0) {
-        //   int dir_entry=(addr&0xFFC00000)>>22;
-        //   int table_entry=(addr&0x3FF000)>12;
-        //   if (dir_entry_present(dir_entry)) {
-        //     set_table_entry(dir_entry,table_entry,((dir_entry*1024)+table_entry)*0x1000,1,1,1);
-        //     for(int page=0;page<1024;page++) {
-        //       asm volatile("invlpg (%0)"::"r"(((dir_entry*1024)+page)*0x1000):"memory");
-        //     }
-        //   } else {
-        //     for(int page=0;page<1024;page++) {
-        //       set_table_entry(dir_entry,page,0x0,1,1,0);
-        //     }
-        //     set_table_entry(dir_entry,table_entry,((dir_entry*1024)+table_entry)*0x1000,1,1,1);
-        //     set_directory_entry(dir_entry,dir_entry,1,1,1);
+      if ((r.err_code&1)==0) {
+        // int dir_entry=(addr&0xFFC00000)>>22;
+        // int table_entry=(addr&0x3FF000)>12;
+        // if (dir_entry_present(dir_entry)) {
+        //   set_table_entry(dir_entry,table_entry,((dir_entry*1024)+table_entry)*0x1000,1,1,1);
+        //   for(int page=0;page<1024;page++) {
+        //     asm volatile("invlpg (%0)"::"r"(((dir_entry*1024)+page)*0x1000):"memory");
         //   }
-        //   return;
+        // } else {
+        //   for(int page=0;page<1024;page++) {
+        //     set_table_entry(dir_entry,page,0x0,1,1,0);
+        //   }
+        //   set_table_entry(dir_entry,table_entry,((dir_entry*1024)+table_entry)*0x1000,1,1,1);
+        //   set_directory_entry(dir_entry,dir_entry,1,1,1);
         // }
+        // return;
       }
       halt();
+      break;
     }
+  }
 }
 
 

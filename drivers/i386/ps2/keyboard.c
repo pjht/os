@@ -52,7 +52,7 @@ static void keyboard_callback(registers_t regs) {
     } else if (scancode==LSHIFTUP || scancode==RSHIFTUP) {
       shift=0;
     } else if (scancode==ENTER) {
-      screen_write_string("\n");
+      putc('\n');
       got_key('\n');
     } else if (scancode<=58) {
       char letter;
@@ -64,8 +64,7 @@ static void keyboard_callback(registers_t regs) {
         letter=sc_ascii[(int)scancode];
       }
       char str[2]={letter,'\0'};
-      screen_write_string(str);
-      got_key(letter);
+      putc(letter);
     }
 }
 

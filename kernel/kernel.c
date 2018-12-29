@@ -21,6 +21,7 @@
 #include "kernel.h"
 #include "vfs.h"
 #include "klog.h"
+#include "pppp.h"
 #include "elf.h"
 
 #include <stdint.h>
@@ -35,26 +36,27 @@ uint32_t initrd_sz;
 devbuf* kbd_buf;
 
 void switch_to_user_mode() {
-  asm volatile("  \
-    cli; \
-    mov $0x23, %ax; \
-    mov %ax, %ds; \
-    mov %ax, %es; \
-    mov %ax, %fs; \
-    mov %ax, %gs; \
-                  \
-    mov %esp, %eax; \
-    pushl $0x23; \
-    pushl %eax; \
-    pushf; \
-    pop %eax; \
-    or $0x200,%eax; \
-    push %eax; \
-    pushl $0x1B; \
-    push $1f; \
-    iret; \
-  1: \
-    ");
+   // Set up a stack structure for switching to user mode.
+   asm volatile("  \
+     cli; \
+     mov $0x23, %ax; \
+     mov %ax, %ds; \
+     mov %ax, %es; \
+     mov %ax, %fs; \
+     mov %ax, %gs; \
+                   \
+     mov %esp, %eax; \
+     pushl $0x23; \
+     pushl %eax; \
+     pushf; \
+     pop %eax; \
+     or $0x200,%eax; \
+     push %eax; \
+     pushl $0x1B; \
+     push $1f; \
+     iret; \
+   1: \
+     ");
 }
 
 void get_memory(multiboot_info_t* mbd) {
@@ -194,156 +196,11 @@ void main(multiboot_info_t* mbd) {
   // klog("INFO","Waiting for 1 second");
   // wait(1000);
   pci_init();
+  //pppp_init();
   tasking_init();
-  // uint32_t pid=fork();
-  // if (pid==0) {
-  //   while (1) {
-  //     printf("Child\n");
-  //     yield();
-  //   }
-  // } else {
-  //   while (1) {
-  //     printf("Parent. Child PID:%d\n",pid);
-  //     yield();
-  //   }
-  // }
-  printf(">");
-  while (1) {
-    char str[256];
-    fgets(str,256,stdin);
-    str[strlen(str)-1]='\0';
-    char* cmd=strtok(str," ");
-    if (strcmp(cmd,"cat")==0) {
-      char* file=strtok(NULL," ");
-      FILE* fd=fopen(file,"r");
-      if (fd!=NULL) {
-        for (char c=fgetc(fd);c!=EOF;c=fgetc(fd)) {
-          putc(c);
-        }
-      }
-    }
-    if (strcmp(cmd,"mount")==0) {
-      char* dev=strtok(NULL," ");
-      char* mntpnt=strtok(NULL," ");
-      char* type=strtok(NULL," ");
-      mount(mntpnt,dev,type);
-      free(mntpnt);
-      free(dev);
-      free(type);
-    }
-    if (strcmp(cmd,"pci")==0) {
-      char* subcmd=strtok(NULL," ");
-      if (strcmp(subcmd,"list")==0) {
-        for (int i=0;i<pci_num_devs;i++) {
-          pci_dev_common_info* info=pci_devs[i];
-          printf("PCI device %d:\n  Main class:",i);
-          switch (info->class_code) {
-            case PCI_CLASS_UNCLASSIFIED:
-              printf("Unclassified\n");
-              break;
-            case PCI_CLASS_STORAGE:
-              printf("Storage\n");
-              break;
-            case PCI_CLASS_NETWORK:
-              printf("Network\n");
-              break;
-            case PCI_CLASS_DISPLAY:
-              printf("Display\n");
-              break;
-            case PCI_CLASS_MULTIMEDIA:
-              printf("Multimedia\n");
-              break;
-            case PCI_CLASS_MEMORY:
-              printf("Memory\n");
-              break;
-            case PCI_CLASS_BRIDGE:
-              printf("Bridge\n");
-              break;
-            case PCI_CLASS_SIMPCOM:
-              printf("Simpcom\n");
-              break;
-            case PCI_CLASS_BASEPERIPH:
-              printf("Baseperiph\n");
-              break;
-            case PCI_CLASS_INPDEV:
-              printf("Inpdev\n");
-              break;
-            case PCI_CLASS_DOCK:
-              printf("Dock\n");
-              break;
-            case PCI_CLASS_CPU:
-              printf("Cpu\n");
-              break;
-            case PCI_CLASS_SERBUS:
-              printf("Serbus\n");
-              break;
-            case PCI_CLASS_WIRELESS:
-              printf("Wireless\n");
-              break;
-            case PCI_CLASS_INTELLIGENT:
-              printf("Intelligent\n");
-              break;
-            case PCI_CLASS_SATELLITE:
-              printf("Satellite\n");
-              break;
-            case PCI_CLASS_ENCRYPTION:
-              printf("Encryption\n");
-              break;
-            case PCI_CLASS_SIGPROCESS:
-              printf("Sigprocess\n");
-              break;
-          }
-        }
-      }
-      if (strcmp(subcmd,"cfgdmp")==0) {
-        char* devnumstr=strtok(NULL," ");
-        devnumstr=strrev(devnumstr);
-        uint32_t devnum=0;
-        uint32_t x=1;
-        for (int i=0;i<strlen(devnumstr);i++) {
-          devnum+=(devnumstr[i]-0x30)*x;
-          x=x*10;
-        }
-        free(devnumstr);
-        uint8_t* info=(uint8_t*)pci_devs[devnum];
-        for (int i=0;i<16;i++) {
-          printf("%x ",info[i]);
-        }
-        printf("\n");
-      }
-      free(subcmd);
-    }
-    if (strcmp(cmd,"rdelf")==0) {
-      FILE* file=fopen(strtok(NULL," "),"r");
-      elf_header* header=malloc(sizeof(elf_header));
-      fread(header,sizeof(elf_header),1,file);
-      fseek(file,header->prog_hdr,SEEK_SET);
-      elf_pheader** p_ents=malloc(sizeof(elf_pheader*)*header->pheader_ent_nm);
-      for (int i=0;i<header->pheader_ent_nm;i++) {
-        p_ents[i]=malloc(sizeof(elf_pheader));
-        fread(p_ents[i],sizeof(elf_pheader),1,file);
-      }
-      for (int i=0;i<header->pheader_ent_nm;i++) {
-        if (p_ents[i]->type!=1) {
-          continue;
-        }
-        printf("Copy %d bytes starting at %x in the file to the virtual address %x\n",p_ents[i]->filesz,p_ents[i]->offset,p_ents[i]->vaddr);
-        char* mem=alloc_memory(1);
-        for (size_t j=0;j<p_ents[i]->memsz;j++) {
-          mem[i]=0;
-        }
-        fseek(file,p_ents[i]->offset,SEEK_SET);
-        fread(mem,1,p_ents[i]->filesz,file);
-        alloc_pages(p_ents[i]->vaddr,virt_to_phys(mem),1,1,1,page_directory,page_tables);
-        int (*start)()=header->entry;
-        int ret=start();
-        printf("Return val:%d",ret);
-      }
-    }
-    free(cmd);
-    printf(">");
-  }
-	switch_to_user_mode();
+  //port_byte_out(0,0);
+  switch_to_user_mode();
+  printf("U");
   for(;;);
 }
 

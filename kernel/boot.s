@@ -123,6 +123,4 @@ _start:
 
 	# Infinite loop if the system has nothing more to do.
 	no_multiboot:
-	cli
-1:	hlt
-	jmp 1b
+	loop: jmp loop

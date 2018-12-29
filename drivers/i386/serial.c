@@ -115,12 +115,7 @@ int serial_dev_drv(char* filename,int c,long pos,char wr) {
   }
   if (wr) {
     while (!serial_is_transmit_fifo_empty(com)) continue;
-    if (c=='\n') {
-      port_byte_out(serial_data_port(com),'\r');
-      port_byte_out(serial_data_port(com),'\n');
-    } else {
-      port_byte_out(serial_data_port(com),c);
-    }
+    port_byte_out(serial_data_port(com),c);
     return 0;
   } else {
     return devbuf_get(bufs[com]);

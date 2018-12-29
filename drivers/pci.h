@@ -4,8 +4,8 @@
 typedef struct {
   uint16_t vend_id;
   uint16_t dev_id;
-  uint16_t status;
   uint16_t command;
+  uint16_t status;
   uint8_t rev_id;
   uint8_t prog_if;
   uint8_t subclass;

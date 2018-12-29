@@ -83,9 +83,9 @@ void screen_clear() {
 }
 
 void screen_set_cursor_offset(int offset) {
-  offset/=2;
-  port_byte_out(SCREEN_CTRL,14);
-  port_byte_out(SCREEN_DATA,(unsigned char)(offset>>8));
-  port_byte_out(SCREEN_CTRL,15);
-  port_byte_out(SCREEN_DATA,(unsigned char)(offset&0xff));
+  // offset/=2;
+  // port_byte_out(SCREEN_CTRL,14);
+  // port_byte_out(SCREEN_DATA,(unsigned char)(offset>>8));
+  // port_byte_out(SCREEN_CTRL,15);
+  // port_byte_out(SCREEN_DATA,(unsigned char)(offset&0xff));
 }
