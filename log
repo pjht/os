@@ -1,0 +1,33 @@
+[INFO] First PS/2 port OK
+[INFO] Keyboard on PS/2 port 1
+[INFO] Registered keyboard driver on PS/2 port 1
+[INFO] Finished initializing PS/2 driver
+[INFO] Scanning for serial ports
+[INFO] Found COM1
+[INFO] Found COM2
+[INFO] Scanning for parallel ports
+[INFO] Found LPT1
+[INFO] Found PCI device. Class code:0x6, Subclass:0x0 Prog IF:0x0
+[INFO] Found PCI device. Class code:0x6, Subclass:0x1 Prog IF:0x0
+[INFO] Found PCI device. Class code:0x1, Subclass:0x1 Prog IF:0x80
+[INFO] Found PCI device. Class code:0x6, Subclass:0x80 Prog IF:0x0
+[INFO] Found PCI device. Class code:0x3, Subclass:0x0 Prog IF:0x0
+[INFO] Found PCI device. Class code:0x2, Subclass:0x0 Prog IF:0x0
+[INFO] Found network controller, detecting type
+[INFO] Unknown network card
+>pci list (Shows PCI devices and types)
+PCI device 0:
+  Main class:Bridge
+PCI device 1:
+  Main class:Bridge
+PCI device 2:
+  Main class:Storage
+PCI device 3:
+  Main class:Bridge
+PCI device 4:
+  Main class:Display
+PCI device 5:
+  Main class:Network
+>cat /hi.txt (Outputs contents of file)
+Hello!
+This is hi.txt!

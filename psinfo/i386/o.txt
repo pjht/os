@@ -1,0 +1,2 @@
+cpu/i386/paging_helpers.o
+kernel/boot.o

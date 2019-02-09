@@ -1,0 +1,126 @@
+# Declare constants for the multiboot header.
+.set ALIGN,    1<<0             # align loaded modules on page boundaries
+.set MEMINFO,  1<<1             # provide memory map
+.set FLAGS,    ALIGN | MEMINFO  # this is the Multiboot 'flag' field
+.set MAGIC,    0x1BADB002       # 'magic number' lets bootloader find the header
+.set CHECKSUM, -(MAGIC + FLAGS) # checksum of above, to prove we are multiboot
+
+# Declare a multiboot header that marks the program as a kernel.
+.section .multiboot
+.align 4
+.long MAGIC
+.long FLAGS
+.long CHECKSUM
+
+# Allocate the initial stack.
+.section .bootstrap_stack, "aw", @nobits
+stack_bottom:
+.skip 16384 # 16 KiB
+stack_top:
+
+.global int_stack_top
+
+.section .interrupt_stack, "aw", @nobits
+int_stack_bottom:
+.skip 16384 # 16 KiB
+int_stack_top:
+
+# Preallocate pages used for paging. Don't hard-code addresses and assume they
+# are available, as the bootloader might have loaded its multiboot structures or
+# modules there. This lets the bootloader know it must avoid the addresses.
+.section .bss, "aw", @nobits
+	.align 4096
+boot_page_directory:
+	.skip 4096
+boot_page_tables:
+boot_page_table1:
+	.skip 4096
+boot_page_table2:
+	.skip 4096
+boot_page_table3:
+	.skip 4096
+boot_page_table4:
+	.skip 4096
+# Further page tables may be required if the kernel grows beyond 3 MiB.
+
+# The kernel entry point.
+.section .text
+.global _start
+.type _start, @function
+_start:
+	cmp $0x2BADB002, %eax
+	jnz no_multiboot
+	# Physical address of boot_page_tables.
+	# TODO: I recall seeing some assembly that used a macro to do the
+	#       conversions to and from physical. Maybe this should be done in this
+	#       code as well?
+	movl $(boot_page_tables - 0xC0000000), %edi
+	# First address to map is address 0.
+	# TODO: Start at the first kernel page instead. Alternatively map the first
+	#       1 MiB as it can be generally useful, and there's no need to
+	#       specially map the VGA buffer.
+	movl $0, %esi
+	# Map 4096 pages.
+	movl $4096, %ecx
+
+1:
+	# Map physical address as "present, writable". Note that this maps
+	# .text and .rodata as writable. Mind security and map them as non-writable.
+	movl %esi, %edx
+	orl $0x007, %edx
+	movl %edx, (%edi)
+
+	# Size of page is 4096 bytes.
+	addl $4096, %esi
+	# Size of entries in boot_page_tables is 4 bytes.
+	addl $4, %edi
+	# Loop to the next entry if we haven't finished.
+	loop 1b
+
+	# The page table is used at both page directory entry 0 (virtually from 0x0
+	# to 0x3FFFFF) (thus identity mapping the kernel) and page directory entry
+	# 768 (virtually from 0xC0000000 to 0xC03FFFFF) (thus mapping it in the
+	# higher half). The kernel is identity mapped because enabling paging does
+	# not change the next instruction, which continues to be physical. The CPU
+	# would instead page fault if there was no identity mapping.
+
+	# Map the page table to both virtual addresses 0x00000000 and 0xC0000000.
+	movl $(boot_page_table1 - 0xC0000000 + 0x007), boot_page_directory - 0xC0000000 + 0
+	movl $(boot_page_table1 - 0xC0000000 + 0x007), boot_page_directory - 0xC0000000 + 768 * 4
+	movl $(boot_page_table2 - 0xC0000000 + 0x007), boot_page_directory - 0xC0000000 + 769 * 4
+	movl $(boot_page_table3 - 0xC0000000 + 0x007), boot_page_directory - 0xC0000000 + 770 * 4
+	movl $(boot_page_table4 - 0xC0000000 + 0x007), boot_page_directory - 0xC0000000 + 771 * 4
+	# Set cr3 to the address of the boot_page_directory.
+	movl $(boot_page_directory - 0xC0000000), %ecx
+	movl %ecx, %cr3
+
+	# Enable paging and the write-protect bit.
+	movl %cr0, %ecx
+	orl $0x80010000, %ecx
+	movl %ecx, %cr0
+
+	# Jump to higher half with an absolute jump.
+	lea 4f, %ecx
+	jmp *%ecx
+
+4:
+	# At this point, paging is fully set up and enabled.
+
+	# Unmap the identity mapping as it is now unnecessary.
+	movl $0, boot_page_directory + 0
+
+	# Reload crc3 to force a TLB flush so the changes to take effect.
+	movl %cr3, %ecx
+	movl %ecx, %cr3
+
+	# Set up the stack.
+	mov $stack_top, %esp
+
+	# Enter the high-level kernel.
+	add $0xC0000000, %ebx
+	push %ebx
+	call kmain
+
+	# Infinite loop if the system has nothing more to do.
+	no_multiboot:
+	loop: jmp loop
