@@ -1,4 +1,5 @@
 #include "../cpu/cpu_init.h"
+#include "../drivers/vga.h"
 #include <grub/text_fb_info.h>
 #include <stdlib.h>
 #include "multiboot.h"
@@ -15,4 +16,5 @@ void kmain(multiboot_info_t* header) {
     info.width=80;
     info.height=25;
   }
+  vga_init(info);
 }
