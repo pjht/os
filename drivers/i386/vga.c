@@ -4,8 +4,8 @@
 char* screen;
 int width;
 int height;
-vga_colors fg_color=VGA_WHITE;
-vga_colors bg_color=VGA_BLACK;
+vga_colors fg_color;
+vga_colors bg_color;
 
 void vga_set_char(int x,int y,char c) {
   screen[xy_to_mem(x,y)]=c;
@@ -13,6 +13,8 @@ void vga_set_char(int x,int y,char c) {
 }
 
 void vga_init(text_fb_info framebuffer_info) {
+  fg_color=VGA_WHITE;
+  bg_color=VGA_BLACK;
   screen=framebuffer_info.address;
   width=framebuffer_info.width;
   height=framebuffer_info.height;
