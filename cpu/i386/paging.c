@@ -64,7 +64,7 @@ void* virt_to_phys(void* virt_addr_ptr) {
 
 
 
-void init_paging() {
+void paging_init() {
   alloc_kern_pages(NUM_KERN_DIRS*1024,1);
   load_page_directory((uint32_t*)((uint32_t)page_directory-0xC0000000));
 }

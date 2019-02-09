@@ -15,7 +15,7 @@ void alloc_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,
 void* alloc_kern_pages(int num_pages,char wr);
 int dir_entry_present(int entry);
 void* virt_to_phys(void* virt_addr_ptr);
-void init_paging();
+void paging_init();
 
 
 #endif
