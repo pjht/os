@@ -3,7 +3,7 @@ C_SOURCES = $(wildcard kernel/*.c drivers/$(PLAT)/*.c drivers/$(PLAT)/*/*.c libc
 OBJ = $(C_SOURCES:.c=.o $(shell cat psinfo/$(PLAT)/o.txt))
 CC = $(shell cat psinfo/$(PLAT)/cc.txt)
 GDB = $(shell cat psinfo/$(PLAT)/gdb.txt)
-CFLAGS = -Wall -g -ffreestanding
+CFLAGS = -Ilibc -Wall -g -ffreestanding
 QFLAGS =  -m 2G -boot d -cdrom os.iso -serial vc #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
 
 all: os.iso
