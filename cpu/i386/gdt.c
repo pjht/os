@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "seg_upd.h"
 #define NUM_ENTRIES 5
 
 typedef struct {
@@ -8,14 +9,14 @@ typedef struct {
   uint8_t access;
   uint8_t limit_flags;
   uint8_t base_high8;
-} gdt_entry;
+} __attribute__((packed)) gdt_entry;
 
 typedef struct {
   uint16_t size;
   uint32_t address;
-} gdt_description;
+} __attribute__((packed)) gdt_description;
 
-gdt_entry gdt[NUM_ENTRIES-1];
+gdt_entry gdt[NUM_ENTRIES];
 gdt_description gdt_desc;
 
 
@@ -26,8 +27,9 @@ void gdt_init() {
   set_entry(3,0,0xFFFFF,0xFA);
   set_entry(4,0,0xFFFFF,0xF2);
   gdt_desc.size=(sizeof(gdt_entry)*NUM_ENTRIES)-1;
-  gdt_desc.address=&gdt[0];
-  asm volatile("lgdt gdt_desc");
+  gdt_desc.address=&gdt;
+  asm volatile("lgdt (%%eax)"::"a"((uint32_t)&gdt_desc));
+  seg_upd();
 }
 
 void set_entry(int i,uint32_t base,uint32_t limit,uint8_t access) {
@@ -36,6 +38,6 @@ void set_entry(int i,uint32_t base,uint32_t limit,uint8_t access) {
   gdt[i].base_mid8=(base&0xFF0000)>>16;
   gdt[i].access=access;
   uint8_t limit_high4=(limit&0xF0000)>>16;
-  gdt[i].limit_flags=0xC0&limit_high4;
+  gdt[i].limit_flags=0xC0|limit_high4;
   gdt[i].base_high8=(base&0xFF000000)>>24;
 }
