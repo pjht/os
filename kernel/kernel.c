@@ -30,6 +30,9 @@ void kmain(multiboot_info_t* header) {
     pushl $0x23; \
     pushl %eax; \
     pushf; \
+    pop %eax; \
+    or $0x200,%eax; \
+    push %eax; \
     pushl $0x1B; \
     push $1f; \
     iret; \
