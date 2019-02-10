@@ -122,24 +122,28 @@ void isr_handler(registers_t r) {
     case 14: {
       uint32_t addr;
       asm("movl %%cr2,%0": "=r"(addr));
-      vga_write_string("FAULT\n");
-      // if (r.err_code==0) {
-      //   klog("PANIC","Kernel process tried to read a non-present page entry at address %x",addr);
-      // } else if (r.err_code==1) {
-      //   klog("PANIC","Kernel process tried to read a page and caused a protection fault at address %x",addr);
-      // } else if (r.err_code==2) {
-      //   klog("PANIC","Kernel process tried to write to a non-present page entry at address %x",addr);
-      // } else if (r.err_code==3) {
-      //   klog("PANIC","Kernel process tried to write a page and caused a protection fault at address %x",addr);
-      // } else if (r.err_code==4) {
-      //   klog("PANIC","User process tried to read a non-present page entry at address %x",addr);
-      // } else if (r.err_code==5) {
-      //   klog("PANIC","User process tried to read a page and caused a protection fault at address %x",addr);
-      // } else if (r.err_code==6) {
-      //   klog("PANIC","User process tried to write to a non-present page entry at address %x",addr);
-      // } else if (r.err_code==7) {
-      //   klog("PANIC","User process tried to write a page and caused a protection fault at address %x",addr);
-      // }
+      if (r.err_code==0) {
+        vga_write_string("Kernel process tried to read a non-present page entry at address ");
+      } else if (r.err_code==1) {
+        vga_write_string("Kernel process tried to read a page and caused a protection fault at address ");
+      } else if (r.err_code==2) {
+        vga_write_string("Kernel process tried to write to a non-present page entry at address ");
+      } else if (r.err_code==3) {
+        vga_write_string("Kernel process tried to write a page and caused a protection fault at address ");
+      } else if (r.err_code==4) {
+        vga_write_string("User process tried to read a non-present page entry at address ");
+      } else if (r.err_code==5) {
+        vga_write_string("User process tried to read a page and caused a protection fault at address ");
+      } else if (r.err_code==6) {
+        vga_write_string("User process tried to write to a non-present page entry at address ");
+      } else if (r.err_code==7) {
+        vga_write_string("User process tried to write a page and caused a protection fault at address ");
+      }
+      char str[11];
+      str[0]='\0';
+      hex_to_ascii(addr,str);
+      vga_write_string(str);
+      vga_write_string("\n");
       // if ((r.err_code&1)==0) {
       //   // int dir_entry=(addr&0xFFC00000)>>22;
       //   // int table_entry=(addr&0x3FF000)>12;
