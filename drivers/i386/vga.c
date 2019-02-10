@@ -1,7 +1,7 @@
 #include <grub/text_fb_info.h>
 #include "../vga.h"
 #include <string.h>
-#define xy_to_indx(x,y) ((x+(y*height))*2)
+#define xy_to_indx(x,y) ((x+(y*width))*2)
 char* screen;
 int width;
 int height;
