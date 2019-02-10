@@ -1,5 +1,5 @@
 #include <stdint.h>
-#define NUM_ENTRIES 4
+#define NUM_ENTRIES 5
 
 typedef struct {
   uint16_t limit_low16;
@@ -21,8 +21,10 @@ gdt_description gdt_desc;
 
 void gdt_init() {
   set_entry(0,0,0,0);
-  set_entry(1,0,0xFFFFF,0x9E);
+  set_entry(1,0,0xFFFFF,0x9A);
   set_entry(2,0,0xFFFFF,0x92);
+  set_entry(3,0,0xFFFFF,0xFA);
+  set_entry(4,0,0xFFFFF,0xF2);
   gdt_desc.size=(sizeof(gdt_entry)*NUM_ENTRIES)-1;
   gdt_desc.address=&gdt[0];
   asm volatile("lgdt gdt_desc");
