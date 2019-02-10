@@ -38,5 +38,5 @@ void kmain(multiboot_info_t* header) {
     iret; \
   1: \
     ");
-  vga_write_string("UMODE!");
+  vga_write_string("UMODE!\n");
 }
