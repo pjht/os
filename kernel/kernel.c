@@ -27,26 +27,26 @@ void kmain(multiboot_info_t* header) {
   }
   vga_init(info);
   vga_write_string("Hello\n");
-  // asm volatile("  \
-  //   cli; \
-  //   mov $0x23, %ax; \
-  //   mov %ax, %ds; \
-  //   mov %ax, %es; \
-  //   mov %ax, %fs; \
-  //   mov %ax, %gs; \
-  //                 \
-  //   mov %esp, %eax; \
-  //   pushl $0x23; \
-  //   pushl %eax; \
-  //   pushf; \
-  //   pop %eax; \
-  //   or $0x200,%eax; \
-  //   push %eax; \
-  //   pushl $0x1B; \
-  //   push $1f; \
-  //   iret; \
-  // 1: \
-  //   ");
+  asm volatile("  \
+    cli; \
+    mov $0x23, %ax; \
+    mov %ax, %ds; \
+    mov %ax, %es; \
+    mov %ax, %fs; \
+    mov %ax, %gs; \
+                  \
+    mov %esp, %eax; \
+    pushl $0x23; \
+    pushl %eax; \
+    pushf; \
+    pop %eax; \
+    or $0x200,%eax; \
+    push %eax; \
+    pushl $0x1B; \
+    push $1f; \
+    iret; \
+  1: \
+    ");
   vga_write_string("UMODE!\n");
   port_byte_out(0xe9,'U');
   port_byte_out(0xe9,'M');
