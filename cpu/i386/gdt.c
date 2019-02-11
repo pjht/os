@@ -70,6 +70,10 @@ void gdt_init() {
   ");
 }
 
+void tss_stack_reset() {
+  tss.esp0=int_stack_top+0xC0000000;
+}
+
 void set_entry(int i,uint32_t base,uint32_t limit,uint8_t access) {
   gdt[i].limit_low16=limit&0xFFFF;
   gdt[i].base_low16=base&0xFFFFF;
