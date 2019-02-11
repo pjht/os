@@ -16,11 +16,11 @@ static Task* headTask;
 void tasking_init() {
   currentTask=NULL;
   next_pid=0;
-  headTask=createTask(NULL);
+  headTask=tasking_createTask(NULL);
   currentTask=headTask;
 }
 
-Task* createTaskEax(void* eip,uint32_t eax) {
+Task* tasking_createTaskEax(void* eip,uint32_t eax) {
     Task* task=malloc(sizeof(Task));
     task->regs.eax=eax;
     task->regs.ebx=0;
@@ -45,11 +45,11 @@ Task* createTaskEax(void* eip,uint32_t eax) {
     return task;
 }
 
-Task* createTask(void* eip) {
-  return createTaskEax(eip,0);
+Task* tasking_createTask(void* eip) {
+  return tasking_createTaskEax(eip,0);
 }
 
-void send_msg(uint32_t pid,char* msg) {
+void tasking_send_msg(uint32_t pid,char* msg) {
   for (Task* task=headTask;task!=NULL;task=task->next) {
     if (task->pid==pid) {
       if (task->msg_store==NULL) {
@@ -66,7 +66,7 @@ void send_msg(uint32_t pid,char* msg) {
   }
 }
 
-char* get_msg(uint32_t* sender) {
+char* tasking_get_msg(uint32_t* sender) {
   if (!currentTask->msg_store) {
     return NULL;
   }
@@ -88,7 +88,7 @@ char* get_msg(uint32_t* sender) {
   return data;
 }
 
-void yield() {
+void tasking_yield() {
     Task* task=currentTask->next;
     if (!task) {
       task=headTask;
