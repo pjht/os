@@ -1,6 +1,5 @@
 #include "../cpu/cpu_init.h"
 #include "../cpu/i386/ports.h"
-#include "../cpu/i386/tasking.h"
 #include "../drivers/vga.h"
 #include <grub/text_fb_info.h>
 #include <stdlib.h>
@@ -57,7 +56,7 @@ void kmain(multiboot_info_t* header) {
   port_byte_out(0xe9,'!');
   port_byte_out(0xe9,'\n');
   vga_write_string("Task create\n");
-  tasking_createTask(task);
+  createTask(task);
   vga_write_string("Task switch\n");
   yield();
   vga_write_string("Back in main\n");
