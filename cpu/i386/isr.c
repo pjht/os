@@ -3,6 +3,7 @@
 #include "ports.h"
 #include "../halt.h"
 #include "../drivers/vga.h"
+#include "../tasking.h"
 #include <string.h>
 #include <stdint.h>
 void irq_handler(registers_t r);
@@ -163,6 +164,11 @@ void isr_handler(registers_t r) {
       // }
       halt();
       break;
+    case 80:
+      if (r.eax==1) {
+        tasking_yield();
+      }
+    break;
     }
   }
 }
