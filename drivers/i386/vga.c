@@ -15,6 +15,22 @@ void vga_set_char(int x,int y,char c) {
   screen[xy_to_indx(x,y)+1]=(bg_color<<4)|fg_color;
 }
 
+void vga_clear() {
+  for (int y=0;y<height;y++) {
+    for (int x=0;x<width;x++) {
+      vga_set_char(x,y,' ');
+    }
+  }
+}
+
+void set_cursor(int x,int y) {
+  int pos=(x+(y*width));
+  port_byte_out(0x3D4,0xF);
+  port_byte_out(0x3D5,pos&0xFF);
+  port_byte_out(0x3D4,0xE);
+  port_byte_out(0x3D5,(pos&0xFF00)>>8);
+}
+
 void vga_init(text_fb_info framebuffer_info) {
   x=0;
   y=0;
@@ -23,15 +39,12 @@ void vga_init(text_fb_info framebuffer_info) {
   screen=framebuffer_info.address;
   width=framebuffer_info.width;
   height=framebuffer_info.height;
+  port_byte_out(0x3D4,0xA);
+  port_byte_out(0x3D5,(port_byte_in(0x3D5)&0xC0)|14);
+  port_byte_out(0x3D4,0xB);
+  port_byte_out(0x3D5,(port_byte_in(0x3D5)&0xE0)|15);
+  set_cursor(0,0);
   vga_clear();
-}
-
-void vga_clear() {
-  for (int y=0;y<height;y++) {
-    for (int x=0;x<width;x++) {
-      vga_set_char(x,y,' ');
-    }
-  }
 }
 
 void vga_write_string(const char* string) {
@@ -57,4 +70,5 @@ void vga_write_string(const char* string) {
       memcpy(&screen,pg1,xy_to_indx(0,25));
     }
   }
+  set_cursor(x,y);
 }
