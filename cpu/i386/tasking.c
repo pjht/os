@@ -29,25 +29,6 @@ void tasking_init() {
   current_task=task;
 }
 
-
-uint32_t fork() {
-  Task* task=malloc(sizeof(Task*));
-  task->cr3=current_task->cr3;
-  task->next=NULL;
-  task->pid=next_pid;
-  next_pid++;
-  uint32_t eip=read_eip();
-  if (task==current_task) {
-    return 0;
-  } else {
-    task->eip=eip;
-    asm volatile("mov %%esp, %0" : "=r"(task->esp));
-    asm volatile("mov %%ebp, %0" : "=r"(task->ebp));
-    tasks_tail->next=task;
-    return task->pid;
-  }
-}
-
 void yield() {
   if (!current_task) {
     return;
