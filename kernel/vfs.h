@@ -12,10 +12,14 @@ typedef enum {
   FSOP_UMOUNT
 } fs_op;
 
+#define NO_FD 0xFFFFFFFF
+
+extern char vfs_initialized;
+
 typedef char (*fs_drv)(fs_op op,FILE* stream,void* data1,void* data2);
 
-void init_vfs();
 uint32_t register_fs(fs_drv drv,const char* type);
 char mount(char* mntpnt,char* dev,char* type);
+void vfs_task();
 
 #endif

@@ -1,2 +1,9 @@
-void set_regs(uint32_t esp,uint32_t ebp,uint32_t eip);
-uint32_t read_eip();
+#ifndef TASKING_HELPERS_H
+#define TASKING_HELPERS_H
+
+#include "tasking.h"
+
+void switchTask(Registers *from, Registers *to);
+uint32_t readEip();
+
+#endif

@@ -35,6 +35,11 @@ uint32_t initrd_sz;
 
 devbuf* kbd_buf;
 
+/*
+pop %eax; \
+or $0x200,%eax; \
+push %eax; \
+*/
 void switch_to_user_mode() {
    // Set up a stack structure for switching to user mode.
    asm volatile("  \
@@ -49,9 +54,6 @@ void switch_to_user_mode() {
      pushl $0x23; \
      pushl %eax; \
      pushf; \
-     pop %eax; \
-     or $0x200,%eax; \
-     push %eax; \
      pushl $0x1B; \
      push $1f; \
      iret; \
@@ -168,40 +170,49 @@ void read_initrd(multiboot_info_t* mbd) {
   }
 }
 
+void init() {
+  klog("INFO","Beginning initialization");
+  //createTask(vfs_task);
+  // while (vfs_initialized==0) {
+  //   //yield();
+  //   klog("INFO","NO_VFS");
+  // }
+  // klog("INFO","VFS");
+  // init_devfs();
+  // screen_init();
+  // kbd_buf=devbuf_init();
+  // add_dev(console_dev_drv,"console");
+  stdout=fopen("/dev/console","w");
+  // while (stdout==NO_FD) {
+  //   yield();
+  // }
+  // klog("INFO","STDOUT");
+  // stdin=fopen("/dev/console","r");
+  // stderr=fopen("/dev/console","w");
+  // yield();
+  // send_msg(0,"Hello");
+  // yield();
+  // while (1) {
+  //   uint32_t sender;
+  //   char* msg=get_msg(&sender);
+  //   if (msg) {
+  //     // Handle message here
+  //   }
+  //   yield();
+  // }
+  while(1) {
+    yield();
+  }
+}
+
 void main(multiboot_info_t* mbd) {
   cpu_init();
-  init_vfs();
-  init_devfs();
-  read_initrd(mbd);
-  add_dev(initrd_dev_drv,"initrd");
-  init_initrd();
-  mount("/","/dev/initrd","initrd");
-  screen_init();
-  kbd_buf=devbuf_init();
-  add_dev(console_dev_drv,"console");
-  stdout=fopen("/dev/console","w");
-  stdin=fopen("/dev/console","r");
-  stderr=fopen("/dev/console","w");
-  ps2_init();
-  serial_init();
-  parallel_init();
-  if (!stdout) {
-    FILE* serial0=fopen("/dev/ttyS0","w");
-    if (serial0) {
-      stdout=serial0;
-      stderr=serial0;
-    }
-  }
-  timer_init();
-  // klog("INFO","Waiting for 1 second");
-  // wait(1000);
-  pci_init();
-  //pppp_init();
   tasking_init();
-  //port_byte_out(0,0);
-  switch_to_user_mode();
-  printf("U");
-  for(;;);
+  //switch_to_user_mode();
+  createTask(init);
+  while (1) {
+    yield();
+  }
 }
 
 void got_key(char key) {

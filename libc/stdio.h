@@ -11,16 +11,18 @@ typedef struct {
   int eof;
 } FILE;
 
+#define NO_FD 0xFFFFFFFF
+
 #define SEEK_CUR 1
 #define SEEK_END 2
 #define SEEK_SET 3
 #define EOF -1
 
-extern FILE* stdin;
-extern FILE* stdout;
-extern FILE* stderr;
+extern uint32_t stdin;
+extern uint32_t stdout;
+extern uint32_t stderr;
 
-FILE* fopen(const char* filename,const char* mode);
+uint32_t fopen(const char* filename,const char* mode);
 int fgetc(FILE* stream);
 int getc();
 char* fgets(char* str,int count,FILE* stream);

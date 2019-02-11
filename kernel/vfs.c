@@ -3,6 +3,7 @@
 #include "../libc/stdlib.h"
 #include "../libc/stdio.h"
 #include "../libc/string.h"
+#include "../cpu/tasking.h"
 #include "vfs.h"
 typedef struct _vfs_mapping_struct {
   char* mntpnt;
@@ -10,17 +11,22 @@ typedef struct _vfs_mapping_struct {
   struct _vfs_mapping_struct* next;
 } vfs_mapping;
 
+#define MAX_FILES 512
+#define BMAP_SZ (MAX_FILES/8)
+
 char** drv_names;
 fs_drv* drvs;
 uint32_t max_drvs;
 uint32_t next_drv_indx;
 vfs_mapping* head_mapping;
 vfs_mapping* tail_mapping;
+char vfs_initialized=0;
 
-FILE* stdin=NULL;
-FILE* stdout=NULL;
-FILE* stderr=NULL;
-
+uint32_t stdin=NO_FD;
+uint32_t stdout=NO_FD;
+uint32_t stderr=NO_FD;
+FILE** files=NULL;
+char* filebmap;
 
 int vfsstrcmp(const char* s1,const char* s2) {
     int i;
@@ -31,6 +37,33 @@ int vfsstrcmp(const char* s1,const char* s2) {
     return s1[i] - s2[i];
 }
 
+char vfs_get_bmap_bit(uint32_t byte_idx,char offset) {
+  char byte=filebmap[byte_idx];
+  char bit=byte&(1<<offset);
+  return bit>>offset;
+}
+
+void vfs_set_bmap_bit(uint32_t byte_idx,char offset,char bit) {
+  char byte=filebmap[byte_idx];
+  byte&=(bit<<offset);
+  filebmap[byte_idx]=byte;
+}
+
+uint32_t get_fd() {
+  for(int i=0;i<BMAP_SZ;i++) {
+    for (int j=0;j<8;j++) {
+      if (vfs_get_bmap_bit(i,j)==0) {
+        uint32_t idx=i*8+j;
+        vfs_set_bmap_bit(i,j,1);
+        return idx;
+      }
+      yield();
+    }
+    yield();
+  }
+  return NO_FD;
+}
+
 void init_vfs() {
   drvs=malloc(sizeof(fs_drv)*32);
   drv_names=malloc(sizeof(fs_drv)*32);
@@ -38,6 +71,12 @@ void init_vfs() {
   next_drv_indx=0;
   head_mapping=NULL;
   tail_mapping=NULL;
+  filebmap=malloc(sizeof(char)*(BMAP_SZ));
+  for(int i=0;i<BMAP_SZ;i++) {
+    filebmap[i]=0;
+  }
+  files=malloc(sizeof(FILE*)*(MAX_FILES));
+  vfs_initialized=1;
 }
 
 uint32_t register_fs(fs_drv drv,const char* type) {
@@ -84,37 +123,34 @@ char mount(char* mntpnt,char* dev,char* type) {
   }
 }
 
-FILE* fopen(const char* filename,const char* mode) {
-  vfs_mapping* mnt=head_mapping;
-  vfs_mapping* mntpnt=NULL;
-  const char* path;
-  uint32_t mntpnt_len=0;
-  for (;mnt!=NULL;mnt=mnt->next) {
-    char* root=mnt->mntpnt;
-    if (strlen(root)>mntpnt_len) {
-      if (vfsstrcmp(root,filename)==0) {
-        mntpnt=mnt;
-        mntpnt_len=strlen(root);
-      }
-    }
+uint32_t fopen(const char* filename,const char* mode) {
+  char* msg=malloc(sizeof(char)*(6+strlen(mode)+1+strlen(filename)+1));
+  strcpy("fopen ",msg);
+  for (int i=0;i<strlen(mode);i++) {
+    msg[6+i]=mode[i];
   }
-  if (mntpnt) {
-    path=filename+mntpnt_len;
-    FILE* stream=malloc(sizeof(FILE));
-    stream->mntpnt=mntpnt->mntpnt;
-    stream->path=path;
-    stream->type=mntpnt->type;
-    stream->pos=0;
-    stream->eof=0;
-    char ok=drvs[mntpnt->type](FSOP_OPEN,stream,NULL,NULL);
-    if (ok) {
-      return stream;
-    } else {
-      free(stream);
-      return NULL;
-    }
+  msg[6+strlen(mode)]=" ";
+  for (int i=0;i<strlen(filename);i++) {
+    msg[6+strlen(mode)+1+i]=filename[i];
   }
-  return NULL;
+  msg[6+strlen(mode)+1+strlen(filename)+1]='\0';
+  klog("INFO",msg);
+  return NO_FD;
+  send_msg(2,msg);
+  yield();
+  uint32_t sender;
+  char* fd_str=get_msg(&sender);
+  while (fd_str==NULL) {
+    yield();
+    char* fd_str=get_msg(&sender);
+  }
+  uint32_t fd;
+  uint32_t number=0;
+  for (int i=0;i<strlen(fd_str);i++) {
+    number+=(fd_str[i]-0x30);
+    number*=10;
+  }
+  return number;
 }
 
 int fgetc(FILE* stream) {
@@ -124,7 +160,7 @@ int fgetc(FILE* stream) {
 }
 
 int getc() {
-  return fgetc(stdin);
+  return fgetc(files[stdin]);
 }
 
 char* fgets(char* str,int count,FILE* stream) {
@@ -167,7 +203,7 @@ int fputc(int c,FILE* stream) {
 }
 
 int putc(int c) {
-  return fputc(c,stdout);
+  return fputc(c,files[stdout]);
 }
 
 int fputs(const char* s,FILE* stream) {
@@ -179,7 +215,7 @@ int fputs(const char* s,FILE* stream) {
 }
 
 int puts(const char* s) {
-  return fputs(s,stdout);
+  return fputs(s,files[stdout]);
 }
 
 int vfprintf(FILE* stream,const char* format,va_list arg) {
@@ -246,7 +282,7 @@ int printf(const char* format,...) {
   va_list arg;
   int code;
   va_start(arg,format);
-  code=vfprintf(stdout,format,arg);
+  code=vfprintf(files[stdout],format,arg);
   va_end(arg);
   if (code) {
     return strlen(format);
@@ -273,4 +309,57 @@ int fclose(FILE* stream) {
   drvs[stream->type](FSOP_CLOSE,stream,NULL,NULL);
   free(stream);
   return 0;
+}
+
+void vfs_task() {
+  init_vfs();
+  while (1) {
+    uint32_t sender;
+    char* msg=get_msg(&sender);
+    if (msg) {
+      char* cmd=strtok(msg," ");
+      if (strcmp(cmd,"fopen")==0) {
+        int fd=get_fd();
+        if (fd==NO_FD) {
+          send_msg(sender,"4294967295");
+        }
+        char* mode=strtok(NULL," ");
+        char* filename=strtok(NULL,"");
+        vfs_mapping* mnt=head_mapping;
+        vfs_mapping* mntpnt=NULL;
+        const char* path;
+        uint32_t mntpnt_len=0;
+        for (;mnt!=NULL;mnt=mnt->next) {
+          char* root=mnt->mntpnt;
+          if (strlen(root)>mntpnt_len) {
+            if (vfsstrcmp(root,filename)==0) {
+              mntpnt=mnt;
+              mntpnt_len=strlen(root);
+            }
+          }
+        }
+        if (mntpnt) {
+          path=filename+mntpnt_len;
+          FILE* stream=malloc(sizeof(FILE));
+          stream->mntpnt=mntpnt->mntpnt;
+          stream->path=path;
+          stream->type=mntpnt->type;
+          stream->pos=0;
+          stream->eof=0;
+          char ok=drvs[mntpnt->type](FSOP_OPEN,stream,NULL,NULL);
+          if (ok) {
+            files[fd]=stream;
+            char* str=malloc(sizeof(char)*11);
+            int_to_ascii(fd,str);
+            send_msg(sender,str);
+          } else {
+            free(stream);
+            send_msg(sender,"4294967295");
+          }
+        }
+        send_msg(sender,"4294967295");
+      }
+    }
+    yield();
+  }
 }
