@@ -167,6 +167,8 @@ void isr_handler(registers_t r) {
     case 80:
       if (r.eax==1) {
         tasking_yield();
+      } else if (r.eax==2) {
+        tasking_createTask((void*)r.ebx);
       }
     break;
     }
