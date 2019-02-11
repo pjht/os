@@ -1,4 +1,5 @@
 #include "../cpu/cpu_init.h"
+#include "../cpu/i386/ports.h"
 #include "../drivers/vga.h"
 #include <grub/text_fb_info.h>
 #include <stdlib.h>
@@ -39,4 +40,11 @@ void kmain(multiboot_info_t* header) {
   1: \
     ");
   vga_write_string("UMODE!\n");
+  port_byte_out(0xe9,'U');
+  port_byte_out(0xe9,'M');
+  port_byte_out(0xe9,'O');
+  port_byte_out(0xe9,'D');
+  port_byte_out(0xe9,'E');
+  port_byte_out(0xe9,'!');
+  port_byte_out(0xe9,'\n');
 }
