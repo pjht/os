@@ -1,3 +1,8 @@
+/*
+pop %eax; \
+or $0x200,%eax; \
+push %eax; \
+*/
 #include "tasking_helpers.h"
 #include "tasking.h"
 #include "../tasking.h"
@@ -12,17 +17,19 @@ uint32_t next_pid;
 
 static Task* currentTask;
 static Task* headTask;
+static Task* createTaskKmode(void* eip,char kmode);
 
 void tasking_init() {
   currentTask=NULL;
   next_pid=0;
-  headTask=tasking_createTask(NULL);
+  headTask=createTaskKmode(NULL,1);
   currentTask=headTask;
 }
 
-Task* tasking_createTaskEax(void* eip,uint32_t eax) {
+static Task* createTaskKmode(void* eip,char kmode) {
     Task* task=malloc(sizeof(Task));
-    task->regs.eax=eax;
+    task->kmode=kmode;
+    task->regs.eax=0;
     task->regs.ebx=0;
     task->regs.ecx=0;
     task->regs.edx=0;
@@ -38,6 +45,13 @@ Task* tasking_createTaskEax(void* eip,uint32_t eax) {
     task->wr=0;
     task->next=NULL;
     task->pid=next_pid;
+    task->priv=0;
+    if (currentTask) {
+      task->priv=currentTask->priv;
+    }
+    if (task->pid==1) {
+      task->priv=1;
+    }
     next_pid++;
     if (currentTask) {
       currentTask->next=task;
@@ -45,12 +59,22 @@ Task* tasking_createTaskEax(void* eip,uint32_t eax) {
     return task;
 }
 
-Task* tasking_createTask(void* eip) {
-  return tasking_createTaskEax(eip,0);
+char isPrivleged(uint32_t pid) {
+  for (Task* task=headTask;task!=NULL;task=task->next) {
+    if (task->pid==pid) {
+      return task->priv;
+    }
+  }
+  return 0;
 }
 
-void tasking_send_msg(uint32_t pid,char* msg) {
-  for (Task* task=headTask;task!=NULL;task=task->next) {
+Task* tasking_createTask(void* eip) {
+  return createTaskKmode(eip,1);
+}
+
+void send_msg(uint32_t pid,char* msg) {
+  Task* task=headTask;
+  while(task!=NULL) {
     if (task->pid==pid) {
       if (task->msg_store==NULL) {
         task->msg_store=malloc(sizeof(char*)*256);
@@ -63,10 +87,25 @@ void tasking_send_msg(uint32_t pid,char* msg) {
         task->wr--;
       }
     }
+    task=task->next;
   }
+  // for (Task* task=headTask;task!=NULL;task=task->next) {
+  //   if (task->pid==pid) {
+  //     if (task->msg_store==NULL) {
+  //       task->msg_store=malloc(sizeof(char*)*256);
+  //       task->sender_store=malloc(sizeof(uint32_t)*256);
+  //     }
+  //     task->msg_store[task->wr]=msg;
+  //     task->sender_store[task->wr]=currentTask->pid;
+  //     task->wr++;
+  //     if (task->wr==task->rd) {
+  //       task->wr--;
+  //     }
+  //   }
+  // }
 }
 
-char* tasking_get_msg(uint32_t* sender) {
+char* get_msg(uint32_t* sender) {
   if (!currentTask->msg_store) {
     return NULL;
   }
@@ -95,5 +134,25 @@ void tasking_yield() {
     }
     Task* oldCurr=currentTask;
     currentTask=task;
+    asm("mov %%eax,%%cr3":: "a"(task->regs.cr3));
+    if (!task->kmode) {
+      asm volatile("  \
+        cli; \
+        mov $0x23, %ax; \
+        mov %ax, %ds; \
+        mov %ax, %es; \
+        mov %ax, %fs; \
+        mov %ax, %gs; \
+                      \
+        mov %esp, %eax; \
+        pushl $0x23; \
+        pushl %eax; \
+        pushf; \
+        pushl $0x1B; \
+        push $1f; \
+        iret; \
+      1: \
+        ");
+    }
     switchTask(&oldCurr->regs, &currentTask->regs);
 }

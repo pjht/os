@@ -3,7 +3,6 @@
 switchTask:
     pusha
     pushf
-    mov %cr3, %eax #Push CR3
     push %eax
     mov 44(%esp), %eax #The first argument, where to save
     mov %ebx, 4(%eax)
@@ -22,8 +21,7 @@ switchTask:
     mov %esi, 28(%eax)
     mov %ecx, 32(%eax)
     mov %edi, 36(%eax)
-    pop %ebx #CR3
-    mov %ebx, 40(%eax)
+    pop %ebx
     push %ebx #Goodbye again ;)
     mov 48(%esp), %eax #Now it is the new object
     mov 4(%eax), %ebx #EBX
@@ -39,8 +37,6 @@ switchTask:
     pop %eax
     mov 24(%eax), %esp #ESP
     push %eax
-    mov 40(%eax), %eax #CR3
-    mov %eax, %cr3
     pop %eax
     push %eax
     mov 32(%eax), %eax #EIP

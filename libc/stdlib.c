@@ -6,7 +6,7 @@
 #define MAX_BLOCKS 512
 #define MALLOC_DEBUG 1
 typedef struct {
-  char* bitmap;
+  uint8_t* bitmap;
   uint32_t bitmap_byt_size;
   uint32_t bitmap_bit_size;
   uint32_t avail_data_size;
@@ -16,18 +16,18 @@ typedef struct {
 
 heap_block entries[MAX_BLOCKS];
 uint32_t num_used_entries;
-char get_bmap_bit(char* bmap,uint32_t index) {
+char get_bmap_bit(uint8_t* bmap,uint32_t index) {
   uint32_t byte=index/8;
   uint32_t bit=index%8;
   char entry=bmap[byte];
   return (entry&(1<<bit))>0;
 }
-void set_bmap_bit(char* bmap,uint32_t index) {
+void set_bmap_bit(uint8_t* bmap,uint32_t index) {
   uint32_t byte=index/8;
   uint32_t bit=index%8;
   bmap[byte]=bmap[byte]|(1<<bit);
 }
-void clear_bmap_bit(char* bmap,uint32_t index) {
+void clear_bmap_bit(uint8_t* bmap,uint32_t index) {
   uint32_t byte=index/8;
   uint32_t bit=index%8;
   bmap[byte]=bmap[byte]&(~(1<<bit));
@@ -37,7 +37,7 @@ void reserve_block(uint32_t mem_blks) {
   entries[num_used_entries].bitmap=alloc_memory((uint32_t)ceilf((double)bmap_byts/BLK_SZ));
   entries[num_used_entries].bitmap_byt_size=bmap_byts;
   entries[num_used_entries].bitmap_bit_size=bmap_byts*8;
-  char* bmap=entries[num_used_entries].bitmap;
+  uint8_t* bmap=entries[num_used_entries].bitmap;
   char bmap_byt_sz=entries[num_used_entries].bitmap_byt_size;
   for(uint32_t i=0;i<bmap_byt_sz;i++) {
     bmap[i]=0;
@@ -53,13 +53,13 @@ void* malloc(uint32_t size) {
   int blk_indx=-1;
   uint32_t bmap_index;
   heap_block entry;
-  for (int i=0;i<num_used_entries;i++) {
+  for (uint32_t i=0;i<num_used_entries;i++) {
     uint32_t remaining_blks;
     entry=entries[i];
     if (entry.avail_data_size>=size) {
-      char* bmap=entry.bitmap;
+      uint8_t* bmap=entry.bitmap;
       uint32_t bmap_byt_sz=entry.bitmap_byt_size;
-      for(int i=0;i<bmap_byt_sz;i++) {
+      for(uint32_t i=0;i<bmap_byt_sz;i++) {
         if (bmap[i]!=0xFF) {
           char got_0=0;
           remaining_blks=num_4b_grps;
@@ -107,7 +107,7 @@ void* malloc(uint32_t size) {
     reserve_block(256);
     return malloc(size);
   }
-  for (int i=0;i<num_4b_grps;i++) {
+  for (uint32_t i=0;i<num_4b_grps;i++) {
     set_bmap_bit(entry.bitmap,bmap_index+i);
   }
   uint32_t data_offset=(bmap_index*8)+12;
@@ -135,7 +135,7 @@ void free(void* mem) {
   uint32_t bmap_index=info[1];
   uint32_t blk_indx=info[2];
   heap_block entry=entries[blk_indx];
-  for (int i=0;i<num_4b_grps;i++) {
+  for (uint32_t i=0;i<num_4b_grps;i++) {
     clear_bmap_bit(entry.bitmap,bmap_index+i);
   }
   entry.avail_data_size+=(num_4b_grps*4)+12;

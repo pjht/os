@@ -1,7 +1,7 @@
-#include "string.h"
+#include <string.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "stdlib.h"
+#include <stdlib.h>
 
 void* memcpy(void* dest_ptr,const void* source_ptr,size_t len) {
     char* source=(char*)source_ptr;
@@ -35,7 +35,7 @@ size_t strlen(const char* str) {
 }
 
 char* strcpy(char* dest,const char* src) {
-  int i;
+  size_t i;
   for (i=0;i<strlen(src);i++) {
     dest[i]=src[i];
   }
@@ -45,8 +45,8 @@ char* strcpy(char* dest,const char* src) {
 
 char* strrev(char* str) {
     char chr;
-    int j;
-    for (int i=0,j=strlen(str)-1;i<j;i++,j--) {
+    int i,j;
+    for (i=0,j=strlen(str)-1;i<j;i++,j--) {
       chr=str[i];
       str[i]=str[j];
       str[j]=chr;
@@ -105,8 +105,8 @@ void backspace(char* s) {
 char* strtok_str=NULL;
 size_t strtok_index;
 
-char strtok_delim_check(char* delim) {
-  for (int i=0;i<strlen(delim);i++) {
+char strtok_delim_check(const char* delim) {
+  for (size_t i=0;i<strlen(delim);i++) {
     if (strtok_str[strtok_index]==delim[i]||strtok_str[strtok_index]=='\0') {
       return 0;
     }

@@ -6,7 +6,7 @@
 void cpu_init() {
   gdt_init();
   isr_install();
-  asm volatile("sti");
+  //asm volatile("sti");
   paging_init();
   tasking_init();
 }
