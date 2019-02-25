@@ -1,6 +1,8 @@
 #include <grub/text_fb_info.h>
 #include "../vga.h"
+#include "../../cpu/i386/ports.h"
 #include <string.h>
+#include <stddef.h>
 #define xy_to_indx(x,y) ((x+(y*width))*2)
 char* screen;
 int width;
@@ -48,7 +50,7 @@ void vga_init(text_fb_info framebuffer_info) {
 }
 
 void vga_write_string(const char* string) {
-  for (int i=0;i<strlen(string);i++) {
+  for (size_t i=0;i<strlen(string);i++) {
     char c=string[i];
     if (c=='\n') {
       x=0;
@@ -64,10 +66,10 @@ void vga_write_string(const char* string) {
     if (y==height) {
       x=0;
       y=0;
-      char* pg1=(char*)((uint32_t)screen+0xfa0);
-      memcpy(pg1,&screen[xy_to_indx(0,1)],xy_to_indx(0,24));
-      vga_clear();
-      memcpy(&screen,pg1,xy_to_indx(0,25));
+      // char* pg1=(char*)((uint32_t)screen+0xfa0);
+      // memcpy(pg1,&screen[xy_to_indx(0,1)],xy_to_indx(0,24));
+      // vga_clear();
+      // memcpy(&screen,pg1,xy_to_indx(0,25));
     }
   }
   set_cursor(x,y);

@@ -9,6 +9,7 @@ devbuf* devbuf_init() {
   for (int i=0;i<256;i++) {
     buf->buf[i]=EOF;
   }
+  return buf;
 }
 
 void devbuf_add(char byte,devbuf* buf) {

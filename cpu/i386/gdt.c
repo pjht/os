@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <string.h>
 #include "seg_upd.h"
 #define NUM_ENTRIES 6
 
@@ -15,7 +16,7 @@ typedef struct {
 
 typedef struct {
   uint16_t size;
-  uint32_t address;
+  gdt_entry* address;
 } __attribute__((packed)) gdt_description;
 
 typedef struct {
@@ -53,22 +54,6 @@ typedef struct {
 gdt_entry gdt[NUM_ENTRIES];
 gdt_description gdt_desc;
 tss_entry tss;
-
-void gdt_init() {
-  set_entry(0,0,0,0);
-  set_entry(1,0,0xFFFFF,0x9A);
-  set_entry(2,0,0xFFFFF,0x92);
-  set_entry(3,0,0xFFFFF,0xFA);
-  set_entry(4,0,0xFFFFF,0xF2);
-  write_tss(5,0x10,int_stack_top+0xC0000000);
-  gdt_desc.size=(sizeof(gdt_entry)*NUM_ENTRIES)-1;
-  gdt_desc.address=&gdt;
-  asm volatile("lgdt (%%eax)"::"a"((uint32_t)&gdt_desc));
-  seg_upd();
-  asm volatile("mov $0x2B, %ax; \
-    ltr %ax; \
-  ");
-}
 
 void tss_stack_reset() {
   tss.esp0=int_stack_top+0xC0000000;
@@ -118,4 +103,20 @@ void write_tss(int32_t num, uint16_t ss0, uint32_t esp0) {
   // to switch to kernel mode from ring 3.
   tss.cs = 0x0b;
   tss.ss = tss.ds = tss.es = tss.fs = tss.gs = 0x13;
+}
+
+void gdt_init() {
+  set_entry(0,0,0,0);
+  set_entry(1,0,0xFFFFF,0x9A);
+  set_entry(2,0,0xFFFFF,0x92);
+  set_entry(3,0,0xFFFFF,0xFA);
+  set_entry(4,0,0xFFFFF,0xF2);
+  write_tss(5,0x10,int_stack_top+0xC0000000);
+  gdt_desc.size=(sizeof(gdt_entry)*NUM_ENTRIES)-1;
+  gdt_desc.address=gdt;
+  asm volatile("lgdt (%%eax)"::"a"((uint32_t)&gdt_desc));
+  seg_upd();
+  asm volatile("mov $0x2B, %ax; \
+    ltr %ax; \
+  ");
 }
