@@ -73,8 +73,7 @@ Task* tasking_createTask(void* eip) {
 }
 
 void send_msg(uint32_t pid,char* msg) {
-  Task* task=headTask;
-  while(task!=NULL) {
+  for (Task* task=headTask;task!=NULL;task=task->next) {
     if (task->pid==pid) {
       if (task->msg_store==NULL) {
         task->msg_store=malloc(sizeof(char*)*256);
@@ -87,22 +86,7 @@ void send_msg(uint32_t pid,char* msg) {
         task->wr--;
       }
     }
-    task=task->next;
   }
-  // for (Task* task=headTask;task!=NULL;task=task->next) {
-  //   if (task->pid==pid) {
-  //     if (task->msg_store==NULL) {
-  //       task->msg_store=malloc(sizeof(char*)*256);
-  //       task->sender_store=malloc(sizeof(uint32_t)*256);
-  //     }
-  //     task->msg_store[task->wr]=msg;
-  //     task->sender_store[task->wr]=currentTask->pid;
-  //     task->wr++;
-  //     if (task->wr==task->rd) {
-  //       task->wr--;
-  //     }
-  //   }
-  // }
 }
 
 char* get_msg(uint32_t* sender) {

@@ -4,15 +4,15 @@
 #include <string.h>
 #include <stddef.h>
 #define xy_to_indx(x,y) ((x+(y*width))*2)
-char* screen;
-int width;
-int height;
-int x;
-int y;
-vga_colors fg_color;
-vga_colors bg_color;
+static char* screen;
+static int width;
+static int height;
+static int x;
+static int y;
+static vga_colors fg_color;
+static vga_colors bg_color;
 
-void vga_set_char(int x,int y,char c) {
+static void set_char(int x,int y,char c) {
   screen[xy_to_indx(x,y)]=c;
   screen[xy_to_indx(x,y)+1]=(bg_color<<4)|fg_color;
 }
@@ -20,12 +20,12 @@ void vga_set_char(int x,int y,char c) {
 void vga_clear() {
   for (int y=0;y<height;y++) {
     for (int x=0;x<width;x++) {
-      vga_set_char(x,y,' ');
+      set_char(x,y,' ');
     }
   }
 }
 
-void set_cursor(int x,int y) {
+static void set_cursor(int x,int y) {
   int pos=(x+(y*width));
   port_byte_out(0x3D4,0xF);
   port_byte_out(0x3D5,pos&0xFF);
@@ -56,7 +56,7 @@ void vga_write_string(const char* string) {
       x=0;
       y++;
     } else {
-      vga_set_char(x,y,c);
+      set_char(x,y,c);
       x++;
     }
     if (x==width) {
@@ -73,4 +73,12 @@ void vga_write_string(const char* string) {
     }
   }
   set_cursor(x,y);
+}
+
+void vga_backspace() {
+  if (x!=0) {
+      x--;
+      set_char(x,y,' ');
+      set_cursor(x,y);
+  }
 }

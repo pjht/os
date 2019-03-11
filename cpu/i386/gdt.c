@@ -51,15 +51,15 @@ typedef struct {
    uint8_t set_ff;
 } __attribute__((packed)) tss_entry;
 
-gdt_entry gdt[NUM_ENTRIES];
-gdt_description gdt_desc;
-tss_entry tss;
+static gdt_entry gdt[NUM_ENTRIES];
+static gdt_description gdt_desc;
+static tss_entry tss;
 
 void tss_stack_reset() {
   tss.esp0=int_stack_top+0xC0000000;
 }
 
-void set_entry(int i,uint32_t base,uint32_t limit,uint8_t access) {
+static void set_entry(int i,uint32_t base,uint32_t limit,uint8_t access) {
   gdt[i].limit_low16=limit&0xFFFF;
   gdt[i].base_low16=base&0xFFFFF;
   gdt[i].base_mid8=(base&0xFF0000)>>16;
@@ -69,7 +69,7 @@ void set_entry(int i,uint32_t base,uint32_t limit,uint8_t access) {
   gdt[i].base_high8=(base&0xFF000000)>>24;
 }
 
-void write_tss(int32_t num, uint16_t ss0, uint32_t esp0) {
+static void write_tss(int32_t num, uint16_t ss0, uint32_t esp0) {
   // Firstly, let's compute the base and limit of our entry into the GDT.
   uint32_t base = (uint32_t) &tss;
   uint32_t limit = base + sizeof(tss_entry);

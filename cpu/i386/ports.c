@@ -1,29 +1,31 @@
-unsigned char port_byte_in(unsigned short port) {
-  unsigned char result;
+#include <stdint.h>
+
+uint8_t port_byte_in(uint16_t port) {
+  uint8_t result;
   asm("in %%dx, %%al":"=a"(result):"d"(port));
   return result;
 }
 
-void port_byte_out(unsigned short port,unsigned char data) {
+void port_byte_out(uint16_t port,uint8_t data) {
   asm("out %%al, %%dx":: "a"(data),"d"(port));
 }
 
-unsigned short port_word_in(unsigned short port) {
-  unsigned short result;
+uint16_t port_word_in(uint16_t port) {
+  uint16_t result;
   asm("in %%dx, %%ax":"=a"(result):"d"(port));
   return result;
 }
 
-void port_word_out(unsigned short port,unsigned short data) {
+void port_word_out(uint16_t port,uint16_t data) {
   asm("out %%ax, %%dx":: "a" (data), "d" (port));
 }
 
-unsigned long port_long_in(unsigned short port) {
-  unsigned long result;
+uint32_t port_long_in(uint16_t port) {
+  uint32_t result;
   asm("inl %%dx, %%eax":"=a"(result):"d"(port));
   return result;
 }
 
-void port_long_out(unsigned short port,unsigned long data) {
+void port_long_out(uint16_t port,uint32_t data) {
   asm("outl %%eax, %%dx":: "a" (data), "d" (port));
 }

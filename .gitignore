@@ -8,3 +8,4 @@ stuff/*
 cpu/memory.h
 os.iso
 disk.img
+iso/boot/initrd

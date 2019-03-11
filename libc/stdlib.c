@@ -4,9 +4,9 @@
 #include "math.h"
 #include <stdint.h>
 #define MAX_BLOCKS 512
-#define MALLOC_DEBUG 1
+
 typedef struct {
-  uint8_t* bitmap;
+  char* bitmap;
   uint32_t bitmap_byt_size;
   uint32_t bitmap_bit_size;
   uint32_t avail_data_size;
@@ -14,31 +14,35 @@ typedef struct {
 } heap_block;
 
 
-heap_block entries[MAX_BLOCKS];
-uint32_t num_used_entries;
-char get_bmap_bit(uint8_t* bmap,uint32_t index) {
+static heap_block entries[MAX_BLOCKS];
+static uint32_t num_used_entries=0;
+
+static char get_bmap_bit(char* bmap,uint32_t index) {
   uint32_t byte=index/8;
   uint32_t bit=index%8;
   char entry=bmap[byte];
   return (entry&(1<<bit))>0;
 }
-void set_bmap_bit(uint8_t* bmap,uint32_t index) {
+
+static void set_bmap_bit(char* bmap,uint32_t index) {
   uint32_t byte=index/8;
   uint32_t bit=index%8;
   bmap[byte]=bmap[byte]|(1<<bit);
 }
-void clear_bmap_bit(uint8_t* bmap,uint32_t index) {
+
+static void clear_bmap_bit(char* bmap,uint32_t index) {
   uint32_t byte=index/8;
   uint32_t bit=index%8;
   bmap[byte]=bmap[byte]&(~(1<<bit));
 }
-void reserve_block(uint32_t mem_blks) {
+
+static void reserve_block(uint32_t mem_blks) {
   uint32_t bmap_byts=((mem_blks*BLK_SZ)/4)/8;
   entries[num_used_entries].bitmap=alloc_memory((uint32_t)ceilf((double)bmap_byts/BLK_SZ));
   entries[num_used_entries].bitmap_byt_size=bmap_byts;
   entries[num_used_entries].bitmap_bit_size=bmap_byts*8;
-  uint8_t* bmap=entries[num_used_entries].bitmap;
-  char bmap_byt_sz=entries[num_used_entries].bitmap_byt_size;
+  char* bmap=entries[num_used_entries].bitmap;
+  uint32_t bmap_byt_sz=entries[num_used_entries].bitmap_byt_size;
   for(uint32_t i=0;i<bmap_byt_sz;i++) {
     bmap[i]=0;
   }
@@ -57,7 +61,7 @@ void* malloc(uint32_t size) {
     uint32_t remaining_blks;
     entry=entries[i];
     if (entry.avail_data_size>=size) {
-      uint8_t* bmap=entry.bitmap;
+      char* bmap=entry.bitmap;
       uint32_t bmap_byt_sz=entry.bitmap_byt_size;
       for(uint32_t i=0;i<bmap_byt_sz;i++) {
         if (bmap[i]!=0xFF) {
