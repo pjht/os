@@ -102,10 +102,10 @@ void backspace(char* s) {
     s[len-1] = '\0';
 }
 
-char* strtok_str=NULL;
-size_t strtok_index;
+static char* strtok_str=NULL;
+static size_t strtok_index;
 
-char strtok_delim_check(const char* delim) {
+static char strtok_delim_check(const char* delim) {
   for (size_t i=0;i<strlen(delim);i++) {
     if (strtok_str[strtok_index]==delim[i]||strtok_str[strtok_index]=='\0') {
       return 0;

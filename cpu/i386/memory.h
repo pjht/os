@@ -5,5 +5,6 @@
 #define BLK_SZ 4096
 
 void* alloc_memory(uint32_t blocks);
+void alloc_memory_virt(uint32_t num_blocks,void* addr);
 
 #endif

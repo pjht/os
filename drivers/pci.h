@@ -1,6 +1,8 @@
 #ifndef PCI_H
 #define PCI_H
 
+#include <stdint.h>
+
 typedef struct {
   uint16_t vend_id;
   uint16_t dev_id;

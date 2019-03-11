@@ -1,70 +1,116 @@
 #include <stdint.h>
+#include <stdlib.h>
 #include "paging_helpers.h"
 #include "paging.h"
-uint32_t page_directory [1024] __attribute__((aligned(4096)));
-uint32_t page_tables [1048576] __attribute__((aligned(4096)));
-void* next_kern_virt=(void*)KERN_VIRT_START;
-void* next_kern_phys=(void*)KERN_PHYS_START;
-void set_directory_entry(int entry,char usr,char wr,char p,uint32_t* page_directory,uint32_t* page_tables) {
-    int flags=p&1;
-    flags=flags|((wr&1)<<1);
-    flags=flags|((usr&1)<<2);
-    page_directory[entry]=(((uint32_t)&(page_tables[entry*1024]))-0xC0000000)|flags;
+#include "pmem.h"
+static uint32_t page_directory[1024] __attribute__((aligned(4096)));
+static uint32_t kern_page_tables[NUM_KERN_DIRS*1024] __attribute__((aligned(4096)));
+static uint32_t smap_page_tables[2048] __attribute__((aligned(4096)));
+static uint32_t* smap=(uint32_t*)0xFF800000;
+
+static char is_page_present(int page) {
+   int table=page>>10;
+   page=page&0x3FF;
+   if ((smap[table]&0x1)==0) {
+     return 0;
+   }
+   smap_page_tables[table+1]=(smap[table]&0xFFFFFC00)|0x3;
+   return smap[(1024+(1024*table))+page]&0x1;
 }
 
-void set_table_entry(uint32_t page,uint32_t base_addr,char usr,char wr,char p,uint32_t* page_tables) {
-    int flags=p&1;
-    flags=flags|((wr&1)<<1);
-    flags=flags|((usr&1)<<2);
-    page_tables[page]=base_addr|flags;
-}
-
-void alloc_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,char wr,uint32_t* page_directory,uint32_t* page_tables) {
+void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,char wr) {
   uint32_t virt_addr=(uint32_t)virt_addr_ptr;
   uint32_t phys_addr=(uint32_t)phys_addr_ptr;
   int dir_entry=(virt_addr&0xFFC00000)>>22;
   int table_entry=(virt_addr&0x3FF000)>>12;
   for (int i=0;i<=num_pages;i++) {
-    set_table_entry((dir_entry*1024)+table_entry,phys_addr,usr,wr,1,page_tables);
+    if (!(smap[dir_entry]&0x1)) {
+      int flags=1;
+      flags=flags|((wr&1)<<1);
+      flags=flags|((usr&1)<<2);
+      smap[dir_entry]=(uint32_t)pmem_alloc(1)|flags;
+    }
+    smap_page_tables[dir_entry+1]=(smap[dir_entry]&0xFFFFFC00)|0x3;
+    int flags=1;
+    flags=flags|((wr&1)<<1);
+    flags=flags|((usr&1)<<2);
+    smap[(1024+(1024*dir_entry))+table_entry]=phys_addr|flags;
     table_entry++;
     phys_addr+=0x1000;
-    if (table_entry==1024) {
-      table_entry=0;
-      set_directory_entry(dir_entry,usr,wr,1,page_directory,page_tables);
-      dir_entry++;
-    } else if (i==num_pages) {
-      set_directory_entry(dir_entry,usr,wr,1,page_directory,page_tables);
-    }
   }
 }
 
-void* alloc_kern_pages(int num_pages,char wr) {
-  void* starting=next_kern_virt;
-  alloc_pages(next_kern_virt,next_kern_phys,num_pages,1,wr,page_directory,page_tables);
-  next_kern_virt+=num_pages*4096;
-  next_kern_phys+=num_pages*4096;
-  return starting;
+void* alloc_pages(int num_pages) {
+  void* phys_addr=pmem_alloc(num_pages);
+  uint32_t bmap_index;
+  uint32_t remaining_blks;
+  for(uint32_t i=0;i<131072;i++) {
+    char got_0=0;
+    remaining_blks=num_pages;
+    uint32_t old_j;
+    for (uint32_t j=i*8;;j++) {
+      char bit=is_page_present(j);
+      if (got_0) {
+        if (bit) {
+          if (remaining_blks==0) {
+              bmap_index=old_j;
+              break;
+          } else {
+            i+=j/8;
+            i--;
+            break;
+          }
+        } else {
+          remaining_blks--;
+        }
+      } else {
+        if (!bit) {
+          got_0=1;
+          old_j=j;
+          remaining_blks--;
+        }
+      }
+      if (remaining_blks==0) {
+        bmap_index=old_j;
+        break;
+      }
+    }
+    if (remaining_blks==0) {
+      break;
+    }
+  }
+  if (remaining_blks!=0) {
+    return NULL;
+  }
+  // for (int i=0;i<num_pages;i++) {
+  //   vmem_set_bmap_bit(bmap_index+i);
+  // }
+  void* addr=(void*)(bmap_index<<12);
+  map_pages(addr,phys_addr,num_pages,1,1);
+  return addr;
 }
 
-int dir_entry_present(int entry) {
-  uint32_t dir_entry=page_directory[entry];
-  return dir_entry&1;
+
+void alloc_pages_virt(int num_pages,void* addr) {
+  void* phys_addr=pmem_alloc(num_pages);
+  map_pages(addr,phys_addr,num_pages,1,1);
 }
-
-void* virt_to_phys(void* virt_addr_ptr) {
-  uint32_t virt_addr=(uint32_t)virt_addr_ptr;
-  int dir_num=(virt_addr&0xFFC00000)>>22;
-  int table_num=(virt_addr&0x3FF000)>>12;
-  int offset=(virt_addr&0xFFF);
-  uint32_t table_entry=page_tables[(dir_num*1024)+table_num];
-  table_entry=table_entry&0xFFFFF000;
-  return (void*)(table_entry+offset);
-
-}
-
-
 
 void paging_init() {
-  alloc_kern_pages(NUM_KERN_DIRS*1024,1);
+  for (uint32_t i=0;i<NUM_KERN_DIRS*1024;i++) {
+    kern_page_tables[i]=(i<<12)|0x7;
+  }
+  smap_page_tables[0]=(((uint32_t)&(page_directory))-0xC0000000)|0x3;
+  for (uint32_t i=1;i<2048;i++) {
+    smap_page_tables[i]=0;
+  }
+  for (uint32_t i=0;i<NUM_KERN_DIRS;i++) {
+    uint32_t entry_virt=(uint32_t)&(kern_page_tables[i*1024]);
+    page_directory[i+768]=(entry_virt-0xC0000000)|0x7;
+  }
+  for (uint32_t i=0;i<2;i++) {
+    uint32_t entry_virt=(uint32_t)&(smap_page_tables[i*1024]);
+    page_directory[i+1022]=(entry_virt-0xC0000000)|0x7;
+  }
   load_page_directory((uint32_t*)((uint32_t)page_directory-0xC0000000));
 }

@@ -4,5 +4,6 @@
 typedef int (*dev_drv)(char* filename,int c,long pos,char wr);
 
 void init_devfs();
-void add_dev(dev_drv drv,char* name);
+void devfs_add(dev_drv drv,char* name);
+
 #endif

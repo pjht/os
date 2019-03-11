@@ -37,10 +37,6 @@ boot_page_table1:
 	.skip 4096
 boot_page_table2:
 	.skip 4096
-boot_page_table3:
-	.skip 4096
-boot_page_table4:
-	.skip 4096
 # Further page tables may be required if the kernel grows beyond 3 MiB.
 
 # The kernel entry point.
@@ -60,8 +56,8 @@ _start:
 	#       1 MiB as it can be generally useful, and there's no need to
 	#       specially map the VGA buffer.
 	movl $0, %esi
-	# Map 4096 pages.
-	movl $4096, %ecx
+	# Map 2048 pages.
+	movl $2048, %ecx
 
 1:
 	# Map physical address as "present, writable". Note that this maps
@@ -88,8 +84,6 @@ _start:
 	movl $(boot_page_table1 - 0xC0000000 + 0x007), boot_page_directory - 0xC0000000 + 0
 	movl $(boot_page_table1 - 0xC0000000 + 0x007), boot_page_directory - 0xC0000000 + 768 * 4
 	movl $(boot_page_table2 - 0xC0000000 + 0x007), boot_page_directory - 0xC0000000 + 769 * 4
-	movl $(boot_page_table3 - 0xC0000000 + 0x007), boot_page_directory - 0xC0000000 + 770 * 4
-	movl $(boot_page_table4 - 0xC0000000 + 0x007), boot_page_directory - 0xC0000000 + 771 * 4
 	# Set cr3 to the address of the boot_page_directory.
 	movl $(boot_page_directory - 0xC0000000), %ecx
 	movl %ecx, %cr3
