@@ -80,11 +80,8 @@ void* alloc_pages(int num_pages) {
     }
   }
   if (remaining_blks!=0) {
-    return NULL;
+    klog("PANIC","Out of memory");
   }
-  // for (int i=0;i<num_pages;i++) {
-  //   vmem_set_bmap_bit(bmap_index+i);
-  // }
   void* addr=(void*)(bmap_index<<12);
   map_pages(addr,phys_addr,num_pages,1,1);
   return addr;

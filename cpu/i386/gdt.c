@@ -105,6 +105,20 @@ static void write_tss(int32_t num, uint16_t ss0, uint32_t esp0) {
   tss.ss = tss.ds = tss.es = tss.fs = tss.gs = 0x13;
 }
 
+void allow_all_ports() {
+  for (int i=0;i<8192;i++) {
+    tss.iopb[i]=0;
+  }
+}
+
+
+void block_all_ports() {
+  for (int i=0;i<8192;i++) {
+    tss.iopb[i]=0xFF;
+  }
+}
+
+
 void gdt_init() {
   set_entry(0,0,0,0);
   set_entry(1,0,0xFFFFF,0x9A);

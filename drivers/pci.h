@@ -16,6 +16,9 @@ typedef struct {
   uint8_t lat_timer;
   uint8_t header_type;
   uint8_t bist;
+  uint16_t bus;
+  uint8_t device;
+  uint8_t func;
 } __attribute__((packed)) pci_dev_common_info;
 
 typedef enum {

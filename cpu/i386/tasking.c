@@ -138,5 +138,10 @@ void tasking_yield() {
       1: \
         ");
     }
+    if (task->priv) {
+      allow_all_ports();
+    } else {
+      block_all_ports();
+    }
     switchTask(&oldCurr->regs, &currentTask->regs);
 }
