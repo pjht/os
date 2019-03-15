@@ -72,11 +72,11 @@ Task* tasking_createTask(void* eip) {
   return createTaskKmode(eip,1);
 }
 
-void send_msg(uint32_t pid,char* msg) {
+void send_msg(uint32_t pid,void* msg) {
   for (Task* task=headTask;task!=NULL;task=task->next) {
     if (task->pid==pid) {
       if (task->msg_store==NULL) {
-        task->msg_store=malloc(sizeof(char*)*256);
+        task->msg_store=malloc(sizeof(void*)*256);
         task->sender_store=malloc(sizeof(uint32_t)*256);
       }
       task->msg_store[task->wr]=msg;
@@ -89,7 +89,7 @@ void send_msg(uint32_t pid,char* msg) {
   }
 }
 
-char* get_msg(uint32_t* sender) {
+void* get_msg(uint32_t* sender) {
   if (!currentTask->msg_store) {
     return NULL;
   }
