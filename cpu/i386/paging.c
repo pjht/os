@@ -46,7 +46,7 @@ void* alloc_pages(int num_pages) {
   void* phys_addr=pmem_alloc(num_pages);
   uint32_t bmap_index;
   uint32_t remaining_blks;
-  for(uint32_t i=0;i<131072;i++) {
+  for(uint32_t i=1;i<131072;i++) {
     char got_0=0;
     remaining_blks=num_pages;
     uint32_t old_j;
