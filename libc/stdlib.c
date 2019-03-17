@@ -1,8 +1,9 @@
-#include "../cpu/memory.h"
 #include "string.h"
 #include "stdlib.h"
 #include "math.h"
 #include <stdint.h>
+#include <memory.h>
+
 #define MAX_BLOCKS 512
 
 typedef struct {
