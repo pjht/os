@@ -23,7 +23,7 @@ os.iso: kernel/kernel.elf initrd/*
 kernel/kernel.elf: $(OBJ)
 	i386-elf-ld -T linker.ld -o $@ $^
 
-%.o: %.c h_files
+%.o: %.c
 	$(CC) $(CFLAGS)  -c $< -o $@
 
 %.o: %.asm
@@ -31,10 +31,6 @@ kernel/kernel.elf: $(OBJ)
 
 %.o: %.s
 	i386-elf-as $< -o $@
-
-h_files: cpu/$(PLAT)/memory.h
-	rm -f cpu/memory.h
-	cp cpu/$(PLAT)/memory.h cpu/memory.h
 
 clean:
 	rm -rf $(OBJ) kernel/cstart.o cpu/memory.h os.iso */*.elf iso/boot/initrd.tar

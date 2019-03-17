@@ -2,6 +2,7 @@
 #include "idt.h"
 #include "gdt.h"
 #include "ports.h"
+#include "paging.h"
 #include "../halt.h"
 #include "../drivers/vga.h"
 #include "../tasking.h"
@@ -172,6 +173,10 @@ void isr_handler(registers_t r) {
         tasking_yield();
       } else if (r.eax==2) {
         tasking_createTask((void*)r.ebx);
+      } else if (r.eax==3) {
+        r.ebx=(uint32_t)alloc_pages(r.ebx);
+      } else if (r.eax==4) {
+        alloc_pages_virt(r.ebx,(void*)r.ecx);
       }
     break;
     }

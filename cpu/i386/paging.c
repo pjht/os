@@ -3,6 +3,8 @@
 #include "paging_helpers.h"
 #include "paging.h"
 #include "pmem.h"
+#include <klog.h>
+
 static uint32_t page_directory[1024] __attribute__((aligned(4096)));
 static uint32_t kern_page_tables[NUM_KERN_DIRS*1024] __attribute__((aligned(4096)));
 static uint32_t smap_page_tables[2048] __attribute__((aligned(4096)));

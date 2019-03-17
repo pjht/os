@@ -10,6 +10,7 @@ push %eax; \
 #include "../../libc/stdlib.h"
 #include "../../libc/stdio.h"
 #include "memory.h"
+#include "gdt.h"
 #include <stdint.h>
 #define STACK_PAGES 2
 

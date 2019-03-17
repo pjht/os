@@ -3,7 +3,6 @@
 #include "../drivers/pci.h"
 #include "../drivers/serial.h"
 #include "../cpu/i386/ports.h"
-#include "../cpu/memory.h"
 #include "vfs.h"
 #include "../fs/devfs.h"
 #include "../fs/initrd.h"
@@ -11,6 +10,7 @@
 #include <stdlib.h>
 #include <tasking.h>
 #include <string.h>
+#include <memory.h>
 #include <grub/multiboot.h>
 #include "klog.h"
 #include "elf.h"
