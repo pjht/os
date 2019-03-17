@@ -12,7 +12,7 @@ void* alloc_memory(uint32_t num_pages) {
 void alloc_memory_virt(uint32_t num_pages,void* addr) {
   void* address;
   asm volatile("  \
-    mov $3, %%eax; \
+    mov $4, %%eax; \
     int $80; \
   "::"b"(num_pages),"c"(addr));
 }
