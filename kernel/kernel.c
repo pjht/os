@@ -3,7 +3,6 @@
 #include "../drivers/pci.h"
 #include "../drivers/serial.h"
 #include "../cpu/i386/ports.h"
-#include "../cpu/i386/pmem.h"
 #include "../cpu/memory.h"
 #include "vfs.h"
 #include "../fs/devfs.h"
@@ -81,7 +80,6 @@ static void init() {
   stdout=fopen("/dev/console","w");
   stdin=fopen("/dev/console","r");
   stderr=fopen("/dev/console","w");
-  pmem_init(mbd);
   read_initrd(mbd);
   devfs_add(initrd_dev_drv,"initrd");
   initrd_init();
@@ -120,7 +118,7 @@ static void init() {
 
 void kmain(multiboot_info_t* header) {
   mbd=header;
-  cpu_init();
+  cpu_init(mbd);
   text_fb_info info;
   if (header->flags&MULTIBOOT_INFO_FRAMEBUFFER_INFO&&header->framebuffer_type==2) {
     info.address=(char*)(((uint32_t)header->framebuffer_addr&0xFFFFFFFF)+0xC0000000);
