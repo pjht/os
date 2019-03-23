@@ -123,7 +123,7 @@ void tasking_yield() {
     }
     Task* oldCurr=currentTask;
     currentTask=task;
-    // load_address_space(task->regs.cr3);
+    load_address_space(task->regs.cr3);
     if (!task->kmode) {
       asm volatile("  \
         cli; \
