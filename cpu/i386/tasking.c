@@ -7,8 +7,8 @@ push %eax; \
 #include "tasking.h"
 #include "../tasking.h"
 #include "isr.h"
-#include "../../libc/stdlib.h"
-#include "../../libc/stdio.h"
+#include <stdio.h>
+#include "kmalloc.h"
 #include "memory.h"
 #include "gdt.h"
 #include <stdint.h>
@@ -28,7 +28,7 @@ void tasking_init() {
 }
 
 static Task* createTaskKmode(void* eip,char kmode) {
-    Task* task=malloc(sizeof(Task));
+    Task* task=kmalloc(sizeof(Task));
     task->kmode=kmode;
     task->regs.eax=0;
     task->regs.ebx=0;
