@@ -38,8 +38,12 @@ static Task* createTaskKmode(void* eip,char kmode) {
     task->regs.edi=0;
     asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(task->regs.eflags)::"%eax");
     task->regs.eip=(uint32_t)eip;
-    asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(task->regs.cr3)::"%eax");
+    task->regs.cr3=new_address_space();
+    uint32_t cr3;
+    asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(cr3)::"%eax");
+    load_address_space(task->regs.cr3);
     task->regs.esp=(uint32_t)alloc_memory(1);
+    load_address_space(cr3);
     task->regs.ebp=0;
     task->msg_store=NULL;
     task->rd=0;
@@ -119,7 +123,7 @@ void tasking_yield() {
     }
     Task* oldCurr=currentTask;
     currentTask=task;
-    asm("mov %%eax,%%cr3":: "a"(task->regs.cr3));
+    // load_address_space(task->regs.cr3);
     if (!task->kmode) {
       asm volatile("  \
         cli; \
