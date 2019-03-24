@@ -7,8 +7,8 @@ push %eax; \
 #include "tasking.h"
 #include "../tasking.h"
 #include "isr.h"
-#include "../../libc/stdlib.h"
-#include "../../libc/stdio.h"
+#include <stdio.h>
+#include "kmalloc.h"
 #include "memory.h"
 #include "gdt.h"
 #include <stdint.h>
@@ -28,7 +28,7 @@ void tasking_init() {
 }
 
 static Task* createTaskKmode(void* eip,char kmode) {
-    Task* task=malloc(sizeof(Task));
+    Task* task=kmalloc(sizeof(Task));
     task->kmode=kmode;
     task->regs.eax=0;
     task->regs.ebx=0;
@@ -38,8 +38,12 @@ static Task* createTaskKmode(void* eip,char kmode) {
     task->regs.edi=0;
     asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(task->regs.eflags)::"%eax");
     task->regs.eip=(uint32_t)eip;
-    asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(task->regs.cr3)::"%eax");
-    task->regs.esp=(uint32_t)alloc_memory(1);
+    task->regs.cr3=new_address_space();
+    uint32_t cr3;
+    asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(cr3)::"%eax");
+    load_address_space(task->regs.cr3);
+    task->regs.esp=((uint32_t)alloc_memory(1))+0xfff;
+    load_address_space(cr3);
     task->regs.ebp=0;
     task->msg_store=NULL;
     task->rd=0;
@@ -70,7 +74,7 @@ char isPrivleged(uint32_t pid) {
 }
 
 Task* tasking_createTask(void* eip) {
-  return createTaskKmode(eip,1);
+  return createTaskKmode(eip,0);
 }
 
 void send_msg(uint32_t pid,void* msg) {
@@ -119,7 +123,12 @@ void tasking_yield() {
     }
     Task* oldCurr=currentTask;
     currentTask=task;
-    asm("mov %%eax,%%cr3":: "a"(task->regs.cr3));
+    load_address_space(task->regs.cr3);
+    if (task->priv) {
+      allow_all_ports();
+    } else {
+      block_all_ports();
+    }
     if (!task->kmode) {
       asm volatile("  \
         cli; \
@@ -138,11 +147,6 @@ void tasking_yield() {
         iret; \
       1: \
         ");
-    }
-    if (task->priv) {
-      allow_all_ports();
-    } else {
-      block_all_ports();
     }
     switchTask(&oldCurr->regs, &currentTask->regs);
 }
