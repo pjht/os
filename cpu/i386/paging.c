@@ -109,6 +109,9 @@ void* new_address_space() {
     smap[i+1022]=(entry_virt-0xC0000000)|0x3;
   }
   smap_page_tables[0]=(((uint32_t)&(page_directory))-0xC0000000)|0x3;
+  for (uint32_t i=1;i<2048;i++) {
+    smap_page_tables[i]=0;
+  }
   return dir;
 }
 
