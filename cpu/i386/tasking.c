@@ -74,7 +74,7 @@ char isPrivleged(uint32_t pid) {
 }
 
 Task* tasking_createTask(void* eip) {
-  return createTaskKmode(eip,1);
+  return createTaskKmode(eip,0);
 }
 
 void send_msg(uint32_t pid,void* msg) {
@@ -124,6 +124,11 @@ void tasking_yield() {
     Task* oldCurr=currentTask;
     currentTask=task;
     load_address_space(task->regs.cr3);
+    if (task->priv) {
+      allow_all_ports();
+    } else {
+      block_all_ports();
+    }
     if (!task->kmode) {
       asm volatile("  \
         cli; \
@@ -142,11 +147,6 @@ void tasking_yield() {
         iret; \
       1: \
         ");
-    }
-    if (task->priv) {
-      allow_all_ports();
-    } else {
-      block_all_ports();
     }
     switchTask(&oldCurr->regs, &currentTask->regs);
 }
