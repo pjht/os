@@ -1,8 +1,3 @@
-/*
-pop %eax; \
-or $0x200,%eax; \
-push %eax; \
-*/
 #include "tasking_helpers.h"
 #include "tasking.h"
 #include "../tasking.h"
@@ -142,6 +137,9 @@ void tasking_yield() {
         pushl $0x23; \
         pushl %eax; \
         pushf; \
+        pop %eax; \
+        or $0x200,%eax; \
+        push %eax; \
         pushl $0x1B; \
         push $1f; \
         iret; \
