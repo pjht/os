@@ -1,9 +1,9 @@
 #include "../../cpu/i386/ports.h"
 #include "../../cpu/i386/isr.h"
 #include "../serial.h"
-#include "../../libc/stdio.h"
-#include "../../libc/string.h"
-#include "../../libc/devbuf.h"
+#include <stdio.h>
+#include <string.h>
+#include <devbuf.h>
 #include "../vga.h"
 #include "../../fs/devfs.h"
 #include <klog.h>

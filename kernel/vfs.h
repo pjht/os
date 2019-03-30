@@ -1,7 +1,7 @@
 #ifndef VFS_H
 #define VFS_H
 #include <stdint.h>
-#include "../libc/stdio.h"
+#include <stdio.h>
 
 typedef enum {
   FSOP_MOUNT,
