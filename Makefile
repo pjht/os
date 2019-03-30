@@ -1,6 +1,8 @@
 PLAT=i386
-C_SOURCES = $(wildcard kernel/*.c drivers/$(PLAT)/*.c drivers/$(PLAT)/*/*.c libc/*.c cpu/$(PLAT)/*.c fs/*.c)
+C_SOURCES = $(wildcard kernel/*.c drivers/$(PLAT)/*.c drivers/$(PLAT)/*/*.c cpu/$(PLAT)/*.c fs/*.c)
+LIBC_SOURCES = $(wildcard libc/*.c libc/*/*.c)
 OBJ = $(C_SOURCES:.c=.o $(shell cat psinfo/$(PLAT)/o.txt))
+LIBC_OBJ = $(LIBC_SOURCES:.c=.o)
 CC = $(shell cat psinfo/$(PLAT)/cc.txt)
 GDB = $(shell cat psinfo/$(PLAT)/gdb.txt)
 CFLAGS = -Ilibc -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
@@ -24,8 +26,11 @@ initrd/prog.elf: prog/*
 	cd prog && make
 	cp prog/prog.elf initrd
 
-kernel/kernel.elf: $(OBJ)
+kernel/kernel.elf: $(OBJ) libc/libc.a
 	i386-elf-ld -T linker.ld -o $@ $^
+
+libc/libc.a: $(LIBC_OBJ)
+	i386-elf-ar rcs $@ $^
 
 %.o: %.c
 	$(CC) $(CFLAGS)  -c $< -o $@
@@ -37,4 +42,4 @@ kernel/kernel.elf: $(OBJ)
 	i386-elf-as $< -o $@
 
 clean:
-	rm -rf $(OBJ) kernel/cstart.o cpu/memory.h os.iso */*.elf iso/boot/initrd.tar
+	rm -rf $(OBJ) libc/libc.a kernel/cstart.o cpu/memory.h os.iso */*.elf iso/boot/initrd.tar
