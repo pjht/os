@@ -1,12 +1,15 @@
 PLAT=i386
 C_SOURCES = $(wildcard kernel/*.c drivers/$(PLAT)/*.c drivers/$(PLAT)/*/*.c cpu/$(PLAT)/*.c fs/*.c)
 LIBC_SOURCES = $(wildcard libc/*.c libc/*/*.c)
+LIBC_HEADERS = $(wildcard libc/*.h libc/*/*.h)
 OBJ = $(C_SOURCES:.c=.o $(shell cat psinfo/$(PLAT)/o.txt))
 LIBC_OBJ = $(LIBC_SOURCES:.c=.o)
 CC = $(shell cat psinfo/$(PLAT)/cc.txt)
 GDB = $(shell cat psinfo/$(PLAT)/gdb.txt)
-CFLAGS = -Ilibc -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
+CFLAGS =  -Isysroot/usr/include -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
 QFLAGS =  -m 2G -boot d -cdrom os.iso -serial vc #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
+
+.PHONY: sysroot
 
 all: os.iso
 
@@ -29,10 +32,15 @@ initrd/prog.elf: prog/*
 kernel/kernel.elf: $(OBJ) libc/libc.a
 	i386-elf-ld -T linker.ld -o $@ $^
 
+sysroot: $(LIBC_HEADERS)
+	cp -r libc/* sysroot/usr/include
+	rm -f sysroot/usr/include/libc.a sysroot/usr/include/*.o sysroot/usr/include/*/*.o sysroot/usr/include/*.c sysroot/usr/include/*/*.c
+
+
 libc/libc.a: $(LIBC_OBJ)
 	i386-elf-ar rcs $@ $^
 
-%.o: %.c
+%.o: %.c sysroot
 	$(CC) $(CFLAGS)  -c $< -o $@
 
 %.o: %.asm
