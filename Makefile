@@ -33,6 +33,7 @@ kernel/kernel.elf: $(OBJ) libc/libc.a
 	i386-elf-ld -T linker.ld -o $@ $^
 
 sysroot: $(LIBC_HEADERS)
+	mkdir -p sysroot/usr/include
 	cp -r libc/* sysroot/usr/include
 	rm -f sysroot/usr/include/libc.a sysroot/usr/include/*.o sysroot/usr/include/*/*.o sysroot/usr/include/*.c sysroot/usr/include/*/*.c
 
