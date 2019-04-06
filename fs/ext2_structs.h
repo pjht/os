@@ -31,7 +31,7 @@ typedef struct {
   uint16_t s_block_group_nr;
   uint32_t s_feature_compat;
   uint32_t s_feature_incompat;
-  uint32_t s_feature_ro_compat;
+  uint32_t s_feature_rw_compat;
   char s_uuid[16];
   char s_volume_name[16];
   char s_last_mounted[64];
@@ -61,9 +61,9 @@ typedef enum {
 }  s_feature_incompat;
 
 typedef enum {
-  EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER=1,
-  EXT2_FEATURE_RO_COMPAT_LARGE_FILE=2,
-  EXT2_FEATURE_RO_COMPAT_BTREE_DIR=4
+  EXT2_FEATURE_RW_COMPAT_SPARSE_SUPER=1,
+  EXT2_FEATURE_RW_COMPAT_LARGE_FILE=2,
+  EXT2_FEATURE_RW_COMPAT_BTREE_DIR=4
 }  s_feature_ro_compat;
 
 typedef struct {
@@ -92,7 +92,7 @@ typedef struct {
   uint32_t i_block[15];
   uint32_t i_generation;
   uint32_t i_file_acl;
-  uint32_t i_dir_acl;
+  uint32_t i_ext_size_or_dir_acl;
   uint32_t i_faddr;
   uint32_t i_osd2;
   char unused[8];

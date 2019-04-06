@@ -30,7 +30,7 @@ initrd/prog.elf: prog/*
 	cp prog/prog.elf initrd
 
 kernel/kernel.elf: $(OBJ) libc/libc.a
-	i386-elf-ld -T linker.ld -o $@ $^
+	i386-elf-gcc -T linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc
 
 sysroot: $(LIBC_HEADERS)
 	mkdir -p sysroot/usr/include

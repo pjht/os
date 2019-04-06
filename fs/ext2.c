@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <stdint.h>
 #include "ext2_structs.h"
 
 ext2_superblock* supblks;
@@ -20,10 +21,10 @@ typedef struct {
   char* contents;
 } file_info;
 
-void* read_blk(int blknum,FILE* f) {
-  void* block=malloc(sizeof(uint8_t)*1024);
-  fseek(f,blknum*1024,SEEK_SET);
-  fread(block,1,sizeof(uint8_t)*1024,f);
+void* read_blk(int blknum,FILE* f,int num) {
+  void* block=malloc(sizeof(uint8_t)*blk_size[num]);
+  fseek(f,blknum*blk_size[num],SEEK_SET);
+  fread(block,1,sizeof(uint8_t)*blk_size[num],f);
   return block;
 }
 
@@ -32,11 +33,67 @@ inode read_inode(uint32_t inode_num,FILE* f,int num) {
   uint32_t grp=(inode_num-1)/supblk.s_inodes_per_group;
   uint32_t index=(inode_num-1)%supblk.s_inodes_per_group;
   uint32_t starting_blk=blk_grps[num][grp].bg_inode_table;
-  size_t inodes_per_blk=1024/sizeof(inode);
+  size_t inodes_per_blk=blk_size[num]/sizeof(inode);
   uint32_t blk=starting_blk+(index/inodes_per_blk);
   uint32_t offset=index%inodes_per_blk;
-  inode* inodes=read_blk(blk,f);
+  inode* inodes=read_blk(blk,f,num);
   return inodes[offset];
+}
+
+uint64_t get_sz(inode inode,int num) {
+  uint64_t size=inode.i_size;
+  if (supblks[num].s_feature_rw_compat&EXT2_FEATURE_RW_COMPAT_LARGE_FILE) {
+    size=size|(((uint64_t)inode.i_ext_size_or_dir_acl)<<32);
+  }
+  return size;
+}
+
+int read_char(inode inode,FILE* f,int pos,int num) {
+  if (inode.i_block[0]==0) {
+    return -1;
+  }
+  uint64_t size=get_sz(inode,num);
+  int block=pos/blk_size[num];
+  pos=pos%blk_size[num];
+  if (block<12) {
+    if (inode.i_block[block]==0) {
+      return -1;
+    } else {
+      return ((char*)read_blk(inode.i_block[block],f,num))[pos];
+    }
+  } else if (block<268) {
+    uint32_t* blocks=read_blk(inode.i_block[12],f,num);
+    if (blocks[i]==0) {
+      return -1
+    } else {
+      return ((char*)read_blk(blocks[block],f,num))[pos];
+    }
+  }
+  return -1;
+}
+
+void* read_inode_contents(inode inode,FILE* f,int num) {
+  if (inode.i_block[0]==0) {
+    return NULL;
+  }
+  uint64_t size=get_sz(inode,num);
+  char* data=malloc(sizeof(char)*ceil(size/blk_size[num]));
+  for (int i=0;i<12;i++) {
+    if (inode.i_block[i]==0) {
+      break;
+    }
+    memcpy(&data[i*blk_size[num]],read_blk(inode.i_block[i],f,num),blk_size[num]);
+  }
+  if (inode.i_block[12]!=0) {
+    uint32_t* blocks=read_blk(inode.i_block[12],f,num);
+    for (int i=0;i<256;i++) {
+      if (blocks[i]==0) {
+        break;
+      }
+      memcpy(&data[(i+12)*blk_size[num]],read_blk(blocks[i],f,num),blk_size[num]);
+    }
+  }
+  return (void*)data;
 }
 
 char** get_dir_listing(uint32_t inode_num,FILE* f,int num) {
@@ -46,7 +103,7 @@ char** get_dir_listing(uint32_t inode_num,FILE* f,int num) {
   inode dir_inode=read_inode(inode_num,f,num);
   uint32_t size=dir_inode.i_size;
   uint32_t tot_size=0;
-  dir_entry* dir=read_blk(dir_inode.i_block[0],f);
+  dir_entry* dir=read_inode_contents(dir_inode,f,num);
   dir_entry* current_entry=dir;
   for(int i=0;tot_size<size;i++) {
     if (current_entry->file_type==0) {
@@ -83,7 +140,7 @@ dir_entry* read_dir_entry(uint32_t inode_num,uint32_t dir_entry_num,FILE* f,int 
   uint32_t size=dir_inode.i_size;
   uint32_t tot_size=0;
   uint32_t ent_num=0;
-  dir_entry* dir=read_blk(dir_inode.i_block[0],f);
+  dir_entry* dir=read_inode_contents(dir_inode,f,num);
   dir_entry* current_entry=dir;
   for(int i=0;tot_size<size;i++) {
     if (current_entry->file_type==0) {
@@ -143,18 +200,20 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
         max_mnts+=32;
     }
     FILE* f=fopen(dev,"r");
-    ext2_superblock* supblk=read_blk(1,f);
+    fseek(f,1024,SEEK_SET);
+    ext2_superblock* supblk=(ext2_superblock*)malloc(sizeof(char)*1024);
+    fread(supblk,1024,1,f);
     supblks[num_mnts]=*supblk;
     blk_size[num_mnts]=1024<<(supblk->s_log_blk_size);
     double num_blk_grps_dbl=supblk->s_blocks_count/(double)supblk->s_blocks_per_group;
     uint32_t num_blk_grps=ceil(num_blk_grps_dbl);
-    blk_grps=malloc(sizeof(blk_grp*)*num_blk_grps);
-    blk_grp* blk_group=read_blk(2,f);
-    blk_grps[num_mnts]=malloc(sizeof(blk_grp)*num_blk_grps);
-    for (uint32_t i=0;i<num_blk_grps;i++) {
-      blk_grps[num_mnts][i]=*blk_group;
-      blk_group++;
-    };
+    blk_grp* blk_group=read_blk(2,f,num_mnts);
+    uint32_t num_blks=((sizeof(blk_grp)*num_blk_grps)/blk_size[num_mnts])+1;
+    blk_grps[num_mnts]=malloc(sizeof(uint8_t)*num_blks*1024);
+    char* data_ptr=(char*)(blk_grps[num_mnts]);
+    for (int i=0;i<num_blks;i++) {
+      memcpy(&data_ptr[i*blk_size[num_mnts]],read_blk(i+2,f,num_mnts),blk_size[num_mnts]);
+    }
     fclose(f);
     mnts[num_mnts]=(char*)data1;
     devs[num_mnts]=dev;
@@ -190,22 +249,24 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
   }
   if (op==FSOP_GETC) {
     file_info* data=stream->data;
-    char* contents;
-    if (data->is_cont_valid) {
-        contents=data->contents;
-    } else {
-      FILE* f=fopen(devs[data->num],"r");
-      contents=read_blk((data->inode).i_block[0],f);
-      fclose(f);
-      data->is_cont_valid=1;
-      data->contents=contents;
-    }
-    if (stream->pos>strlen(contents)) {
+    //char* contents;
+    // if (data->is_cont_valid) {
+    //     contents=data->contents;
+    // } else {
+    //   FILE* f=fopen(devs[data->num],"r");
+    //   contents=read_inode_contents(data->inode,f,data->num);
+    //   fclose(f);
+    //   data->is_cont_valid=1;
+    //   data->contents=contents;
+    // }
+    if (stream->pos>get_sz(data->inode,data->num)) {
       *((int*)data1)=EOF;
       stream->eof=1;
       return 1;
     }
-    *((int*)data1)=contents[stream->pos];
+    FILE* f=fopen(devs[data->num],"r");
+    *((int*)data1)=read_char(data->inode,f,stream->pos,data->num);
+    fclose(f);
     stream->pos++;
     return 1;
   }

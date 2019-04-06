@@ -33,9 +33,9 @@ static uint8_t* read_sect(int base,int slave,int lba) {
     sect[i+1]=(data&0xFF00)>>8;
   }
   last_read_sector=lba;
-  if (sect_data) {
-    free(sect_data);
-  }
+  // if (sect_data) {
+  //   free(sect_data);
+  // }
   sect_data=sect;
   return sect;
 }
