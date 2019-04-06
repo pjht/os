@@ -8,6 +8,7 @@
 #define IDE_PRIM_CTRL 0x3f6
 #define IDE_SEC_IO 0x170
 #define IDE_SEC_CTRL 0x376
+
 static uint8_t ident[4][512];
 static uint8_t* sect_data=NULL;
 static uint32_t last_read_sector=0;
@@ -126,7 +127,7 @@ void ide_init() {
           ident[0][i+1]=(data&0xFF00)>>8;
         }
         klog("INFO","Found IDE primary master");
-        port_byte_out(0x3f6,port_byte_in(0x3f6)|0x2);
+        port_byte_out(IDE_PRIM_CTRL,port_byte_in(IDE_PRIM_CTRL)|0x2);
         devfs_add(drv,"hda");
       }
     }
@@ -181,7 +182,7 @@ void ide_init() {
   //       ident[0][i+1]=(data&0xFF00)>>8;
   //     }
   //     klog("INFO","Found IDE secondary master");
-  //     port_byte_out(0x3f6,port_byte_in(0x3f6)|0x2);
+  //     port_byte_out(IDE_SEC_CTRL,port_byte_in(IDE_SEC_CTRL)|0x2);
   //     devfs_add(drv,"hdc");
   //   }
   //   //Detect secondary slave
@@ -203,7 +204,7 @@ void ide_init() {
   //       ident[0][i+1]=(data&0xFF00)>>8;
   //     }
   //     klog("INFO","Found IDE decondaryary slave");
-  //     port_byte_out(0x3f6,port_byte_in(0x3f6)|0x2);
+  //     port_byte_out(IDE_SEC_CTRL,port_byte_in(IDE_SEC_CTRL)|0x2);
   //     devfs_add(drv,"hdd");
   //   }
   // }
