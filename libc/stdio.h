@@ -7,7 +7,7 @@ typedef struct {
   char* mntpnt;
   const char* path;
   uint32_t type;
-  long pos;
+  unsigned long pos;
   int eof;
   void* data;
 } FILE;

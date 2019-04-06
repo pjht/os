@@ -74,8 +74,8 @@ static void checkFunction(pci_dev_common_info* info) {
     max_devs+=32;
     pci_devs=malloc(sizeof(pci_dev_common_info)*max_devs);
   }
-  // pci_devs[pci_num_devs]=info;
-  // pci_num_devs++;
+  pci_devs[pci_num_devs]=info;
+  pci_num_devs++;
   klog("INFO","Found PCI device. Class code:%x, Subclass:%x Prog IF:%x",info->class_code,info->subclass,info->prog_if);
   klog("INFO","Vendor ID:%x, Device ID:%x",info->vend_id,info->dev_id);
   if ((info->header_type&0x7f)==0) {
