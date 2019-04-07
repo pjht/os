@@ -12,9 +12,10 @@
 static uint8_t ident[4][512];
 static uint8_t* sect_data=NULL;
 static uint32_t last_read_sector=0;
-
+static uint32_t last_read_base=0;
+static uint32_t last_read_slave=0;
 static uint8_t* read_sect(int base,int slave,int lba) {
-  if (last_read_sector==lba && sect_data) {
+  if (last_read_sector==lba && last_read_base==base && last_read_slave==slave && sect_data) {
     return sect_data;
   }
   port_byte_out(base+6,0xe0|slave<<4|((lba&0xFF000000)>>24));
@@ -33,6 +34,8 @@ static uint8_t* read_sect(int base,int slave,int lba) {
     sect[i+1]=(data&0xFF00)>>8;
   }
   last_read_sector=lba;
+  last_read_base=base;
+  last_read_slave=slave;
   // if (sect_data) {
   //   free(sect_data);
   // }
@@ -41,11 +44,13 @@ static uint8_t* read_sect(int base,int slave,int lba) {
 }
 
 static void write_sect(int base,int slave,int lba,uint8_t* sect) {
-  if (last_read_sector==lba) {
+  if (last_read_sector==lba && last_read_base==base && last_read_slave==slave) {
     sect_data=sect;
   }
   if (!sect_data) {
     last_read_sector=lba;
+    last_read_base=base;
+    last_read_slave=slave;
     sect_data=sect;
   }
   port_byte_out(base+6,0xe0|slave<<4|(lba&0xFF000000>>24));
