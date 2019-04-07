@@ -63,8 +63,8 @@ int read_char(inode inode,FILE* f,int pos,int num) {
     }
   } else if (block<268) {
     uint32_t* blocks=read_blk(inode.i_block[12],f,num);
-    if (blocks[i]==0) {
-      return -1
+    if (blocks[block-12]==0) {
+      return -1;
     } else {
       return ((char*)read_blk(blocks[block],f,num))[pos];
     }
