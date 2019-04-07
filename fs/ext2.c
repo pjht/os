@@ -116,6 +116,7 @@ char** get_dir_listing(uint32_t inode_num,FILE* f,int num) {
     names[num_entries_used]=malloc(current_entry->name_len+1);
     strcpy(names[num_entries_used],current_entry->file_name);
     names[num_entries_used][(int)current_entry->name_len]='\0';
+    klog("INFO","Found entry with name %s",names[num_entries_used]);
     num_entries_used++;
     tot_size+=current_entry->rec_len;
     current_entry=(dir_entry*)(((uint32_t)current_entry)+current_entry->rec_len);
@@ -125,6 +126,7 @@ char** get_dir_listing(uint32_t inode_num,FILE* f,int num) {
     names=realloc(names,sizeof(char*)*max_len);
   }
   names[num_entries_used]=NULL;
+  klog("INFO","Parsed directory");
   return names;
 }
 
@@ -233,16 +235,40 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
     }
     if (data) {
       FILE* f=fopen(devs[data->num],"r");
-      char got_inode;
-      uint32_t inode_num=inode_for_fname(2,stream->path,&got_inode,f,data->num);
-      if (got_inode) {
-        data->inode=read_inode(inode_num,f,data->num);
-        fclose(f);
-        return 1;
-      } else {
-        fclose(f);
-        return 0;
+      uint32_t inode_num=2;
+      for (char* tok=strtok(stream->path,"/");tok!=NULL;tok=strtok(NULL,"/")) {
+        char got_inode;
+        inode_num=inode_for_fname(inode_num,tok,&got_inode,f,data->num);
+        if (got_inode) {
+          inode inode=read_inode(inode_num,f,data->num);
+          if ((inode.i_mode&EXT2_S_IFDIR)==0) {
+            char* next_tok=strtok(NULL,"/");
+            if (tok) {
+              klog("INFO","%s: Not a directory",tok);
+              fclose(f);
+              return 0;
+            } else {
+              break;
+            }
+          }
+        } else {
+          klog("INFO","%s: No such file or directory",tok);
+          fclose(f);
+          return 0;
+        }
       }
+      klog("INFO","File inode:%d",inode_num);
+      return 0;
+      // char got_inode;
+      // uint32_t inode_num=inode_for_fname(2,stream->path,&got_inode,f,data->num);
+      // if (got_inode) {
+      //   data->inode=read_inode(inode_num,f,data->num);
+      //   fclose(f);
+      //   return 1;
+      // } else {
+      //   fclose(f);
+      //   return 0;
+      // }
     } else {
       return 0;
     }

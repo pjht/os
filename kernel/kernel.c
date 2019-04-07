@@ -91,10 +91,10 @@ static void init() {
   uint32_t word=port_long_in(0xCFC);
   port_long_out(0xCF8,(1<<31)|0x4);
   if (word!=port_long_in(0xCFC)) {
-    pci_init();
+    // pci_init();
   }
   // Detect and initailize serial ports
-  serial_init();
+  //serial_init();
   FILE* file=fopen("/initrd/prog.elf","r");
   elf_header header;
   fread(&header,sizeof(elf_header),1,file);
@@ -116,15 +116,15 @@ static void init() {
   ide_init();
   init_ext2();
   mount("/","/dev/hda","ext2");
-  FILE* f=fopen("/file","r");
-  char str[256];
-  fgets(str,256,f);
-  str[strlen(str)-1]='\0';
-  klog("INFO","Got string %s",str);
-  fgets(str,256,f);
-  str[strlen(str)-1]='\0';
-  klog("INFO","Got string %s",str);
-  fclose(f);
+  FILE* f=fopen("/mydir/myfile","r");
+  // char str[256];
+  // fgets(str,256,f);
+  // str[strlen(str)-1]='\0';
+  // klog("INFO","Got string %s",str);
+  // fgets(str,256,f);
+  // str[strlen(str)-1]='\0';
+  // klog("INFO","Got string %s",str);
+  // fclose(f);
   // ext2_parse();
   // char** names=get_dir_listing(2);
   // for(int i=0;names[i]!=NULL;i++) {
