@@ -19,7 +19,7 @@ static uint8_t* read_sect(int base,int slave,int lba) {
     return sect_data;
   }
   port_byte_out(base+6,0xe0|slave<<4|((lba&0xFF000000)>>24));
-  for (int i=0;i<4;i++) port_byte_in(7);
+  for (int i=0;i<4;i++) port_byte_in(base+7);
   while ((port_byte_in(base+7)&0x80)!=0);
   port_byte_out(base+2,1);
   port_byte_out(base+3,lba&0xFF);
