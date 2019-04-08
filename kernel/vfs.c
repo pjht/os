@@ -133,7 +133,7 @@ char* fgets(char* str,int count,FILE* stream) {
   for (i=0;i<count-1;i++) {
     char c=fgetc(stream);
     if (c==EOF) {
-      break;
+      return NULL;
     } else if (c=='\n') {
       str[i]=c;
       i++;
@@ -151,7 +151,7 @@ size_t fread(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
   for (size_t i=0;i<bytes;i++) {
     int c=fgetc(stream);
     if (c==EOF) {
-      return (size_t)((double)i/size);
+      return (size_t)(i/size);
     }
     buffer[i]=c;
   }
@@ -174,7 +174,10 @@ int putc(int c) {
 int fputs(const char* s,FILE* stream) {
   size_t len=strlen(s);
   for (size_t i=0;i<len;i++) {
-    fputc(s[i],stream);
+    int c=fputc(s[i],stream);
+    if (c==EOF) {
+      return EOF;
+    }
   }
   return 1;
 }
@@ -184,16 +187,23 @@ int puts(const char* s) {
 }
 
 int vfprintf(FILE* stream,const char* format,va_list arg) {
+  int c;
 	for(;*format!='\0';format++) {
     if(*format!='%') {
-  		fputc(*format,stream);
+  		c=fputc(*format,stream);
+      if (c==EOF) {
+        return EOF;
+      }
       continue;
   	}
     format++;
 		switch(*format) {
 			case 'c': {
         int i=va_arg(arg,int);
-				fputc(i,stream);
+				c=fputc(i,stream);
+        if (c==EOF) {
+          return EOF;
+        }
 				break;
       }
 			case 'd': {
@@ -204,7 +214,10 @@ int vfprintf(FILE* stream,const char* format,va_list arg) {
 				}
         char str[11];
         int_to_ascii(i,str);
-				fputs(str,stream);
+				c=fputs(str,stream);
+        if (c==EOF) {
+          return EOF;
+        }
 				break;
       }
 			// case 'o': {
@@ -214,7 +227,10 @@ int vfprintf(FILE* stream,const char* format,va_list arg) {
       // }
 			case 's': {
         char* s=va_arg(arg,char*);
-				fputs(s,stream);
+				c=fputs(s,stream);
+        if (c==EOF) {
+          return EOF;
+        }
 				break;
       }
 			case 'x': {
@@ -222,7 +238,10 @@ int vfprintf(FILE* stream,const char* format,va_list arg) {
         char str[11];
         str[0]='\0';
         hex_to_ascii(i,str);
-				fputs(str,stream);
+				c=fputs(str,stream);
+        if (c==EOF) {
+          return EOF;
+        }
 				break;
       }
 		}
