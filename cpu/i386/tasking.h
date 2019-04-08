@@ -18,7 +18,9 @@ typedef struct Task {
     uint8_t wr;
     uint32_t pid;
     char priv;
+    int errno;
 } Task;
 
+int* tasking_get_errno_address();
 
 #endif

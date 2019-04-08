@@ -177,6 +177,8 @@ void isr_handler(registers_t r) {
         r.ebx=(uint32_t)alloc_pages(r.ebx);
       } else if (r.eax==4) {
         alloc_pages_virt(r.ebx,(void*)r.ecx);
+      } else if (r.eax==5) {
+        r.ebx=tasking_get_errno_address();
       }
     break;
     }

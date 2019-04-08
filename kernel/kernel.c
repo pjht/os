@@ -14,6 +14,7 @@
 #include <grub/multiboot.h>
 #include "klog.h"
 #include "elf.h"
+#include <errno.h>
 #include "../drivers/ide.h"
 #include "../fs/ext2.h"
 
@@ -121,28 +122,6 @@ static void init() {
   fgets(str,256,f);
   str[strlen(str)-1]='\0';
   klog("INFO","Got string %s",str);
-  // fgets(str,256,f);
-  // str[strlen(str)-1]='\0';
-  // klog("INFO","Got string %s",str);
-  // fclose(f);
-  // ext2_parse();
-  // char** names=get_dir_listing(2);
-  // for(int i=0;names[i]!=NULL;i++) {
-  //   printf("%s ",names[i]);
-  // }
-  // printf("\n");
-  // free_dir_listing(names);
-  // char* name="file";
-  // char got_inode;
-  // uint32_t inode_num=inode_for_fname(2,name,&got_inode);
-  // klog("INFO","Contents of file \"file\":");
-  // if (got_inode) {
-  //   inode file_inode=read_inode(inode_num);
-  //   char* contents=read_blk(file_inode.i_block[0]);
-  //   printf("%s",contents);
-  // } else {
-  //   printf("%s: No such file or directory\n",name);
-  // }
   for(;;) {
     yield();
   }

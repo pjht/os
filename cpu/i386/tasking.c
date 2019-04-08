@@ -46,6 +46,7 @@ static Task* createTaskKmode(void* eip,char kmode) {
     task->next=NULL;
     task->pid=next_pid;
     task->priv=0;
+    task->errno=0;
     if (currentTask) {
       task->priv=currentTask->priv;
     }
@@ -59,6 +60,9 @@ static Task* createTaskKmode(void* eip,char kmode) {
     return task;
 }
 
+int* tasking_get_errno_address() {
+  return &(currentTask->errno);
+}
 char isPrivleged(uint32_t pid) {
   for (Task* task=headTask;task!=NULL;task=task->next) {
     if (task->pid==pid) {
