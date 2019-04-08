@@ -117,10 +117,10 @@ static void init() {
   init_ext2();
   mount("/","/dev/hda","ext2");
   FILE* f=fopen("/mydir/myfile","r");
-  // char str[256];
-  // fgets(str,256,f);
-  // str[strlen(str)-1]='\0';
-  // klog("INFO","Got string %s",str);
+  char str[256];
+  fgets(str,256,f);
+  str[strlen(str)-1]='\0';
+  klog("INFO","Got string %s",str);
   // fgets(str,256,f);
   // str[strlen(str)-1]='\0';
   // klog("INFO","Got string %s",str);

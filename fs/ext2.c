@@ -234,14 +234,15 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
     if (data) {
       FILE* f=fopen(devs[data->num],"r");
       uint32_t inode_num=2;
+      inode inode;
       for (char* tok=strtok(stream->path,"/");tok!=NULL;tok=strtok(NULL,"/")) {
         char got_inode;
         inode_num=inode_for_fname(inode_num,tok,&got_inode,f,data->num);
         if (got_inode) {
-          inode inode=read_inode(inode_num,f,data->num);
+          inode=read_inode(inode_num,f,data->num);
           if ((inode.i_mode&EXT2_S_IFDIR)==0) {
             char* next_tok=strtok(NULL,"/");
-            if (tok) {
+            if (next_tok) {
               klog("INFO","%s: Not a directory",tok);
               fclose(f);
               return 0;
@@ -255,18 +256,9 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
           return 0;
         }
       }
-      klog("INFO","File inode:%d",inode_num);
-      return 0;
-      // char got_inode;
-      // uint32_t inode_num=inode_for_fname(2,stream->path,&got_inode,f,data->num);
-      // if (got_inode) {
-      //   data->inode=read_inode(inode_num,f,data->num);
-      //   fclose(f);
-      //   return 1;
-      // } else {
-      //   fclose(f);
-      //   return 0;
-      // }
+      data->inode=inode;
+      fclose(f);
+      return 1;
     } else {
       return 0;
     }
