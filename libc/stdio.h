@@ -1,8 +1,10 @@
 #ifndef STDIO_H
 #define STDIO_H
 
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
+
 typedef struct {
   char* mntpnt;
   const char* path;
@@ -32,6 +34,7 @@ int putc(int c);
 int fputs(const char* s,FILE* stream);
 int puts(const char* s);
 int fprintf(FILE* stream,const char* format,...);
+int vfprintf(FILE* stream,const char* format,va_list arg);
 int printf(const char* format,...);
 int fseek(FILE* stream,long offset,int origin);
 long ftell(FILE* stream);
