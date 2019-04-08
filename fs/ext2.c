@@ -4,6 +4,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdint.h>
+#include <errno.h>
 #include "ext2_structs.h"
 
 ext2_superblock* supblks;
@@ -243,7 +244,7 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
           if ((inode.i_mode&EXT2_S_IFDIR)==0) {
             char* next_tok=strtok(NULL,"/");
             if (next_tok) {
-              klog("INFO","%s: Not a directory",tok);
+              errno=ENOTDIR;
               fclose(f);
               return 0;
             } else {
@@ -251,7 +252,7 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
             }
           }
         } else {
-          klog("INFO","%s: No such file or directory",tok);
+          errno=ENOENT;
           fclose(f);
           return 0;
         }
