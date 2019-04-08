@@ -275,3 +275,11 @@ int fclose(FILE* stream) {
   free(stream);
   return 0;
 }
+
+int feof(FILE *stream) {
+  return stream->eof;
+}
+
+int ferror(FILE *stream) {
+  return stream->error;
+}

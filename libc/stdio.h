@@ -36,5 +36,7 @@ int printf(const char* format,...);
 int fseek(FILE* stream,long offset,int origin);
 long ftell(FILE* stream);
 int fclose(FILE* file);
+int feof(FILE *stream);
+int ferror(FILE *stream);
 
 #endif
