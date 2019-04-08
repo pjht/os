@@ -114,9 +114,8 @@ char** get_dir_listing(uint32_t inode_num,FILE* f,int num) {
       names=realloc(names,sizeof(char*)*max_len);
     }
     names[num_entries_used]=malloc(current_entry->name_len+1);
-    strcpy(names[num_entries_used],current_entry->file_name);
+    names[num_entries_used]=current_entry->file_name;
     names[num_entries_used][(int)current_entry->name_len]='\0';
-    klog("INFO","Found entry with name %s",names[num_entries_used]);
     num_entries_used++;
     tot_size+=current_entry->rec_len;
     current_entry=(dir_entry*)(((uint32_t)current_entry)+current_entry->rec_len);
@@ -126,7 +125,6 @@ char** get_dir_listing(uint32_t inode_num,FILE* f,int num) {
     names=realloc(names,sizeof(char*)*max_len);
   }
   names[num_entries_used]=NULL;
-  klog("INFO","Parsed directory");
   return names;
 }
 
@@ -170,7 +168,7 @@ uint32_t inode_for_fname(uint32_t dir_inode_num, char* name, char* got_inode,FIL
       break;
     }
   }
-  free_dir_listing(names);
+  //free_dir_listing(names);
   return inode;
 }
 
