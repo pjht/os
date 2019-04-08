@@ -9,6 +9,7 @@ typedef struct {
   uint32_t type;
   unsigned long pos;
   int eof;
+  int error;
   void* data;
 } FILE;
 

@@ -106,6 +106,7 @@ FILE* fopen(const char* filename,const char* mode) {
     stream->type=mntpnt->type;
     stream->pos=0;
     stream->eof=0;
+    stream->error=0;
     char ok=drvs[mntpnt->type](FSOP_OPEN,stream,NULL,NULL);
     if (ok) {
       return stream;
