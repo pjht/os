@@ -28,6 +28,10 @@ void* read_blk(int blknum,FILE* f,int num) {
   fread(block,1,sizeof(uint8_t)*blk_size[num],f);
   return block;
 }
+void write_blk(int blknum,void* block,FILE* f,int num) {
+  fseek(f,blknum*blk_size[num],SEEK_SET);
+  fwrite(block,1,sizeof(uint8_t)*blk_size[num],f);
+}
 
 inode read_inode(uint32_t inode_num,FILE* f,int num) {
   ext2_superblock supblk=supblks[num];
