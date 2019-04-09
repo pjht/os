@@ -28,6 +28,7 @@ void* read_blk(int blknum,FILE* f,int num) {
   fread(block,1,sizeof(uint8_t)*blk_size[num],f);
   return block;
 }
+
 void write_blk(int blknum,void* block,FILE* f,int num) {
   fseek(f,blknum*blk_size[num],SEEK_SET);
   fwrite(block,1,sizeof(uint8_t)*blk_size[num],f);
@@ -43,6 +44,19 @@ inode read_inode(uint32_t inode_num,FILE* f,int num) {
   uint32_t offset=index%inodes_per_blk;
   inode* inodes=read_blk(blk,f,num);
   return inodes[offset];
+}
+
+void write_inode(uint32_t inode_num,inode node,FILE* f,int num) {
+  ext2_superblock supblk=supblks[num];
+  uint32_t grp=(inode_num-1)/supblk.s_inodes_per_group;
+  uint32_t index=(inode_num-1)%supblk.s_inodes_per_group;
+  uint32_t starting_blk=blk_grps[num][grp].bg_inode_table;
+  size_t inodes_per_blk=blk_size[num]/sizeof(inode);
+  uint32_t blk=starting_blk+(index/inodes_per_blk);
+  uint32_t offset=index%inodes_per_blk;
+  inode* inodes=read_blk(blk,f,num);
+  inodes[offset]=node;
+  write_blk(blk,inodes,f,num);
 }
 
 uint64_t get_sz(inode inode,int num) {
