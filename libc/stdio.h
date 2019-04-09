@@ -8,6 +8,8 @@
 typedef struct {
   char* mntpnt;
   const char* path;
+  int wr;
+  int rd;
   uint32_t type;
   unsigned long pos;
   int eof;

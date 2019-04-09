@@ -103,6 +103,13 @@ FILE* fopen(const char* filename,const char* mode) {
     FILE* stream=malloc(sizeof(FILE));
     stream->mntpnt=mntpnt->mntpnt;
     stream->path=path;
+    if (strcmp(mode,"w")==0) {
+      stream->wr=1;
+      stream->rd=0;
+    } else {
+      stream->wr=0;
+      stream->rd=1;
+    }
     stream->type=mntpnt->type;
     stream->pos=0;
     stream->eof=0;
