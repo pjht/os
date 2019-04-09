@@ -107,6 +107,9 @@ FILE* fopen(const char* filename,const char* mode) {
     if (strcmp(mode,"w")==0) {
       stream->wr=1;
       stream->rd=0;
+    } else if (strcmp(mode,"r+")==0) {
+      stream->wr=1;
+      stream->rd=1;
     } else {
       stream->wr=0;
       stream->rd=1;
