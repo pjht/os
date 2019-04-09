@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 #include "vfs.h"
 typedef struct _vfs_mapping_struct {
   char* mntpnt;
@@ -126,6 +127,11 @@ FILE* fopen(const char* filename,const char* mode) {
 }
 
 int fgetc(FILE* stream) {
+  if (!stream->rd) {
+    errno=EBADF;
+    stream->error=1;
+    return EOF;
+  }
   int c;
   drvs[stream->type](FSOP_GETC,stream,&c,NULL);
   return c;
@@ -136,6 +142,11 @@ int getc() {
 }
 
 char* fgets(char* str,int count,FILE* stream) {
+  if (!stream->rd) {
+    errno=EBADF;
+    stream->error=1;
+    return NULL;
+  }
   int i;
   for (i=0;i<count-1;i++) {
     char c=fgetc(stream);
@@ -153,6 +164,11 @@ char* fgets(char* str,int count,FILE* stream) {
 }
 
 size_t fread(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
+  if (!stream->rd) {
+    errno=EBADF;
+    stream->error=1;
+    return 0;
+  }
   char* buffer=(char*)buffer_ptr;
   size_t bytes=size*count;
   for (size_t i=0;i<bytes;i++) {
@@ -166,6 +182,11 @@ size_t fread(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
 }
 
 int fputc(int c,FILE* stream) {
+  if (!stream->wr) {
+    errno=EBADF;
+    stream->error=1;
+    return EOF;
+  }
   char ok=drvs[stream->type](FSOP_PUTC,stream,&c,NULL);
   if (ok) {
     return c;
@@ -179,6 +200,11 @@ int putc(int c) {
 }
 
 int fputs(const char* s,FILE* stream) {
+  if (!stream->wr) {
+    errno=EBADF;
+    stream->error=1;
+    return EOF;
+  }
   size_t len=strlen(s);
   for (size_t i=0;i<len;i++) {
     int c=fputc(s[i],stream);
