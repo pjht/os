@@ -219,6 +219,23 @@ int puts(const char* s) {
   return fputs(s,stdout);
 }
 
+size_t fwrite(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
+  if (!stream->wr) {
+    errno=EBADF;
+    stream->error=1;
+    return 0;
+  }
+  char* buffer=(char*)buffer_ptr;
+  size_t bytes=size*count;
+  for (size_t i=0;i<bytes;i++) {
+    int c=fputs(stream,buffer[i]);
+    if (c==EOF) {
+      return (size_t)(i/size);
+    }
+  }
+  return count;
+}
+
 int vfprintf(FILE* stream,const char* format,va_list arg) {
   int c;
 	for(;*format!='\0';format++) {

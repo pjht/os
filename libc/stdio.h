@@ -34,6 +34,7 @@ size_t fread(void* buffer,size_t size,size_t count,FILE* stream);
 int fputc(int c,FILE* stream);
 int putc(int c);
 int fputs(const char* s,FILE* stream);
+size_t fwrite(void* buffer_ptr,size_t size,size_t count,FILE* stream);
 int puts(const char* s);
 int fprintf(FILE* stream,const char* format,...);
 int vfprintf(FILE* stream,const char* format,va_list arg);
