@@ -10,6 +10,7 @@
 ext2_superblock* supblks;
 uint32_t* blk_size;
 blk_grp** blk_grps;
+uint32_t* blk_grp_num;
 char** mnts;
 char** devs;
 int num_mnts;
@@ -214,6 +215,7 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
         supblks=realloc(supblks,sizeof(ext2_superblock)*(max_mnts+32));
         blk_size=realloc(blk_size,sizeof(uint32_t)*(max_mnts+32));
         blk_grps=realloc(blk_grps,sizeof(blk_grp*)*(max_mnts+32));
+        blk_grp_num=realloc(blk_grp_num,sizeof(uint32_t)*(max_mnts+32));
         mnts=realloc(mnts,sizeof(char*)*(max_mnts+32));
         devs=realloc(devs,sizeof(char*)*(max_mnts+32));
         max_mnts+=32;
@@ -229,6 +231,7 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
     blk_grp* blk_group=read_blk(2,f,num_mnts);
     uint32_t num_blks=((sizeof(blk_grp)*num_blk_grps)/blk_size[num_mnts])+1;
     blk_grps[num_mnts]=malloc(sizeof(uint8_t)*num_blks*1024);
+    blk_grp_num[num_mnts]=num_blk_grps;
     char* data_ptr=(char*)(blk_grps[num_mnts]);
     for (int i=0;i<num_blks;i++) {
       memcpy(&data_ptr[i*blk_size[num_mnts]],read_blk(i+2,f,num_mnts),blk_size[num_mnts]);
