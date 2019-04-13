@@ -5,6 +5,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <errno.h>
+#include <klog.h>
 #include "ext2_structs.h"
 
 ext2_superblock* supblks;
@@ -22,6 +23,19 @@ typedef struct {
   char is_cont_valid;
   char* contents;
 } file_info;
+
+static char get_bmap_bit(uint32_t index,uint8_t* bitmap) {
+  uint32_t byte=index/8;
+  uint32_t bit=index%8;
+  char entry=bitmap[byte];
+  return (entry&(1<<bit))>0;
+}
+
+static void set_bmap_bit(uint32_t index,uint8_t* bitmap) {
+  uint32_t byte=index/8;
+  uint32_t bit=index%8;
+  bitmap[byte]=bitmap[byte]|(1<<bit);
+}
 
 void* read_blk(int blknum,FILE* f,int num) {
   void* block=malloc(sizeof(uint8_t)*blk_size[num]);
@@ -60,29 +74,70 @@ void write_inode(uint32_t inode_num,inode node,FILE* f,int num) {
   write_blk(blk,inodes,f,num);
 }
 
-uint64_t get_sz(inode inode,int num) {
-  uint64_t size=inode.i_size;
+uint32_t reserve_inode(FILE* f,int num) {
+  blk_grp* grps=blk_grps[num];
+  for (uint32_t i=0;i<blk_grp_num[num];i++) {
+    if (grps[i].bg_free_inodes_count==0) {
+      continue;
+    }
+    uint32_t starting_blk=grps[i].bg_inode_bitmap;
+    uint32_t num_blks=((supblks[num].s_inodes_per_group/8)/blk_size[num])+1;
+    uint8_t* bitmap=malloc(sizeof(uint8_t)*num_blks*blk_size[num]);
+    for (uint32_t i=0;i<num_blks;i++) {
+      memcpy(&bitmap[i*blk_size[num]],read_blk(i+starting_blk,f,num),blk_size[num]);
+    }
+    uint32_t j;
+    for (j=0;j<supblks[num].s_inodes_per_group;j++) {
+      if (get_bmap_bit(j,bitmap)==0) break;
+
+    }
+    set_bmap_bit(j,bitmap);
+    if (get_bmap_bit(j,bitmap)==0) {
+      klog("INFO","Could not reserve inode!");
+      for (;;);
+    } else {
+      klog("INFO","Inode reserved");
+    }
+    for (uint32_t i=0;i<num_blks;i++) {
+      write_blk(i+starting_blk,&bitmap[i*blk_size[num]],f,num);
+    }
+    return (256*i)+j;
+  }
+  return 0;
+}
+
+uint64_t get_sz(inode node,int num) {
+  uint64_t size=node.i_size;
   if (supblks[num].s_feature_rw_compat&EXT2_FEATURE_RW_COMPAT_LARGE_FILE) {
-    size=size|(((uint64_t)inode.i_ext_size_or_dir_acl)<<32);
+    size=size|(((uint64_t)node.i_ext_size_or_dir_acl)<<32);
   }
   return size;
 }
 
-int read_char(inode inode,FILE* f,int pos,int num) {
-  if (inode.i_block[0]==0) {
+void inc_sz(inode node,int num) {
+  if (supblks[num].s_feature_rw_compat&EXT2_FEATURE_RW_COMPAT_LARGE_FILE) {
+    node.i_size+=1;
+    if (node.i_size==0) {
+      node.i_ext_size_or_dir_acl+=1;
+    }
+  } else {
+    node.i_size+=1;
+  }
+}
+int read_char(inode node,FILE* f,int pos,int num) {
+  if (node.i_block[0]==0) {
     return -1;
   }
-  uint64_t size=get_sz(inode,num);
   int block=pos/blk_size[num];
   pos=pos%blk_size[num];
   if (block<12) {
-    if (inode.i_block[block]==0) {
+    if (node.i_block[block]==0) {
       return -1;
     } else {
-      return ((char*)read_blk(inode.i_block[block],f,num))[pos];
+      return ((char*)read_blk(node.i_block[block],f,num))[pos];
     }
   } else if (block<268) {
-    uint32_t* blocks=read_blk(inode.i_block[12],f,num);
+    uint32_t* blocks=read_blk(node.i_block[12],f,num);
     if (blocks[block-12]==0) {
       return -1;
     } else {
@@ -92,20 +147,47 @@ int read_char(inode inode,FILE* f,int pos,int num) {
   return -1;
 }
 
-void* read_inode_contents(inode inode,FILE* f,int num) {
-  if (inode.i_block[0]==0) {
+void append_char(inode node,uint32_t inode_num,uint8_t c,FILE* f,int num) {
+  uint64_t size=get_sz(node,num);
+  uint32_t blk_idx=size/blk_size[num];
+  uint32_t offset=size%blk_size[num];
+  if (blk_idx>12||(node.i_block[blk_idx]==0)) return;
+  uint32_t blk=node.i_block[blk_idx];
+  uint8_t* block=read_blk(blk,f,num);
+  block[offset]=c;
+  write_blk(blk,block,f,num);
+  inc_sz(node,num);
+  write_inode(inode_num,node,f,num);
+}
+
+void write_char(inode node,uint8_t c,uint64_t pos,FILE* f,int num) {
+  uint64_t size=get_sz(node,num);
+  if (pos>size) {
+    return;
+  }
+  uint32_t blk_idx=pos/blk_size[num];
+  uint32_t offset=pos%blk_size[num];
+  if (blk_idx>12||(node.i_block[blk_idx]==0)) return;
+  uint32_t blk=node.i_block[blk_idx];
+  uint8_t* block=read_blk(blk,f,num);
+  block[offset]=c;
+  write_blk(blk,block,f,num);
+}
+
+void* read_inode_contents(inode node,FILE* f,int num) {
+  if (node.i_block[0]==0) {
     return NULL;
   }
-  uint64_t size=get_sz(inode,num);
+  uint64_t size=get_sz(node,num);
   char* data=malloc(sizeof(char)*ceil(size/blk_size[num]));
   for (int i=0;i<12;i++) {
-    if (inode.i_block[i]==0) {
+    if (node.i_block[i]==0) {
       break;
     }
-    memcpy(&data[i*blk_size[num]],read_blk(inode.i_block[i],f,num),blk_size[num]);
+    memcpy(&data[i*blk_size[num]],read_blk(node.i_block[i],f,num),blk_size[num]);
   }
-  if (inode.i_block[12]!=0) {
-    uint32_t* blocks=read_blk(inode.i_block[12],f,num);
+  if (node.i_block[12]!=0) {
+    uint32_t* blocks=read_blk(node.i_block[12],f,num);
     for (int i=0;i<256;i++) {
       if (blocks[i]==0) {
         break;
@@ -177,19 +259,19 @@ dir_entry* read_dir_entry(uint32_t inode_num,uint32_t dir_entry_num,FILE* f,int 
 }
 
 uint32_t inode_for_fname(uint32_t dir_inode_num, char* name, char* got_inode,FILE* f,int num) {
-  uint32_t inode=0;
+  uint32_t node=0;
   *got_inode=0;
   char** names=get_dir_listing(dir_inode_num,f,num);
   for(int i=0;names[i]!=NULL;i++) {
     if (strcmp(names[i],name)==0) {
       dir_entry* entry=read_dir_entry(dir_inode_num,i,f,num);
-      inode=entry->inode;
+      node=entry->inode;
       *got_inode=1;
       break;
     }
   }
   //free_dir_listing(names);
-  return inode;
+  return node;
 }
 
 char* fname_for_inode(uint32_t dir_inode_num, uint32_t inode_num,FILE* f,int num) {
@@ -228,12 +310,11 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
     blk_size[num_mnts]=1024<<(supblk->s_log_blk_size);
     double num_blk_grps_dbl=supblk->s_blocks_count/(double)supblk->s_blocks_per_group;
     uint32_t num_blk_grps=ceil(num_blk_grps_dbl);
-    blk_grp* blk_group=read_blk(2,f,num_mnts);
     uint32_t num_blks=((sizeof(blk_grp)*num_blk_grps)/blk_size[num_mnts])+1;
     blk_grps[num_mnts]=malloc(sizeof(uint8_t)*num_blks*1024);
     blk_grp_num[num_mnts]=num_blk_grps;
     char* data_ptr=(char*)(blk_grps[num_mnts]);
-    for (int i=0;i<num_blks;i++) {
+    for (uint32_t i=0;i<num_blks;i++) {
       memcpy(&data_ptr[i*blk_size[num_mnts]],read_blk(i+2,f,num_mnts),blk_size[num_mnts]);
     }
     fclose(f);
@@ -254,15 +335,16 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
       }
     }
     if (data) {
-      FILE* f=fopen(devs[data->num],"r");
+      FILE* f=fopen(devs[data->num],"r+");
       uint32_t inode_num=2;
-      inode inode;
+      inode node;
       for (char* tok=strtok(stream->path,"/");tok!=NULL;tok=strtok(NULL,"/")) {
         char got_inode;
-        inode_num=inode_for_fname(inode_num,tok,&got_inode,f,data->num);
+        uint32_t temp_num=inode_for_fname(inode_num,tok,&got_inode,f,data->num);
         if (got_inode) {
-          inode=read_inode(inode_num,f,data->num);
-          if ((inode.i_mode&EXT2_S_IFDIR)==0) {
+          inode_num=temp_num;
+          node=read_inode(inode_num,f,data->num);
+          if ((node.i_mode&EXT2_S_IFDIR)==0) {
             char* next_tok=strtok(NULL,"/");
             if (next_tok) {
               errno=ENOTDIR;
@@ -273,12 +355,50 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
             }
           }
         } else {
+          if (stream->wr) {
+            char* next_tok=strtok(NULL,"/");
+            if (next_tok) {
+              errno=ENOENT;
+              fclose(f);
+              return 0;
+            } else {
+              klog("INFO","Creating new file");
+              klog("INFO","Parent directory inode:%d",inode_num);
+              inode_num=reserve_inode(f,data->num);
+              klog("INFO","Inode %d is free",inode_num);
+              inode node;
+              node.i_mode=EXT2_S_IFREG;
+              node.i_uid=0;
+              node.i_size=0;
+              node.i_atime=0;
+              node.i_ctime=0;
+              node.i_mtime=0;
+              node.i_dtime=0;
+              node.i_gid=0;
+              node.i_links_count=1;
+              node.i_blocks=0;
+              node.i_flags=0;
+              node.i_osd1=0;
+              for (int i=0;i<15;i++) {
+                node.i_block[i]=0;
+              }
+              node.i_generation=0;
+              node.i_file_acl=0;
+              node.i_ext_size_or_dir_acl=0;
+              node.i_faddr=0;
+              node.i_osd2=0;
+              write_inode(inode_num,node,f,data->num);
+              errno=ENOENT;
+              fclose(f);
+              return 0;
+            }
+          }
           errno=ENOENT;
           fclose(f);
           return 0;
         }
       }
-      data->inode=inode;
+      data->inode=node;
       fclose(f);
       return 1;
     } else {
@@ -321,6 +441,7 @@ void init_ext2() {
   supblks=malloc(sizeof(ext2_superblock)*32);
   blk_size=malloc(sizeof(uint32_t)*32);
   blk_grps=malloc(sizeof(blk_grp*)*32);
+  blk_grp_num=malloc(sizeof(uint32_t)*32);
   mnts=malloc(sizeof(char*)*32);
   devs=malloc(sizeof(char*)*32);
   num_mnts=0;

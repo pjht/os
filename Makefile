@@ -7,14 +7,14 @@ LIBC_OBJ = $(LIBC_SOURCES:.c=.o)
 CC = $(shell cat psinfo/$(PLAT)/cc.txt)
 GDB = $(shell cat psinfo/$(PLAT)/gdb.txt)
 CFLAGS =  -Isysroot/usr/include -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
-QFLAGS =  -hda ext2.img -m 2G -boot d -cdrom os.iso -serial vc #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
+QFLAGS =  -hda ext2.img -m 2G -boot d -cdrom os.iso -serial stdio #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
 
 .PHONY: sysroot
 
 all: os.iso
 
 run: os.iso
-	qemu-system-i386 $(QFLAGS) -monitor stdio
+	qemu-system-i386 $(QFLAGS) > drv_log # -monitor stdio
 
 debug: os.iso kernel/kernel.elf
 	qemu-system-i386 -s $(QFLAGS) &

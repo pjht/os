@@ -44,7 +44,6 @@ static uint8_t* read_sect(int base,int slave,uint32_t lba) {
 }
 
 static void write_sect(int base,int slave,uint32_t lba,uint8_t* sect) {
-  kslog("INFO","Writing sector %x",lba);
   if (last_read_sector==lba && last_read_base==base && last_read_slave==slave && sect_data) {
     sect_data=sect;
   }
@@ -54,17 +53,18 @@ static void write_sect(int base,int slave,uint32_t lba,uint8_t* sect) {
     last_read_slave=slave;
     sect_data=sect;
   }
-  port_byte_out(base+6,0xe0|slave<<4|(lba&0xFF000000>>24));
+  port_byte_out(base+6,0xe0|slave<<4|((lba&0xFF000000)>>24));
   for (int i=0;i<4;i++) port_byte_in(base+7);
   while ((port_byte_in(base+7)&0x80)!=0);
   port_byte_out(base+2,1);
   port_byte_out(base+3,lba&0xFF);
-  port_byte_out(base+4,lba&0xFF00>>8);
-  port_byte_out(base+5,lba&0xFF0000>>16);
+  port_byte_out(base+4,(lba&0xFF00)>>8);
+  port_byte_out(base+5,(lba&0xFF0000)>>16);
   port_byte_out(base+7,0x30);
   while ((port_byte_in(base+7)&0x88)!=0x8);
   for (int i=0;i<512;i+=2) {
     port_word_out(base,sect[i]|(sect[i+1]<<8));
+    for (int i=0;i<4;i++) port_byte_in(base+7);
   }
   while ((port_byte_in(base+7)&0x80)!=0);
   port_byte_out(base+7,0xE7);
@@ -95,7 +95,7 @@ static int drv(char* filename,int c,long pos,char wr) {
     uint8_t* sect=read_sect(base,slave,lba);
     sect[offset]=(uint8_t)c;
     write_sect(base,slave,lba,sect);
-    return 0;
+    return 1;
   } else {
     uint32_t lba=pos/512;
     int offset=pos%512;

@@ -231,7 +231,7 @@ size_t fwrite(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
   char* buffer=(char*)buffer_ptr;
   size_t bytes=size*count;
   for (size_t i=0;i<bytes;i++) {
-    int c=fputc(buffer[i],stream);
+    int c=fputc((uint8_t)buffer[i],stream);
     if (c==EOF) {
       return (size_t)(i/size);
     }
