@@ -6,7 +6,7 @@
 
 static char** names;
 static uint32_t* offsets;
-static long* sizes;
+static unsigned long* sizes;
 static uint32_t num_files;
 static FILE* initrd_fd;
 

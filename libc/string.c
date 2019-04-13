@@ -102,7 +102,7 @@ void backspace(char* s) {
     s[len-1] = '\0';
 }
 
-static char* strtok_str=NULL;
+static const char* strtok_str=NULL;
 static size_t strtok_index;
 
 static char strtok_delim_check(const char* delim) {
@@ -114,7 +114,7 @@ static char strtok_delim_check(const char* delim) {
   return 1;
 }
 
-char* strtok(char* str, const char* delim) {
+char* strtok(const char* str, const char* delim) {
   if (str!=NULL) {
     strtok_str=str;
     strtok_index=0;

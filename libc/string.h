@@ -7,7 +7,7 @@ void* memset(void* dest,int val,size_t len);
 int strcmp(const char* s1,const char* s2);
 size_t strlen(const char* str);
 char* strcpy(char* dest,const char* src);
-char* strtok(char* str, const char* delim);
+char* strtok(const char* str, const char* delim);
 
 char* strrev(char *str);
 void int_to_ascii(int n,char* str);

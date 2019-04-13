@@ -12,9 +12,9 @@
 static uint8_t ident[4][512];
 static uint8_t* sect_data=NULL;
 static uint32_t last_read_sector=0;
-static uint32_t last_read_base=0;
-static uint32_t last_read_slave=0;
-static uint8_t* read_sect(int base,int slave,int lba) {
+static int last_read_base=0;
+static int last_read_slave=0;
+static uint8_t* read_sect(int base,int slave,uint32_t lba) {
   if (last_read_sector==lba && last_read_base==base && last_read_slave==slave && sect_data) {
     return sect_data;
   }
@@ -43,8 +43,9 @@ static uint8_t* read_sect(int base,int slave,int lba) {
   return sect;
 }
 
-static void write_sect(int base,int slave,int lba,uint8_t* sect) {
-  if (last_read_sector==lba && last_read_base==base && last_read_slave==slave) {
+static void write_sect(int base,int slave,uint32_t lba,uint8_t* sect) {
+  kslog("INFO","Writing sector %x",lba);
+  if (last_read_sector==lba && last_read_base==base && last_read_slave==slave && sect_data) {
     sect_data=sect;
   }
   if (!sect_data) {
@@ -89,14 +90,14 @@ static int drv(char* filename,int c,long pos,char wr) {
     slave=1;
   }
   if (wr) {
-    int lba=pos/512;
+    uint32_t lba=pos/512;
     int offset=pos%512;
     uint8_t* sect=read_sect(base,slave,lba);
     sect[offset]=(uint8_t)c;
     write_sect(base,slave,lba,sect);
     return 0;
   } else {
-    int lba=pos/512;
+    uint32_t lba=pos/512;
     int offset=pos%512;
     uint8_t* sect=read_sect(base,slave,lba);
     uint8_t val=sect[offset];
