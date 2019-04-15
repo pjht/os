@@ -114,6 +114,15 @@ uint64_t get_sz(inode node,int num) {
   return size;
 }
 
+void set_sz(inode node,uint64_t sz,int num) {
+  if (supblks[num].s_feature_rw_compat&EXT2_FEATURE_RW_COMPAT_LARGE_FILE) {
+    node.i_size=(uint32_t)(sz&0xFFFFFFFF)
+    node.i_ext_size_or_dir_acl=(uint32_t)((sz&0xFFFFFFFF00000000)>>32)
+  } else {
+    node.i_size=(uint32_t)sz;
+  }
+}
+
 void inc_sz(inode node,int num) {
   if (supblks[num].s_feature_rw_compat&EXT2_FEATURE_RW_COMPAT_LARGE_FILE) {
     node.i_size+=1;
