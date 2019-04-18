@@ -116,8 +116,8 @@ uint64_t get_sz(inode node,int num) {
 
 void set_sz(inode node,uint64_t sz,int num) {
   if (supblks[num].s_feature_rw_compat&EXT2_FEATURE_RW_COMPAT_LARGE_FILE) {
-    node.i_size=(uint32_t)(sz&0xFFFFFFFF)
-    node.i_ext_size_or_dir_acl=(uint32_t)((sz&0xFFFFFFFF00000000)>>32)
+    node.i_size=(uint32_t)(sz&0xFFFFFFFF);
+    node.i_ext_size_or_dir_acl=(uint32_t)((sz&0xFFFFFFFF00000000)>>32);
   } else {
     node.i_size=(uint32_t)sz;
   }
@@ -169,18 +169,30 @@ void append_char(inode node,uint32_t inode_num,uint8_t c,FILE* f,int num) {
   write_inode(inode_num,node,f,num);
 }
 
-void write_char(inode node,uint8_t c,uint64_t pos,FILE* f,int num) {
+int write_char(inode node,uint8_t c,uint64_t pos,FILE* f,int num) {
   uint64_t size=get_sz(node,num);
-  if (pos>size) {
-    return;
-  }
   uint32_t blk_idx=pos/blk_size[num];
+  if (pos>size) {
+    if (blk_idx>12) {
+      return EFBIG;
+    } else {
+      if (node.i_block[blk_idx]==0) {
+          for (int i=0;i<=blk_idx;i++) {
+            // node.i_block[blk_idx]=reserve_block(f,num);
+            return 0;
+          }
+      } else {
+        set_sz(node,size++,num);
+      }
+    }
+  }
   uint32_t offset=pos%blk_size[num];
   if (blk_idx>12||(node.i_block[blk_idx]==0)) return;
   uint32_t blk=node.i_block[blk_idx];
   uint8_t* block=read_blk(blk,f,num);
   block[offset]=c;
   write_blk(blk,block,f,num);
+  return 0;
 }
 
 void* read_inode_contents(inode node,FILE* f,int num) {
@@ -438,6 +450,9 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
     return 1;
   }
   if (op==FSOP_PUTC) {
+    file_info* data=stream->data;
+    FILE* f=fopen(devs[data->num],"r+");
+    write_char(data->inode,*((uint8_t*)data1),stream->pos,f,data->num);
     return 1;
   }
   if (op==FSOP_CLOSE) {
