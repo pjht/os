@@ -21,7 +21,6 @@
 static long initrd_sz;
 static char* initrd;
 static multiboot_info_t* mbd;
-
 typedef int (*func_ptr)();
 
 static int console_dev_drv(char* filename,int c,long pos,char wr) {
@@ -95,7 +94,7 @@ static void init() {
     // pci_init();
   }
   // Detect and initailize serial ports
-  //serial_init();
+  serial_init();
   FILE* file=fopen("/initrd/prog.elf","r");
   elf_header header;
   fread(&header,sizeof(elf_header),1,file);
@@ -115,13 +114,15 @@ static void init() {
     klog("INFO","RAN PROG:%d",val);
   }
   ide_init();
+  load_parts("/dev/hda");
   init_ext2();
-  mount("/","/dev/hda","ext2");
-  fopen("/mydir/mybadfile","w");
-  // char str[256];
-  // fgets(str,256,f);
-  // str[strlen(str)-1]='\0';
-  // klog("INFO","Got string %s",str);
+  mount("/","/dev/hda1","ext2");
+  klog("INFO","MOUNT");
+  FILE* f=fopen("/file","r");
+  char str[256];
+  fgets(str,256,f);
+  str[strlen(str)-1]='\0';
+  klog("INFO","Got string %s",str);
   for(;;) {
     yield();
   }
