@@ -127,6 +127,9 @@ void* malloc(uint32_t size) {
 
 void* realloc(void *mem, size_t new_sz) {
   void* ptr=malloc(new_sz);
+  if (mem==NULL) {
+    return ptr;
+  }
   uint32_t num_4b_grps=*((uint32_t*)((uint32_t)mem-12));
   memcpy(ptr,mem,num_4b_grps*4);
   free(mem);
