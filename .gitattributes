@@ -1,3 +1,0 @@
-*.img filter=lfs diff=lfs merge=lfs -text
-*.vdi filter=lfs diff=lfs merge=lfs -text
-*.img[[:space:]]*.vdi filter=lfs diff=lfs merge=lfs -text
