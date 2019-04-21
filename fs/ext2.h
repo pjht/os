@@ -1,5 +1,5 @@
-#ifndef DEVFS_H
-#define DEVFS_H
+#ifndef EXT2_H
+#define EXT2_H
 
 void init_ext2();
 
