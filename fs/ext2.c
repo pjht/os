@@ -19,7 +19,7 @@ int max_mnts;
 
 typedef struct {
   int num;
-  inode inode;
+  inode* inode;
   char is_cont_valid;
   char* contents;
 } file_info;
@@ -49,7 +49,7 @@ void write_blk(int blknum,void* block,FILE* f,int num) {
   fwrite(block,1,sizeof(uint8_t)*blk_size[num],f);
 }
 
-inode read_inode(uint32_t inode_num,FILE* f,int num) {
+inode* read_inode(uint32_t inode_num,FILE* f,int num) {
   ext2_superblock supblk=supblks[num];
   uint32_t grp=(inode_num-1)/supblk.s_inodes_per_group;
   uint32_t index=(inode_num-1)%supblk.s_inodes_per_group;
@@ -58,10 +58,10 @@ inode read_inode(uint32_t inode_num,FILE* f,int num) {
   uint32_t blk=starting_blk+(index/inodes_per_blk);
   uint32_t offset=index%inodes_per_blk;
   inode* inodes=read_blk(blk,f,num);
-  return inodes[offset];
+  return &inodes[offset];
 }
 
-void write_inode(uint32_t inode_num,inode node,FILE* f,int num) {
+void write_inode(uint32_t inode_num,inode* node,FILE* f,int num) {
   ext2_superblock supblk=supblks[num];
   uint32_t grp=(inode_num-1)/supblk.s_inodes_per_group;
   uint32_t index=(inode_num-1)%supblk.s_inodes_per_group;
@@ -70,7 +70,7 @@ void write_inode(uint32_t inode_num,inode node,FILE* f,int num) {
   uint32_t blk=starting_blk+(index/inodes_per_blk);
   uint32_t offset=index%inodes_per_blk;
   inode* inodes=read_blk(blk,f,num);
-  inodes[offset]=node;
+  inodes[offset]=*node;
   write_blk(blk,inodes,f,num);
 }
 
@@ -106,47 +106,47 @@ uint32_t reserve_inode(FILE* f,int num) {
   return 0;
 }
 
-uint64_t get_sz(inode node,int num) {
-  uint64_t size=node.i_size;
+uint64_t get_sz(inode* node,int num) {
+  uint64_t size=node->i_size;
   if (supblks[num].s_feature_rw_compat&EXT2_FEATURE_RW_COMPAT_LARGE_FILE) {
-    size=size|(((uint64_t)node.i_ext_size_or_dir_acl)<<32);
+    size=size|(((uint64_t)node->i_ext_size_or_dir_acl)<<32);
   }
   return size;
 }
 
-void set_sz(inode node,uint64_t sz,int num) {
+void set_sz(inode* node,uint64_t sz,int num) {
   if (supblks[num].s_feature_rw_compat&EXT2_FEATURE_RW_COMPAT_LARGE_FILE) {
-    node.i_size=(uint32_t)(sz&0xFFFFFFFF);
-    node.i_ext_size_or_dir_acl=(uint32_t)((sz&0xFFFFFFFF00000000)>>32);
+    node->i_size=(uint32_t)(sz&0xFFFFFFFF);
+    node->i_ext_size_or_dir_acl=(uint32_t)((sz&0xFFFFFFFF00000000)>>32);
   } else {
-    node.i_size=(uint32_t)sz;
+    node->i_size=(uint32_t)sz;
   }
 }
 
-void inc_sz(inode node,int num) {
+void inc_sz(inode* node,int num) {
   if (supblks[num].s_feature_rw_compat&EXT2_FEATURE_RW_COMPAT_LARGE_FILE) {
-    node.i_size+=1;
-    if (node.i_size==0) {
-      node.i_ext_size_or_dir_acl+=1;
+    node->i_size+=1;
+    if (node->i_size==0) {
+      node->i_ext_size_or_dir_acl+=1;
     }
   } else {
-    node.i_size+=1;
+    node->i_size+=1;
   }
 }
-int read_char(inode node,FILE* f,int pos,int num) {
-  if (node.i_block[0]==0) {
+int read_char(inode* node,FILE* f,int pos,int num) {
+  if (node->i_block[0]==0) {
     return -1;
   }
   int block=pos/blk_size[num];
   pos=pos%blk_size[num];
   if (block<12) {
-    if (node.i_block[block]==0) {
+    if (node->i_block[block]==0) {
       return -1;
     } else {
-      return ((char*)read_blk(node.i_block[block],f,num))[pos];
+      return ((char*)read_blk(node->i_block[block],f,num))[pos];
     }
   } else if (block<268) {
-    uint32_t* blocks=read_blk(node.i_block[12],f,num);
+    uint32_t* blocks=read_blk(node->i_block[12],f,num);
     if (blocks[block-12]==0) {
       return -1;
     } else {
@@ -156,12 +156,12 @@ int read_char(inode node,FILE* f,int pos,int num) {
   return -1;
 }
 
-void append_char(inode node,uint32_t inode_num,uint8_t c,FILE* f,int num) {
+void append_char(inode* node,uint32_t inode_num,uint8_t c,FILE* f,int num) {
   uint64_t size=get_sz(node,num);
   uint32_t blk_idx=size/blk_size[num];
   uint32_t offset=size%blk_size[num];
-  if (blk_idx>12||(node.i_block[blk_idx]==0)) return;
-  uint32_t blk=node.i_block[blk_idx];
+  if (blk_idx>12||(node->i_block[blk_idx]==0)) return;
+  uint32_t blk=node->i_block[blk_idx];
   uint8_t* block=read_blk(blk,f,num);
   block[offset]=c;
   write_blk(blk,block,f,num);
@@ -169,14 +169,14 @@ void append_char(inode node,uint32_t inode_num,uint8_t c,FILE* f,int num) {
   write_inode(inode_num,node,f,num);
 }
 
-int write_char(inode node,uint8_t c,uint64_t pos,FILE* f,int num) {
+int write_char(inode* node,uint8_t c,uint64_t pos,FILE* f,int num) {
   uint64_t size=get_sz(node,num);
   uint32_t blk_idx=pos/blk_size[num];
   if (pos>size) {
     if (blk_idx>12) {
       return EFBIG;
     } else {
-      if (node.i_block[blk_idx]==0) {
+      if (node->i_block[blk_idx]==0) {
           for (uint32_t i=0;i<=blk_idx;i++) {
             // node.i_block[blk_idx]=reserve_block(f,num);
             return 0;
@@ -187,28 +187,28 @@ int write_char(inode node,uint8_t c,uint64_t pos,FILE* f,int num) {
     }
   }
   uint32_t offset=pos%blk_size[num];
-  if (blk_idx>12||(node.i_block[blk_idx]==0)) return 0;
-  uint32_t blk=node.i_block[blk_idx];
+  if (blk_idx>12||(node->i_block[blk_idx]==0)) return 0;
+  uint32_t blk=node->i_block[blk_idx];
   uint8_t* block=read_blk(blk,f,num);
   block[offset]=c;
   write_blk(blk,block,f,num);
   return 0;
 }
 
-void* read_inode_contents(inode node,FILE* f,int num) {
-  if (node.i_block[0]==0) {
+void* read_inode_contents(inode* node,FILE* f,int num) {
+  if (node->i_block[0]==0) {
     return NULL;
   }
   uint64_t size=get_sz(node,num);
   char* data=malloc(sizeof(char)*ceil(size/blk_size[num]));
   for (int i=0;i<12;i++) {
-    if (node.i_block[i]==0) {
+    if (node->i_block[i]==0) {
       break;
     }
-    memcpy(&data[i*blk_size[num]],read_blk(node.i_block[i],f,num),blk_size[num]);
+    memcpy(&data[i*blk_size[num]],read_blk(node->i_block[i],f,num),blk_size[num]);
   }
-  if (node.i_block[12]!=0) {
-    uint32_t* blocks=read_blk(node.i_block[12],f,num);
+  if (node->i_block[12]!=0) {
+    uint32_t* blocks=read_blk(node->i_block[12],f,num);
     for (int i=0;i<256;i++) {
       if (blocks[i]==0) {
         break;
@@ -223,8 +223,8 @@ char** get_dir_listing(uint32_t inode_num,FILE* f,int num) {
   char** names=malloc(sizeof(char*)*100);
   int num_entries_used=0;
   int max_len=100;
-  inode dir_inode=read_inode(inode_num,f,num);
-  uint32_t size=dir_inode.i_size;
+  inode* dir_inode=read_inode(inode_num,f,num);
+  uint32_t size=dir_inode->i_size;
   uint32_t tot_size=0;
   dir_entry* dir=read_inode_contents(dir_inode,f,num);
   dir_entry* current_entry=dir;
@@ -259,8 +259,8 @@ void free_dir_listing(char** names) {
 }
 
 dir_entry* read_dir_entry(uint32_t inode_num,uint32_t dir_entry_num,FILE* f,int num) {
-  inode dir_inode=read_inode(inode_num,f,num);
-  uint32_t size=dir_inode.i_size;
+  inode* dir_inode=read_inode(inode_num,f,num);
+  uint32_t size=dir_inode->i_size;
   uint32_t tot_size=0;
   uint32_t ent_num=0;
   dir_entry* dir=read_inode_contents(dir_inode,f,num);
@@ -358,14 +358,14 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
     if (data) {
       FILE* f=fopen(devs[data->num],"r+");
       uint32_t inode_num=2;
-      inode node;
+      inode* node;
       for (char* tok=strtok(stream->path,"/");tok!=NULL;tok=strtok(NULL,"/")) {
         char got_inode;
         uint32_t temp_num=inode_for_fname(inode_num,tok,&got_inode,f,data->num);
         if (got_inode) {
           inode_num=temp_num;
           node=read_inode(inode_num,f,data->num);
-          if ((node.i_mode&EXT2_S_IFDIR)==0) {
+          if ((node->i_mode&EXT2_S_IFDIR)==0) {
             char* next_tok=strtok(NULL,"/");
             if (next_tok) {
               errno=ENOTDIR;
@@ -408,7 +408,7 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
               node.i_ext_size_or_dir_acl=0;
               node.i_faddr=0;
               node.i_osd2=0;
-              write_inode(inode_num,node,f,data->num);
+              write_inode(inode_num,&node,f,data->num);
               errno=ENOENT;
               fclose(f);
               return 0;
