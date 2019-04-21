@@ -16,6 +16,7 @@
 #include "elf.h"
 #include <errno.h>
 #include "../drivers/ide.h"
+#include "parts.h"
 #include "../fs/ext2.h"
 
 static long initrd_sz;

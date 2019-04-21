@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <klog.h>
 #include "../fs/devfs.h"
 
 typedef struct {
@@ -13,7 +14,7 @@ typedef struct {
   uint32_t length;
 } partition;
 
-static char** part_devs=NULL;
+static const char** part_devs=NULL;
 static partition** parts=NULL;
 static uint32_t num_part_devs=0;
 static uint32_t max_part_devs=0;
@@ -37,7 +38,7 @@ int drv(char* filename,int c,long pos,char wr) {
   char* str=malloc(sizeof(char)*(strlen(filename)+1));
   strcpy(str,filename);
   str[strlen(str)-1]='\0';
-  int i;
+  uint32_t i;
   for (i=0;i<num_part_devs;i++) {
     if (strcmp(part_devs[i]+5,str)==0) {
       break;
@@ -63,7 +64,7 @@ int drv(char* filename,int c,long pos,char wr) {
   } else {
     FILE* f=fopen(part_devs[i],"r");
     fseek(f,pos,SEEK_SET);
-    char* c=fgetc(f);
+    int c=fgetc(f);
     fclose(f);
     return c;
   }

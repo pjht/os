@@ -35,7 +35,7 @@ static Task* createTaskKmode(void* eip,char kmode) {
     task->regs.edi=0;
     asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(task->regs.eflags)::"%eax");
     task->regs.eip=(uint32_t)eip;
-    task->regs.cr3=new_address_space();
+    task->regs.cr3=(uint32_t)new_address_space();
     uint32_t cr3;
     asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(cr3)::"%eax");
     load_address_space(task->regs.cr3);

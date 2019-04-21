@@ -177,7 +177,7 @@ int write_char(inode node,uint8_t c,uint64_t pos,FILE* f,int num) {
       return EFBIG;
     } else {
       if (node.i_block[blk_idx]==0) {
-          for (int i=0;i<=blk_idx;i++) {
+          for (uint32_t i=0;i<=blk_idx;i++) {
             // node.i_block[blk_idx]=reserve_block(f,num);
             return 0;
           }
@@ -187,7 +187,7 @@ int write_char(inode node,uint8_t c,uint64_t pos,FILE* f,int num) {
     }
   }
   uint32_t offset=pos%blk_size[num];
-  if (blk_idx>12||(node.i_block[blk_idx]==0)) return;
+  if (blk_idx>12||(node.i_block[blk_idx]==0)) return 0;
   uint32_t blk=node.i_block[blk_idx];
   uint8_t* block=read_blk(blk,f,num);
   block[offset]=c;
