@@ -226,8 +226,8 @@ char** get_dir_listing(uint32_t inode_num,FILE* f,int num) {
   inode* dir_inode=read_inode(inode_num,f,num);
   uint32_t size=dir_inode->i_size;
   uint32_t tot_size=0;
-  dir_entry* dir=read_inode_contents(dir_inode,f,num);
-  dir_entry* current_entry=dir;
+  ext2_dir_entry* dir=read_inode_contents(dir_inode,f,num);
+  ext2_dir_entry* current_entry=dir;
   for(int i=0;tot_size<size;i++) {
     if (current_entry->file_type==0) {
       break;
@@ -241,7 +241,7 @@ char** get_dir_listing(uint32_t inode_num,FILE* f,int num) {
     names[num_entries_used][(int)current_entry->name_len]='\0';
     num_entries_used++;
     tot_size+=current_entry->rec_len;
-    current_entry=(dir_entry*)(((uint32_t)current_entry)+current_entry->rec_len);
+    current_entry=(ext2_dir_entry*)(((uint32_t)current_entry)+current_entry->rec_len);
   }
   if(num_entries_used==max_len) {
     max_len+=1;
@@ -258,13 +258,13 @@ void free_dir_listing(char** names) {
   free(names);
 }
 
-dir_entry* read_dir_entry(uint32_t inode_num,uint32_t dir_entry_num,FILE* f,int num) {
+ext2_dir_entry* read_dir_entry(uint32_t inode_num,uint32_t dir_entry_num,FILE* f,int num) {
   inode* dir_inode=read_inode(inode_num,f,num);
   uint32_t size=dir_inode->i_size;
   uint32_t tot_size=0;
   uint32_t ent_num=0;
-  dir_entry* dir=read_inode_contents(dir_inode,f,num);
-  dir_entry* current_entry=dir;
+  ext2_dir_entry* dir=read_inode_contents(dir_inode,f,num);
+  ext2_dir_entry* current_entry=dir;
   for(int i=0;tot_size<size;i++) {
     if (current_entry->file_type==0) {
       break;
@@ -274,7 +274,7 @@ dir_entry* read_dir_entry(uint32_t inode_num,uint32_t dir_entry_num,FILE* f,int 
     }
     ent_num++;
     tot_size+=current_entry->rec_len;
-    current_entry=(dir_entry*)(((uint32_t)current_entry)+current_entry->rec_len);
+    current_entry=(ext2_dir_entry*)(((uint32_t)current_entry)+current_entry->rec_len);
   }
   return NULL;
 }
@@ -297,7 +297,7 @@ uint32_t inode_for_fname(uint32_t dir_inode_num, char* name, char* got_inode,FIL
 
 char* fname_for_inode(uint32_t dir_inode_num, uint32_t inode_num,FILE* f,int num) {
   for(int i=0;;i++) {
-    dir_entry* entry=read_dir_entry(dir_inode_num,i,f,num);
+    ext2_dir_entry* entry=read_dir_entry(dir_inode_num,i,f,num);
     if (entry) {
       if (entry->inode==inode_num) {
         char* name=malloc(strlen(entry->file_name)+1);
