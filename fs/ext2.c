@@ -225,8 +225,8 @@ void* read_inode_contents(inode* node,FILE* f,int num) {
   return (void*)data;
 }
 
-char** get_dir_listing(uint32_t inode_num,FILE* f,int num) {
-  char** names=malloc(sizeof(char*)*100);
+dir_entry* get_dir_listing(uint32_t inode_num,FILE* f,int num) {
+  dir_entry* entries=malloc(sizeof(dir_entry)*100);
   int num_entries_used=0;
   int max_len=100;
   inode* dir_inode=read_inode(inode_num,f,num);
@@ -240,28 +240,30 @@ char** get_dir_listing(uint32_t inode_num,FILE* f,int num) {
     }
     if(num_entries_used==max_len) {
       max_len+=100;
-      names=realloc(names,sizeof(char*)*max_len);
+      entries=realloc(entries,sizeof(dir_entry)*max_len);
     }
-    names[num_entries_used]=malloc(current_entry->name_len+1);
-    names[num_entries_used]=current_entry->file_name;
-    names[num_entries_used][(int)current_entry->name_len]='\0';
+    entries[num_entries_used].inode=current_entry->inode;
+    entries[num_entries_used].type=current_entry->file_type;
+    entries[num_entries_used].name=malloc(current_entry->name_len+1);
+    strcpy(entries[num_entries_used].name,current_entry->file_name);
+    entries[num_entries_used].name[(int)current_entry->name_len]='\0';
     num_entries_used++;
     tot_size+=current_entry->rec_len;
     current_entry=(ext2_dir_entry*)(((uint32_t)current_entry)+current_entry->rec_len);
   }
   if(num_entries_used==max_len) {
     max_len+=1;
-    names=realloc(names,sizeof(char*)*max_len);
+    entries=realloc(entries,sizeof(dir_entry)*max_len);
   }
-  names[num_entries_used]=NULL;
-  return names;
+  entries[num_entries_used].inode=0;
+  return entries;
 }
 
 void free_dir_listing(char** names) {
-  for(int i=0;names[i]!=NULL;i++) {
-    free(names[i]);
-  }
-  free(names);
+  // for(int i=0;names[i]!=NULL;i++) {
+  //   free(names[i]);
+  // }
+  // free(names);
 }
 
 ext2_dir_entry* read_dir_entry(uint32_t inode_num,uint32_t dir_entry_num,FILE* f,int num) {
@@ -286,19 +288,15 @@ ext2_dir_entry* read_dir_entry(uint32_t inode_num,uint32_t dir_entry_num,FILE* f
 }
 
 uint32_t inode_for_fname(uint32_t dir_inode_num, char* name, char* got_inode,FILE* f,int num) {
-  uint32_t node=0;
   *got_inode=0;
-  char** names=get_dir_listing(dir_inode_num,f,num);
-  for(int i=0;names[i]!=NULL;i++) {
-    if (strcmp(names[i],name)==0) {
-      dir_entry* entry=read_dir_entry(dir_inode_num,i,f,num);
-      node=entry->inode;
+  dir_entry* entries=get_dir_listing(dir_inode_num,f,num);
+  for(int i=0;entries[i].inode!=0;i++) {
+    if (strcmp(entries[i].name,name)==0) {
       *got_inode=1;
-      break;
+      return entries[i].inode;
     }
   }
-  //free_dir_listing(names);
-  return node;
+  return 0;
 }
 
 char* fname_for_inode(uint32_t dir_inode_num, uint32_t inode_num,FILE* f,int num) {
