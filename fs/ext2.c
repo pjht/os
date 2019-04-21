@@ -18,6 +18,12 @@ int num_mnts;
 int max_mnts;
 
 typedef struct {
+  uint32_t inode;
+  char type;
+  char* name;
+} dir_entry;
+
+typedef struct {
   int num;
   inode* inode;
   char is_cont_valid;
