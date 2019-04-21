@@ -244,8 +244,9 @@ dir_entry* get_dir_listing(uint32_t inode_num,FILE* f,int num) {
     }
     entries[num_entries_used].inode=current_entry->inode;
     entries[num_entries_used].type=current_entry->file_type;
-    entries[num_entries_used].name=malloc(current_entry->name_len+1);
-    strcpy(entries[num_entries_used].name,current_entry->file_name);
+    // entries[num_entries_used].name=malloc(sizeof(char)*((current_entry->name_len)+1));
+    entries[num_entries_used].name=current_entry->file_name;
+    // strcpy(entries[num_entries_used].name,current_entry->file_name);
     entries[num_entries_used].name[(int)current_entry->name_len]='\0';
     num_entries_used++;
     tot_size+=current_entry->rec_len;
