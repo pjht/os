@@ -11,6 +11,7 @@ LIBC_OBJ = $(LIBC_SOURCES:.c=.o)
 CC = $(shell cat psinfo/$(PLAT)/cc.txt)
 AS = $(shell cat psinfo/$(PLAT)/as.txt)
 AR = $(shell cat psinfo/$(PLAT)/ar.txt)
+NASM = $(shell cat psinfo/$(PLAT)/nasm.txt)
 EMU = $(shell cat psinfo/$(PLAT)/emu.txt)
 GDB = $(shell cat psinfo/$(PLAT)/gdb.txt)
 CFLAGS =  -Isysroot/usr/include -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
@@ -52,7 +53,7 @@ libc/libc.a: $(LIBC_OBJ)
 	$(CC) $(CFLAGS)  -c $< -o $@
 
 %.o: %.asm
-	nasm $< -f elf -o $@
+	$(NASM) $< -o $@
 
 %.o: %.s
 	$(AS) $< -o $@
