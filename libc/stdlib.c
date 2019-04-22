@@ -52,7 +52,7 @@ static void reserve_block(uint32_t mem_blks) {
   num_used_entries++;
 }
 
-void* malloc(uint32_t size) {
+void* malloc(size_t size) {
   uint32_t num_4b_grps=(uint32_t)ceilf((float)size/4);
   num_4b_grps+=3;
   int blk_indx=-1;
@@ -130,7 +130,7 @@ void* realloc(void *mem, size_t new_sz) {
   if (mem==NULL) {
     return ptr;
   }
-  uint32_t num_4b_grps=*((uint32_t*)((uint32_t)mem-12));
+  uint32_t num_4b_grps=*((uint32_t*)((char*)mem-12));
   memcpy(ptr,mem,num_4b_grps*4);
   free(mem);
   mem=ptr;
@@ -138,7 +138,7 @@ void* realloc(void *mem, size_t new_sz) {
 }
 
 void free(void* mem) {
-  uint32_t* info=(uint32_t*)((uint32_t)mem-12);
+  uint32_t* info=(uint32_t*)((char*)mem-12);
   uint32_t num_4b_grps=info[0];
   uint32_t bmap_index=info[1];
   uint32_t blk_indx=info[2];
