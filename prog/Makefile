@@ -5,6 +5,7 @@ CC = i386-elf-gcc
 
 prog.elf: $(OBJ)
 	i386-elf-ld -o $@ $^
+	rm -rf *.o
 
 %.o: %.c
 	$(CC) $(CFLAGS)  -c $< -o $@
