@@ -1,5 +1,0 @@
-cpu/i386/interrupt.o
-cpu/i386/paging_helpers.o
-cpu/i386/seg_upd.o
-cpu/i386/tasking_helpers.o
-kernel/boot.o
