@@ -250,7 +250,7 @@ dir_entry* get_dir_listing(uint32_t inode_num,FILE* f,int num) {
     entries[num_entries_used].name[(int)current_entry->name_len]='\0';
     num_entries_used++;
     tot_size+=current_entry->rec_len;
-    current_entry=(ext2_dir_entry*)(((uint32_t)current_entry)+current_entry->rec_len);
+    current_entry=(ext2_dir_entry*)(((char*)current_entry)+current_entry->rec_len);
   }
   if(num_entries_used==max_len) {
     max_len+=1;
@@ -283,7 +283,7 @@ ext2_dir_entry* read_dir_entry(uint32_t inode_num,uint32_t dir_entry_num,FILE* f
     }
     ent_num++;
     tot_size+=current_entry->rec_len;
-    current_entry=(ext2_dir_entry*)(((uint32_t)current_entry)+current_entry->rec_len);
+    current_entry=(ext2_dir_entry*)(((char*)current_entry)+current_entry->rec_len);
   }
   return NULL;
 }

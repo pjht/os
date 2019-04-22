@@ -75,10 +75,10 @@ void* kmalloc(uint32_t size) {
     set_bmap_bit(bmap_index+i);
   }
   uint32_t data_offset=(bmap_index*8)+8;
-  uint32_t* info=(void*)(((uint32_t)data)+data_offset-8);
+  uint32_t* info=(void*)(((char*)data)+data_offset-8);
   info[0]=num_4b_grps;
   info[1]=bmap_index;
-  return (void*)(((uint32_t)data)+data_offset);
+  return (void*)(((char*)data)+data_offset);
 
 }
 

@@ -116,12 +116,12 @@ void* malloc(uint32_t size) {
     set_bmap_bit(entry.bitmap,bmap_index+i);
   }
   uint32_t data_offset=(bmap_index*8)+12;
-  uint32_t* info=(void*)(((uint32_t)entry.data_block)+data_offset-12);
+  uint32_t* info=(void*)(((char*)entry.data_block)+data_offset-12);
   info[0]=num_4b_grps;
   info[1]=bmap_index;
   info[2]=blk_indx;
   entry.avail_data_size-=size+12;
-  return (void*)(((uint32_t)entry.data_block)+data_offset);
+  return (void*)(((char*)entry.data_block)+data_offset);
 
 }
 
