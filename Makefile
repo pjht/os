@@ -38,7 +38,7 @@ initrd/prog.elf: prog/*
 	cp prog/prog.elf initrd
 
 kernel/kernel.elf: $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) libc/libc.a
-	$(CC) -T linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc
+	$(CC) -Xlinker -n -T cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc
 
 sysroot: $(LIBC_HEADERS)
 	mkdir -p sysroot/usr/include
