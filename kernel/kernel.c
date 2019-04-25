@@ -1,12 +1,12 @@
 // #include "../cpu/cpu_init.h"
-// #include "../drivers/vga.h"
+#include "../drivers/vga.h"
 // #include "../drivers/pci.h"
 // #include "../drivers/serial.h"
 // #include "../cpu/i386/ports.h"
 // #include "vfs.h"
 // #include "../fs/devfs.h"
 // #include "../fs/initrd.h"
-// #include <grub/text_fb_info.h>
+#include <grub/text_fb_info.h>
 // #include <stdlib.h>
 // #include <tasking.h>
 // #include <string.h>
@@ -18,10 +18,11 @@
 // #include "../drivers/ide.h"
 // #include "parts.h"
 // #include "../fs/ext2.h"
-//
+#include <stdint.h>
+
 // static long initrd_sz;
 // static char* initrd;
-// static multiboot_info_t* mbd;
+static multiboot_info_t* mbd;
 // typedef int (*func_ptr)();
 //
 // static int console_dev_drv(char* filename,int c,long pos,char wr) {
@@ -129,23 +130,35 @@
 //   }
 // }
 //
+
+void func() {
+  for (;;);
+}
+
 void kmain(multiboot_info_t* header) {
-  // mbd=header;
-  // cpu_init(mbd);
-  // text_fb_info info;
+  // void (*ptr)()=((uint64_t)func)+0x800000000000;
+  // ptr();
+  mbd=header;
+  //cpu_init(mbd);
+  text_fb_info info;
   // if (header->flags&MULTIBOOT_INFO_FRAMEBUFFER_INFO&&header->framebuffer_type==2) {
   //   info.address=(char*)(((uint32_t)header->framebuffer_addr&0xFFFFFFFF)+0xC0000000);
   //   info.width=header->framebuffer_width;
   //   info.height=header->framebuffer_height;
   // } else {
-  //   info.address=(char*)0xC00B8000;
-  //   info.width=80;
-  //   info.height=25;
-  // }
-  // vga_init(info);
-  // createTask(init);
+    //info.address=(char*)0xB8000;
+    info.address=(char*)0xffff8000000B8000;
+    info.width=80;
+    info.height=25;
+  //}
+  vga_init(info);
+  vga_write_string("OKAY\n");
+  //createTask(init);
   // for (;;) {
   //   yield();
   // }
+  // static char* screen=(char*)0xB8000;
+  // screen[0]='O';
+  // screen[1]=0x2f;
   for(;;);
 }

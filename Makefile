@@ -15,14 +15,14 @@ NASM = $(shell cat psinfo/$(PLAT)/nasm.txt)
 EMU = $(shell cat psinfo/$(PLAT)/emu.txt)
 GDB = $(shell cat psinfo/$(PLAT)/gdb.txt)
 CFLAGS =  -Isysroot/usr/include -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
-QFLAGS =  -hda image.img -m 2G -boot d -cdrom os.iso -serial stdio #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
+QFLAGS =  -hda image.img -m 2G -boot d -cdrom os.iso #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
 
 .PHONY: sysroot
 
 all: os.iso
 
 run: os.iso
-	$(EMU) $(QFLAGS) > drv_log # -monitor stdio
+	$(EMU) $(QFLAGS) -monitor stdio
 
 debug: os.iso kernel/kernel.elf
 	$(EMU) -s $(QFLAGS) &
