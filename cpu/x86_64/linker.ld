@@ -1,46 +1,52 @@
 ENTRY(start)
 
-SECTIONS {
+PHDRS {
+  boot PT_LOAD FILEHDR PHDRS;
+  kernel PT_NULL;
+}
 
+SECTIONS {
   . = 1M;
 
-  .boot ALIGN (4K) :
+  .multiboot :
   {
-      /* ensure that the multiboot header is at the beginning */
-      *(.multiboot_header)
-  }
+    *(.multiboot)
+  } :boot
 
-  .text ALIGN (4K) :
+  .boot.text ALIGN (4K) :
   {
-      *(.boot.text)
-  }
+    *(.boot.text)
+  } :boot
 
-  .bss ALIGN (4K) :
+  .boot.rodata ALIGN (4K) :
   {
-      *(.boot.bss)
-  }
-
-  .rodata ALIGN (4K) :
+    *(.boot.rodata)
+  } :boot
+  .boot.data ALIGN (4K) :
   {
-      *(.boot.rodata)
-  }
+    *(.boot.data)
+  } :boot
+  .boot.bss ALIGN (4K) :
+  {
+    *(.boot.bss)
+  } :boot
 
-  . = 0x800000100000;
+  . = 0xffff800000100000;
 
-  .text 0x800000100000 ALIGN (4K) : AT (ADDR (.text) - 0x800000000000)
+  .text ALIGN (4K) : AT (ADDR (.text) - 0xfff800000000000)
   {
     *(.text)
-  }
-  .rodata 0x800000100000 + SIZEOF (.text) ALIGN (4K) : AT (ADDR (.rodata) - 0x800000000000)
+  } :kernel
+  .rodata ALIGN (4K) : AT (ADDR (.rodata) - 0xfff800000000000)
   {
     *(.rodata)
-  }
-  .data  0x800000100000 + SIZEOF (.text) + SIZEOF (.rodata) ALIGN (4K) : AT (ADDR (.data) - 0x800000000000)
+  } :kernel
+  .data ALIGN (4K) : AT (ADDR (.data) - 0xfff800000000000)
   {
     *(.data)
-  }
-  .bss  0x800000100000 + SIZEOF (.text) + SIZEOF (.rodata) + SIZEOF (.data) ALIGN (4K) : AT (ADDR (.bss) - 0x800000000000)
+  } :kernel
+  .bss ALIGN (4K) : AT (ADDR (.bss) - 0xfff800000000000)
   {
     *(.bss)
-  }
+  } :kernel
 }

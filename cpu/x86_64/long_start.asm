@@ -1,9 +1,9 @@
 global long_mode_start
 extern kmain
 
-section .text
+section .boot.text
 bits 64
 long_mode_start:
-    mov rax,kmain+0xffff800000000000
+    mov rax,kmain
     call rax
     loop: jmp loop
