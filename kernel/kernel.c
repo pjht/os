@@ -1,12 +1,12 @@
 // #include "../cpu/cpu_init.h"
-// #include "../drivers/vga.h"
+#include "../drivers/vga.h"
 // #include "../drivers/pci.h"
 // #include "../drivers/serial.h"
 // #include "../cpu/i386/ports.h"
 // #include "vfs.h"
 // #include "../fs/devfs.h"
 // #include "../fs/initrd.h"
-// #include <grub/text_fb_info.h>
+#include <grub/text_fb_info.h>
 // #include <stdlib.h>
 // #include <tasking.h>
 // #include <string.h>
@@ -138,17 +138,18 @@
 void kmain(multiboot_info_t* header) {
   // mbd=header;
   // cpu_init(mbd);
-  // text_fb_info info;
+  text_fb_info info;
   // if (header->flags&MULTIBOOT_INFO_FRAMEBUFFER_INFO&&header->framebuffer_type==2) {
   //   info.address=(char*)(((uint32_t)header->framebuffer_addr&0xFFFFFFFF)+0xC0000000);
   //   info.width=header->framebuffer_width;
   //   info.height=header->framebuffer_height;
   // } else {
-  //   info.address=(char*)0xB8000;
-  //   info.width=80;
-  //   info.height=25;
+    info.address=(char*)0xffff8000000B8000;
+    info.width=80;
+    info.height=25;
   // }
-  // vga_init(info);
+  vga_init(info);
+  vga_write_string("Hello long mode world!");
   // createTask(init);
   // for (;;) {
   //   yield();
