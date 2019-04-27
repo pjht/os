@@ -1,6 +1,8 @@
 #ifndef CPU_INIT_H
 #define CPU_INIT_H
 
-void cpu_init();
+#include <grub/multiboot2.h>
+
+void cpu_init(struct multiboot_boot_header_tag* tags);
 
 #endif

@@ -4,11 +4,11 @@
 #include "pmem.h"
 #include "../tasking.h"
 
-void cpu_init(multiboot_info_t* mbd) {
+void cpu_init(struct multiboot_boot_header_tag* tags) {
   gdt_init();
   isr_install();
   asm volatile("sti");
-  pmem_init(mbd);
+  pmem_init(tags);
   paging_init();
   tasking_init();
 }

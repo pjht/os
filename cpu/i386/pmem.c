@@ -1,4 +1,4 @@
-#include <grub/multiboot.h>
+#include <grub/multiboot2.h>
 #include "../halt.h"
 #include <stdint.h>
 #include <stdlib.h>
@@ -25,35 +25,41 @@ static void clear_bmap_bit(int index) {
   bmap[byte]=bmap[byte]&(~(1<<bit));
 }
 
-void pmem_init(multiboot_info_t* mbd) {
-  if (!mbd->flags&&MULTIBOOT_INFO_MEM_MAP) {
-    klog("PANIC","No memory map supplied by bootloader!");
-    halt();
-  }
+void pmem_init(struct multiboot_boot_header_tag* tags) {
   for (int i=0;i<131072;i++) {
     bmap[i]=0xFF;
   }
-  uint32_t mmap_length=mbd->mmap_length;
-  struct multiboot_mmap_entry* mmap_addr=(struct multiboot_mmap_entry*)(mbd->mmap_addr+0xC0000000);
-  struct multiboot_mmap_entry* mmap_entry=mmap_addr;
-  uint32_t size;
-  for (int i=0;(uint32_t)mmap_entry<((uint32_t)mmap_addr+mmap_length);mmap_entry=(struct multiboot_mmap_entry*)((uint32_t)mmap_entry+size+4)) {
-    size=mmap_entry->size;
-    uint32_t start=mmap_entry->addr;
-    uint32_t end=start+mmap_entry->len-1;
-    uint32_t type=mmap_entry->type;
-    if (type!=1 || start<0x100000) {
-      continue;
+  char found_mmap=0;
+  struct multiboot_tag* tag=(struct multiboot_tag*)(tags+1);
+  while (tag->type!=0) {
+    switch (tag->type) {
+      case MULTIBOOT_TAG_TYPE_MMAP: {
+        found_mmap=1;
+        struct multiboot_mmap_entry* orig_ptr=(struct multiboot_mmap_entry*)(((char*)tag)+16);
+        for (struct multiboot_mmap_entry* ptr=orig_ptr;(char*)ptr<((char*)orig_ptr)+tag->size;ptr++) {
+          if (ptr->type!=MULTIBOOT_MEMORY_AVAILABLE) continue;
+          uint32_t size=ptr->len;
+          uint32_t start=ptr->addr;
+          if (start<0x100000) continue;
+          uint32_t end=start+ptr->len-1;
+          if (start&0xFFF) {
+            start+=0x1000;
+          }
+          start=start>>12;
+          end=end>>12;
+          for (uint32_t i=start;i<end;i++) {
+            clear_bmap_bit(i);
+          }
+        }
+        char str[256];
+        break;
+      }
     }
-    if (start&0xFFF) {
-      start+=0x1000;
-    }
-    start=start>>12;
-    end=end>>12;
-    for (uint32_t i=start;i<end;i++) {
-      clear_bmap_bit(i);
-    }
-    i++;
+    tag=(struct multiboot_tag*)((char*)tag+((tag->size+7)&0xFFFFFFF8));
+  }
+  if (!found_mmap) {
+    vga_write_string("[PANIC] No memory map supplied by bootloader!");
+    halt();
   }
   for (uint32_t i=0;i<2048;i++) {
     set_bmap_bit(i);

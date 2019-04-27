@@ -1,16 +1,39 @@
-# Declare constants for the multiboot header.
-.set ALIGN,    1<<0             # align loaded modules on page boundaries
-.set MEMINFO,  1<<1             # provide memory map
-.set FLAGS,    ALIGN | MEMINFO  # this is the Multiboot 'flag' field
-.set MAGIC,    0x1BADB002       # 'magic number' lets bootloader find the header
-.set CHECKSUM, -(MAGIC + FLAGS) # checksum of above, to prove we are multiboot
-
 # Declare a multiboot header that marks the program as a kernel.
 .section .multiboot
-.align 4
-.long MAGIC
-.long FLAGS
-.long CHECKSUM
+ header_start:
+     .long 0xe85250d6                # magic number (multiboot 2)
+     .long 0                         # architecture 0 (protected mode i386)
+     .long header_end - header_start # header length
+     # checksum
+     .long 0x100000000 - (0xe85250d6 + 0 + (header_end - header_start))
+
+     # info request tag
+     info_tag_start:
+     .word 1    # type
+     .word 0    # flags
+     .long info_tag_end-info_tag_start #size
+     .long 4
+     .long 6
+     info_tag_end:
+
+     # entry addr tag
+     .word 3 # type
+     .word 0 # flags
+     .long 12 # size
+     .long _start- 0xC0000000 # entry_addr
+     .long 0 #alignment
+
+		 # page align tag
+		 .word 6 # type
+		 .word 0 # flags
+		 .long 8 # size
+
+     # required end tag
+     .word 0    # type
+     .word 0    # flags
+     .long 8    # size
+ header_end:
+
 
 # Allocate the initial stack.
 .section .bootstrap_stack, "aw", @nobits
@@ -44,7 +67,7 @@ boot_page_table2:
 .global _start
 .type _start, @function
 _start:
-	cmp $0x2BADB002, %eax
+	cmp $0x36d76289, %eax
 	jnz no_multiboot
 	# Physical address of boot_page_tables.
 	# TODO: I recall seeing some assembly that used a macro to do the

@@ -11,7 +11,7 @@
 #include <tasking.h>
 #include <string.h>
 #include <memory.h>
-#include <grub/multiboot.h>
+#include <grub/multiboot2.h>
 #include "klog.h"
 #include "elf.h"
 #include <errno.h>
@@ -22,9 +22,8 @@
 
 static long initrd_sz;
 static char* initrd;
-static multiboot_info_t* mbd;
 typedef int (*func_ptr)();
-//
+
 // static int console_dev_drv(char* filename,int c,long pos,char wr) {
 //   if (wr) {
 //     if (c=='\f') {
@@ -42,7 +41,7 @@ typedef int (*func_ptr)();
 //     // return devbuf_get(kbd_buf);
 //   }
 // }
-//
+
 // static int initrd_dev_drv(char* filename,int c,long pos,char wr) {
 //   if (wr) {
 //     return 0;
@@ -52,7 +51,7 @@ typedef int (*func_ptr)();
 //   }
 //   return initrd[pos];
 // }
-//
+
 // static void read_initrd(multiboot_info_t* mbd) {
 //   if ((mbd->flags&MULTIBOOT_INFO_MODS)!=0) {
 //     uint32_t mods_count=mbd->mods_count;
@@ -87,7 +86,7 @@ typedef int (*func_ptr)();
 //   // read_initrd(mbd);
 //   // devfs_add(initrd_dev_drv,"initrd");
 //   // initrd_init();
-//   mount("/initrd/","","initrd");
+//   // mount("/initrd/","","initrd");
 //   // Detect PCI
 //   port_long_out(0xCF8,(1<<31));
 //   uint32_t word=port_long_in(0xCFC);
@@ -97,24 +96,24 @@ typedef int (*func_ptr)();
 //   }
 //   // Detect and initailize serial ports
 //   serial_init();
-//   FILE* file=fopen("/initrd/prog.elf","r");
-//   elf_header header;
-//   fread(&header,sizeof(elf_header),1,file);
-//   if (header.magic!=ELF_MAGIC) {
-//     klog("INFO","Invalid magic number for prog.elf");
-//     fclose(file);
-//   } else {
-//     fseek(file,header.prog_hdr,SEEK_SET);
-//     elf_pheader pheader;
-//     fread(&pheader,sizeof(elf_pheader),1,file);
-//     alloc_memory_virt(1,(void*)pheader.vaddr);
-//     fseek(file,pheader.offset,SEEK_SET);
-//     fread((void*)pheader.vaddr,pheader.filesz,1,file);
-//     klog("INFO","VADDR:%x",pheader.vaddr);
-//     func_ptr prog=(func_ptr)header.entry;
-//     int val=prog();
-//     klog("INFO","RAN PROG:%d",val);
-//   }
+//   // FILE* file=fopen("/initrd/prog.elf","r");
+//   // elf_header header;
+//   // fread(&header,sizeof(elf_header),1,file);
+//   // if (header.magic!=ELF_MAGIC) {
+//   //   klog("INFO","Invalid magic number for prog.elf");
+//   //   fclose(file);
+//   // } else {
+//   //   fseek(file,header.prog_hdr,SEEK_SET);
+//   //   elf_pheader pheader;
+//   //   fread(&pheader,sizeof(elf_pheader),1,file);
+//   //   alloc_memory_virt(1,(void*)pheader.vaddr);
+//   //   fseek(file,pheader.offset,SEEK_SET);
+//   //   fread((void*)pheader.vaddr,pheader.filesz,1,file);
+//   //   klog("INFO","VADDR:%x",pheader.vaddr);
+//   //   func_ptr prog=(func_ptr)header.entry;
+//   //   int val=prog();
+//   //   klog("INFO","RAN PROG:%d",val);
+//   // }
 //   ide_init();
 //   load_parts("/dev/hda");
 //   init_ext2();
@@ -129,15 +128,9 @@ typedef int (*func_ptr)();
 //     yield();
 //   }
 // }
-//
-//
-// void func() {
-//   for (;;);
-// }
 
-void kmain(multiboot_info_t* header) {
-  mbd=header;
-  cpu_init(mbd);
+void kmain(struct multiboot_boot_header_tag* tags) {
+  cpu_init(tags);
   text_fb_info info;
   // if (header->flags&MULTIBOOT_INFO_FRAMEBUFFER_INFO&&header->framebuffer_type==2) {
   //   info.address=(char*)(((uint32_t)header->framebuffer_addr&0xFFFFFFFF)+0xC0000000);
@@ -145,11 +138,12 @@ void kmain(multiboot_info_t* header) {
   //   info.height=header->framebuffer_height;
   // } else {
     info.address=(char*)0xffff8000000B8000;
+    // info.address=(char*)0xC00B8000;
     info.width=80;
     info.height=25;
   // }
   vga_init(info);
-  vga_write_string("Hello long mode world!");
+  vga_write_string("Hello long mode world!\n");
   // createTask(init);
   // for (;;) {
   //   yield();
