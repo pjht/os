@@ -182,7 +182,6 @@ void isr_handler(registers_t r) {
     break;
     }
   }
-  asm volatile("xchgw %bx, %bx");
 }
 
 
