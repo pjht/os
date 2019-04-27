@@ -1,29 +1,29 @@
-// #include "../cpu/cpu_init.h"
+#include "../cpu/cpu_init.h"
 #include "../drivers/vga.h"
-// #include "../drivers/pci.h"
-// #include "../drivers/serial.h"
+#include "../drivers/pci.h"
+#include "../drivers/serial.h"
 // #include "../cpu/i386/ports.h"
-// #include "vfs.h"
-// #include "../fs/devfs.h"
-// #include "../fs/initrd.h"
+#include "vfs.h"
+#include "../fs/devfs.h"
+#include "../fs/initrd.h"
 #include <grub/text_fb_info.h>
-// #include <stdlib.h>
-// #include <tasking.h>
-// #include <string.h>
-// #include <memory.h>
+#include <stdlib.h>
+#include <tasking.h>
+#include <string.h>
+#include <memory.h>
 #include <grub/multiboot.h>
-// #include "klog.h"
-// #include "elf.h"
-// #include <errno.h>
-// #include "../drivers/ide.h"
-// #include "parts.h"
-// #include "../fs/ext2.h"
-// #include <stdint.h>
-//
-// static long initrd_sz;
-// static char* initrd;
-// static multiboot_info_t* mbd;
-// typedef int (*func_ptr)();
+#include "klog.h"
+#include "elf.h"
+#include <errno.h>
+#include "../drivers/ide.h"
+#include "parts.h"
+#include "../fs/ext2.h"
+#include <stdint.h>
+
+static long initrd_sz;
+static char* initrd;
+static multiboot_info_t* mbd;
+typedef int (*func_ptr)();
 //
 // static int console_dev_drv(char* filename,int c,long pos,char wr) {
 //   if (wr) {
@@ -76,7 +76,7 @@
 //     for(;;) {}
 //   }
 // }
-//
+
 // static void init() {
 //   init_vfs();
 //   init_devfs();
@@ -136,8 +136,8 @@
 // }
 
 void kmain(multiboot_info_t* header) {
-  // mbd=header;
-  // cpu_init(mbd);
+  mbd=header;
+  cpu_init(mbd);
   text_fb_info info;
   // if (header->flags&MULTIBOOT_INFO_FRAMEBUFFER_INFO&&header->framebuffer_type==2) {
   //   info.address=(char*)(((uint32_t)header->framebuffer_addr&0xFFFFFFFF)+0xC0000000);
