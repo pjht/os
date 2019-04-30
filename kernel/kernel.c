@@ -24,33 +24,33 @@ static long initrd_sz;
 static char* initrd;
 typedef int (*func_ptr)();
 
-// static int console_dev_drv(char* filename,int c,long pos,char wr) {
-//   if (wr) {
-//     if (c=='\f') {
-//       vga_clear();
-//     } else if (c=='\b') {
-//       vga_backspace();
-//     }
-//     char str[2];
-//     str[0]=(char)c;
-//     str[1]='\0';
-//     vga_write_string(str);
-//     return 0;
-//   } else {
-//     return 0;
-//     // return devbuf_get(kbd_buf);
-//   }
-// }
+static int console_dev_drv(char* filename,int c,long pos,char wr) {
+  if (wr) {
+    if (c=='\f') {
+      vga_clear();
+    } else if (c=='\b') {
+      vga_backspace();
+    }
+    char str[2];
+    str[0]=(char)c;
+    str[1]='\0';
+    vga_write_string(str);
+    return 0;
+  } else {
+    return 0;
+    // return devbuf_get(kbd_buf);
+  }
+}
 
-// static int initrd_dev_drv(char* filename,int c,long pos,char wr) {
-//   if (wr) {
-//     return 0;
-//   }
-//   if (pos>=initrd_sz) {
-//     return EOF;
-//   }
-//   return initrd[pos];
-// }
+static int initrd_dev_drv(char* filename,int c,long pos,char wr) {
+  if (wr) {
+    return 0;
+  }
+  if (pos>=initrd_sz) {
+    return EOF;
+  }
+  return initrd[pos];
+}
 
 // static void read_initrd(multiboot_info_t* mbd) {
 //   if ((mbd->flags&MULTIBOOT_INFO_MODS)!=0) {
@@ -76,58 +76,58 @@ typedef int (*func_ptr)();
 //   }
 // }
 
-// static void init() {
-//   init_vfs();
-//   init_devfs();
-//   devfs_add(console_dev_drv,"console");
-//   stdout=fopen("/dev/console","w");
-//   stdin=fopen("/dev/console","r");
-//   stderr=fopen("/dev/console","w");
-//   // read_initrd(mbd);
-//   // devfs_add(initrd_dev_drv,"initrd");
-//   // initrd_init();
-//   // mount("/initrd/","","initrd");
-//   // Detect PCI
-//   port_long_out(0xCF8,(1<<31));
-//   uint32_t word=port_long_in(0xCFC);
-//   port_long_out(0xCF8,(1<<31)|0x4);
-//   if (word!=port_long_in(0xCFC)) {
-//     // pci_init();
-//   }
-//   // Detect and initailize serial ports
-//   serial_init();
-//   // FILE* file=fopen("/initrd/prog.elf","r");
-//   // elf_header header;
-//   // fread(&header,sizeof(elf_header),1,file);
-//   // if (header.magic!=ELF_MAGIC) {
-//   //   klog("INFO","Invalid magic number for prog.elf");
-//   //   fclose(file);
-//   // } else {
-//   //   fseek(file,header.prog_hdr,SEEK_SET);
-//   //   elf_pheader pheader;
-//   //   fread(&pheader,sizeof(elf_pheader),1,file);
-//   //   alloc_memory_virt(1,(void*)pheader.vaddr);
-//   //   fseek(file,pheader.offset,SEEK_SET);
-//   //   fread((void*)pheader.vaddr,pheader.filesz,1,file);
-//   //   klog("INFO","VADDR:%x",pheader.vaddr);
-//   //   func_ptr prog=(func_ptr)header.entry;
-//   //   int val=prog();
-//   //   klog("INFO","RAN PROG:%d",val);
-//   // }
-//   ide_init();
-//   load_parts("/dev/hda");
-//   init_ext2();
-//   mount("/","/dev/hda1","ext2");
-//   klog("INFO","MOUNT");
-//   FILE* f=fopen("/file","r");
-//   char str[256];
-//   fgets(str,256,f);
-//   str[strlen(str)-1]='\0';
-//   klog("INFO","Got string %s",str);
-//   for(;;) {
-//     yield();
-//   }
-// }
+static void init() {
+  init_vfs();
+  init_devfs();
+  devfs_add(console_dev_drv,"console");
+  stdout=fopen("/dev/console","w");
+  stdin=fopen("/dev/console","r");
+  stderr=fopen("/dev/console","w");
+  // read_initrd(mbd);
+  // devfs_add(initrd_dev_drv,"initrd");
+  // initrd_init();
+  // mount("/initrd/","","initrd");
+  // Detect PCI
+  port_long_out(0xCF8,(1<<31));
+  uint32_t word=port_long_in(0xCFC);
+  port_long_out(0xCF8,(1<<31)|0x4);
+  if (word!=port_long_in(0xCFC)) {
+    // pci_init();
+  }
+  // Detect and initailize serial ports
+  serial_init();
+  // FILE* file=fopen("/initrd/prog.elf","r");
+  // elf_header header;
+  // fread(&header,sizeof(elf_header),1,file);
+  // if (header.magic!=ELF_MAGIC) {
+  //   klog("INFO","Invalid magic number for prog.elf");
+  //   fclose(file);
+  // } else {
+  //   fseek(file,header.prog_hdr,SEEK_SET);
+  //   elf_pheader pheader;
+  //   fread(&pheader,sizeof(elf_pheader),1,file);
+  //   alloc_memory_virt(1,(void*)pheader.vaddr);
+  //   fseek(file,pheader.offset,SEEK_SET);
+  //   fread((void*)pheader.vaddr,pheader.filesz,1,file);
+  //   klog("INFO","VADDR:%x",pheader.vaddr);
+  //   func_ptr prog=(func_ptr)header.entry;
+  //   int val=prog();
+  //   klog("INFO","RAN PROG:%d",val);
+  // }
+  ide_init();
+  load_parts("/dev/hda");
+  init_ext2();
+  mount("/","/dev/hda1","ext2");
+  klog("INFO","MOUNT");
+  FILE* f=fopen("/file","r");
+  char str[256];
+  fgets(str,256,f);
+  str[strlen(str)-1]='\0';
+  klog("INFO","Got string %s",str);
+  for(;;) {
+    yield();
+  }
+}
 
 void kmain(struct multiboot_boot_header_tag* tags) {
   cpu_init(tags);
@@ -137,16 +137,16 @@ void kmain(struct multiboot_boot_header_tag* tags) {
   //   info.width=header->framebuffer_width;
   //   info.height=header->framebuffer_height;
   // } else {
-    info.address=(char*)0xffff8000000B8000;
-    // info.address=(char*)0xC00B8000;
+    // info.address=(char*)0xffff8000000B8000;
+    info.address=(char*)0xC00B8000;
     info.width=80;
     info.height=25;
   // }
   vga_init(info);
   vga_write_string("Hello long mode world!\n");
-  // createTask(init);
-  // for (;;) {
-  //   yield();
-  // }
-  for(;;);
+  // check_gets();
+  createTask(init);
+  for (;;) {
+    yield();
+  }
 }

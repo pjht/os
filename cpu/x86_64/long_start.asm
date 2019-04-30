@@ -4,6 +4,7 @@ extern kmain
 section .boot.text
 bits 64
 long_mode_start:
+    xchg bx,bx
     mov ax, 0
     mov ss, ax
     mov ds, ax

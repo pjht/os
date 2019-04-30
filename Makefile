@@ -1,4 +1,4 @@
-PLAT=x86_64
+PLAT=i386
 C_SOURCES = $(wildcard kernel/*.c drivers/$(PLAT)/*.c drivers/$(PLAT)/*/*.c cpu/$(PLAT)/*.c fs/*.c)
 ASM = $(wildcard cpu/$(PLAT)/*.asm)
 S_ASM = $(wildcard cpu/$(PLAT)/*.s)

@@ -6,8 +6,14 @@ header_start:
     ; checksum
     dd 0x100000000 - (0xe85250d6 + 0 + (header_end - header_start))
 
-    ; insert optional multiboot tags here
-
+    ; info request tag
+    info_tag_start:
+    dw 1    ; type
+    dw 0    ; flags
+    dd info_tag_end-info_tag_start ;size
+    dd 6 ; full memory map (available and reserved ranges)
+    info_tag_end:
+    dd 0 ; tag alignment
     ; required end tag
     dw 0    ; type
     dw 0    ; flags
@@ -21,6 +27,7 @@ section .boot.text
 bits 32
 start:
     mov esp, stack_top
+    mov edi, ebx
 
     call check_multiboot
     call check_cpuid
