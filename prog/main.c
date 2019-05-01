@@ -1,6 +1,6 @@
 #include "../libc/string.h"
 
-int _start() {
+int main() {
   int x=17;
   char str[2];
   str[0]='h';

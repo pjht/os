@@ -1,5 +1,5 @@
 C_SOURCES = $(wildcard *.c)
-OBJ = $(C_SOURCES:.c=.o ../libc/libc.a)
+OBJ = $(C_SOURCES:.c=.o ../libc/libc.a ../kernel/start.o)
 CFLAGS = -Wall -g -ffreestanding
 CC = i386-elf-gcc
 

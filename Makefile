@@ -33,7 +33,7 @@ os.iso: kernel/kernel.elf initrd/* initrd/prog.elf
 	ruby makeinitrd.rb initrd iso/boot/initrd
 	grub-mkrescue -o $@ iso
 
-initrd/prog.elf: prog/*
+initrd/prog.elf: prog/* kernel/start.o
 	cd prog && make
 	cp prog/prog.elf initrd
 
