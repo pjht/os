@@ -57,7 +57,7 @@ void initrd_init() {
   names=malloc(sizeof(char*)*32);
   offsets=malloc(sizeof(uint32_t)*32);
   sizes=malloc(sizeof(long)*32);
-  for (uint32_t i=0;;i++) {
+  for (uint32_t i=0;i<1;i++) {
       if (i==max_files) {
         names=realloc(names,sizeof(char*)*(max_files+32));
         offsets=realloc(offsets,sizeof(uint32_t)*(max_files+32));

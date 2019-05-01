@@ -1,4 +1,10 @@
+#include "../libc/string.h"
+
 int _start() {
   int x=17;
-  return x+strlen("Hi");
+  char str[2];
+  str[0]='h';
+  str[1]='\0';
+  char* vga=0xC00B8000;
+  return x+strlen(str);
 }

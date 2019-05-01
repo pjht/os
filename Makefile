@@ -15,7 +15,7 @@ NASM = $(shell cat psinfo/$(PLAT)/nasm.txt)
 EMU = $(shell cat psinfo/$(PLAT)/emu.txt)
 GDB = $(shell cat psinfo/$(PLAT)/gdb.txt)
 CFLAGS =  -Isysroot/usr/include -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
-QFLAGS =  -hda image.img -m 2G -boot d -cdrom os.iso #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
+QFLAGS =  -hda ext2.img -m 2G -boot d -cdrom os.iso -serial vc #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
 
 .PHONY: sysroot
 
