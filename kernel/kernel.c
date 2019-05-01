@@ -63,7 +63,6 @@ static void read_initrd(struct multiboot_boot_header_tag* tags) {
         initrd=malloc(sizeof(char)*(mod->mod_end-mod->mod_start));
         initrd_sz=mod->mod_end-mod->mod_start;
         memcpy(initrd,mod->mod_start+0xC0000000,mod->mod_end-mod->mod_start);
-        klog("INFO","Got module called %s at start address %x and end address %x",mod->cmdline,mod->mod_start,mod->mod_end);
       }
     }
     tag=(struct multiboot_tag*)((char*)tag+((tag->size+7)&0xFFFFFFF8));
@@ -97,7 +96,6 @@ static void init() {
     klog("INFO","Invalid magic number for prog.elf");
     fclose(file);
   } else {
-    klog("INFO","ENTRY: %x",header.entry);
     for (int i=0;i<header.pheader_ent_nm;i++) {
       elf_pheader pheader;
       fseek(file,(header.prog_hdr)+(header.pheader_ent_sz*i),SEEK_SET);
@@ -106,10 +104,8 @@ static void init() {
       memset((void*)pheader.vaddr,0xAA,pheader.memsz);
       if (pheader.filesz>0) {
         fseek(file,pheader.offset,SEEK_SET);
-        klog("INFO","fread((void*)%x,%x,1,file)",pheader.vaddr,pheader.filesz);
         fread((void*)pheader.vaddr,pheader.filesz,1,file);
       }
-      klog("INFO","OFF:%x VADDR:%x FILESZ:%x MEMSZ:%x",pheader.offset, pheader.vaddr,pheader.filesz,pheader.memsz);
     }
     func_ptr prog=(func_ptr)header.entry;
     int val=prog();
