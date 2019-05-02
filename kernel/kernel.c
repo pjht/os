@@ -89,6 +89,16 @@ static void init() {
   }
   // Detect and initailize serial ports
   serial_init();
+  ide_init();
+  // load_parts("/dev/hda");
+  init_ext2();
+  mount("/","/dev/hda","ext2");
+  klog("INFO","MOUNT");
+  FILE* f=fopen("/file","r");
+  char str[256];
+  fgets(str,256,f);
+  str[strlen(str)-1]='\0';
+  klog("INFO","Got string %s",str);
   FILE* file=fopen("/initrd/prog.elf","r");
   elf_header header;
   fread(&header,sizeof(elf_header),1,file);
@@ -108,22 +118,11 @@ static void init() {
       }
     }
     func_ptr prog=(func_ptr)header.entry;
-    int val=prog();
-    klog("INFO","RAN PROG:%d",val);
+    prog();
   }
-  ide_init();
-  // load_parts("/dev/hda");
-  init_ext2();
-  mount("/","/dev/hda","ext2");
-  klog("INFO","MOUNT");
-  FILE* f=fopen("/file","r");
-  char str[256];
-  fgets(str,256,f);
-  str[strlen(str)-1]='\0';
-  klog("INFO","Got string %s",str);
-  for(;;) {
-    yield();
-  }
+  // for(;;) {
+  //   yield();
+  // }
 }
 
 void kmain(struct multiboot_boot_header_tag* hdr) {
