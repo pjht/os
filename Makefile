@@ -35,7 +35,7 @@ os.iso: kernel/kernel.elf initrd/* initrd/prog.elf
 
 initrd/prog.elf: prog/* kernel/start.o
 	cd prog && make
-	cp prog/prog.elf initrd
+	cp prog/prog.elf initrd/init
 
 kernel/kernel.elf: $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) libc/libc.a
 	$(CC) -z max-page-size=4096 -Xlinker -n -T cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc

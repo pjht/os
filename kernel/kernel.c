@@ -25,36 +25,7 @@ static char* initrd;
 typedef int (*func_ptr)();
 static struct multiboot_boot_header_tag* tags;
 
-static int console_dev_drv(char* filename,int c,long pos,char wr) {
-  if (wr) {
-    if (c=='\f') {
-      vga_clear();
-    } else if (c=='\b') {
-      vga_backspace();
-    }
-    char str[2];
-    str[0]=(char)c;
-    str[1]='\0';
-    vga_write_string(str);
-    return 0;
-  } else {
-    return 0;
-    // return devbuf_get(kbd_buf);
-  }
-}
-
-static int initrd_dev_drv(char* filename,int c,long pos,char wr) {
-  if (wr) {
-    return 0;
-  }
-  if (pos>=initrd_sz) {
-    return EOF;
-  }
-  return (initrd[pos]&0xFF);
-}
-
 static void read_initrd(struct multiboot_boot_header_tag* tags) {
-
   struct multiboot_tag* tag=(struct multiboot_tag*)(tags+1);
   while (tag->type!=0) {
     switch (tag->type) {
@@ -69,81 +40,99 @@ static void read_initrd(struct multiboot_boot_header_tag* tags) {
   }
 }
 
-static void init() {
-  init_vfs();
-  init_devfs();
-  devfs_add(console_dev_drv,"console");
-  stdout=fopen("/dev/console","w");
-  stdin=fopen("/dev/console","r");
-  stderr=fopen("/dev/console","w");
-  read_initrd(tags);
-  devfs_add(initrd_dev_drv,"initrd");
-  initrd_init();
-  mount("/initrd/","","initrd");
-  // Detect PCI
-  port_long_out(0xCF8,(1<<31));
-  uint32_t word=port_long_in(0xCFC);
-  port_long_out(0xCF8,(1<<31)|0x4);
-  if (word!=port_long_in(0xCFC)) {
-    // pci_init();
-  }
-  // Detect and initailize serial ports
-  serial_init();
-  ide_init();
-  // load_parts("/dev/hda");
-  init_ext2();
-  mount("/","/dev/hda","ext2");
-  klog("INFO","MOUNT");
-  FILE* f=fopen("/file","r");
-  char str[256];
-  fgets(str,256,f);
-  str[strlen(str)-1]='\0';
-  klog("INFO","Got string %s",str);
-  FILE* file=fopen("/initrd/prog.elf","r");
-  elf_header header;
-  fread(&header,sizeof(elf_header),1,file);
-  if (header.magic!=ELF_MAGIC) {
-    klog("INFO","Invalid magic number for prog.elf");
-    fclose(file);
-  } else {
-    for (int i=0;i<header.pheader_ent_nm;i++) {
-      elf_pheader pheader;
-      fseek(file,(header.prog_hdr)+(header.pheader_ent_sz*i),SEEK_SET);
-      fread(&pheader,sizeof(elf_pheader),1,file);
-      alloc_memory_virt(((pheader.memsz)/4096)+1,(void*)pheader.vaddr);
-      memset((void*)pheader.vaddr,0xAA,pheader.memsz);
-      if (pheader.filesz>0) {
-        fseek(file,pheader.offset,SEEK_SET);
-        fread((void*)pheader.vaddr,pheader.filesz,1,file);
-      }
-    }
-    func_ptr prog=(func_ptr)header.entry;
-    prog();
-  }
-  // for(;;) {
-  //   yield();
-  // }
-}
 
 void kmain(struct multiboot_boot_header_tag* hdr) {
   tags=hdr;
   cpu_init(tags);
   text_fb_info info;
-  // if (header->flags&MULTIBOOT_INFO_FRAMEBUFFER_INFO&&header->framebuffer_type==2) {
-  //   info.address=(char*)(((uint32_t)header->framebuffer_addr&0xFFFFFFFF)+0xC0000000);
-  //   info.width=header->framebuffer_width;
-  //   info.height=header->framebuffer_height;
-  // } else {
-    // info.address=(char*)0xffff8000000B8000;
-    info.address=(char*)0xC00B8000;
-    info.width=80;
-    info.height=25;
-  // }
+  info.address=(char*)0xC00B8000;
+  info.width=80;
+  info.height=25;
   vga_init(info);
-  vga_write_string("Hello long mode world!\n");
-  // check_gets();
-  createTask(init);
-  for (;;) {
-    yield();
+  read_initrd(tags);
+  int pos=0;
+  uint32_t datapos;
+  for (uint32_t i=0;i<1;i++) {
+      uint32_t name_size;
+      char* name_sz_ptr=(char*)&name_size;
+      name_sz_ptr[0]=initrd[pos];
+      name_sz_ptr[1]=initrd[pos+1];
+      name_sz_ptr[2]=initrd[pos+2];
+      name_sz_ptr[3]=initrd[pos+3];
+      char str[256];
+      str[0]='\0';
+      int_to_ascii(name_size,str);
+      vga_write_string("[INFO] NAME_SZ:");
+      vga_write_string(str);
+      vga_write_string("\n");
+      pos+=4;
+      if (name_size==0) {
+        break;
+      }
+      if (strcmp("init",&initrd[pos])==0) {
+        pos+=5;
+        uint32_t contents_size;
+        char* cont_sz_ptr=(char*)&contents_size;
+        cont_sz_ptr[0]=initrd[pos];
+        cont_sz_ptr[1]=initrd[pos+1];
+        cont_sz_ptr[2]=initrd[pos+2];
+        cont_sz_ptr[3]=initrd[pos+3];
+        pos+=4;
+        datapos=pos;
+        char str[256];
+        str[0]='\0';
+        int_to_ascii(contents_size,str);
+        vga_write_string("[INFO] CONT_SZ:");
+        vga_write_string(str);
+        vga_write_string("\n");
+        str[0]='\0';
+        int_to_ascii(datapos,str);
+        vga_write_string("[INFO] DATAPOS:");
+        vga_write_string(str);
+        vga_write_string("\n");
+        pos+=contents_size;
+        break;
+      }
+      uint32_t contents_size;
+      char* cont_sz_ptr=(char*)&contents_size;
+      cont_sz_ptr[0]=initrd[pos];
+      cont_sz_ptr[1]=initrd[pos+1];
+      cont_sz_ptr[2]=initrd[pos+2];
+      cont_sz_ptr[3]=initrd[pos+3];
+      pos+=4;
+      pos+=contents_size;
+  }
+  elf_header header;
+  pos=datapos;
+  char* hdr_ptr=(char*)&header;
+  for (int i=0;i<sizeof(elf_header);i++) {
+    hdr_ptr[i]=initrd[pos];
+    pos++;
+  }
+  if (header.magic!=ELF_MAGIC) {
+    vga_write_string("[INFO] Invalid magic number for prog.elf\n");
+  } else {
+    for (int i=0;i<header.pheader_ent_nm;i++) {
+      elf_pheader pheader;
+      pos=(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos;
+      char* phdr_ptr=(char*)&pheader;
+      for (int i=0;i<sizeof(elf_pheader);i++) {
+        phdr_ptr[i]=initrd[pos];
+        pos++;
+      }
+      alloc_memory_virt(((pheader.memsz)/4096)+1,(void*)pheader.vaddr);
+      memset((void*)pheader.vaddr,0,pheader.memsz);
+      if (pheader.filesz>0) {
+        pos=pheader.offset+datapos;
+        char* data_ptr=(char*)pheader.vaddr;
+        for (int i=0;i<pheader.filesz;i++) {
+          data_ptr[i]=initrd[pos];
+          pos++;
+        }
+        vga_write_string("[INFO] Loaded section\n");
+      }
+    }
+    func_ptr prog=(func_ptr)header.entry;
+    prog();
   }
 }
