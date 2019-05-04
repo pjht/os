@@ -90,6 +90,20 @@ void* alloc_pages(int num_pages) {
   return addr;
 }
 
+void* virt_to_phys(void* virt_addr_arg) {
+  uint32_t virt_addr=(uint32_t)virt_addr_arg;
+  int offset=virt_addr&0xFFFF;
+  virt_addr=virt_addr&0xFFFFFC00;
+  if (!is_page_present(virt_addr>>12)) return NULL;
+  int dir_idx=virt_addr&0xFFC00000;
+  int tbl_idx=virt_addr&0x3FFC00;
+  if ((smap[dir_idx]&0x1)==0) {
+    return 0;
+  }
+  smap_page_tables[dir_idx+1]=(smap[dir_idx]&0xFFFFFC00)|0x3;
+  return (void*)((smap[(1024+(1024*dir_idx))+tbl_idx]&0xFFFFFC00)+offset);
+}
+
 
 void alloc_pages_virt(int num_pages,void* addr) {
   void* phys_addr=pmem_alloc(num_pages);

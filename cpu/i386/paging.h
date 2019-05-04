@@ -12,5 +12,5 @@ void alloc_pages_virt(int num_pages,void* addr);
 void paging_init();
 void* new_address_space();
 void load_address_space(uint32_t cr3);
-
+void* virt_to_phys(void* virt_addr);
 #endif
