@@ -23,9 +23,9 @@ void* get_msg(uint32_t* sender) {
   return msg;
 }
 
-void send_msg(uint32_t pid,void* msg) {
+void send_msg(uint32_t pid,void* msg,uint32_t size) {
   asm volatile("  \
     mov $7, %%eax; \
     int $80; \
-  "::"b"(pid),"c"(msg));
+  "::"b"(pid),"c"(msg),"d"(size));
 }

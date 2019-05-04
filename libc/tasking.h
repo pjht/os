@@ -6,7 +6,7 @@
 void yield();
 void createTask(void* task);
 char isPrivleged(uint32_t pid);
-void send_msg(uint32_t pid,void* msg);
+void send_msg(uint32_t pid,void* msg,uint32_t size);
 void* get_msg(uint32_t* sender);
 
 #endif

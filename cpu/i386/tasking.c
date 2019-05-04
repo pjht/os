@@ -78,7 +78,7 @@ Task* tasking_createTask(void* eip) {
   return createTaskKmode(eip,0);
 }
 
-void tasking_send_msg(uint32_t pid,void* msg) {
+void tasking_send_msg(uint32_t pid,void* msg,uint32_t size) {
   for (Task* task=headTask;task!=NULL;task=task->next) {
     if (task->pid==pid) {
       uint32_t cr3;

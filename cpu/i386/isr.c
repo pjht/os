@@ -182,7 +182,7 @@ void isr_handler(registers_t r) {
       } else if (r.eax==6) {
         r.ebx=tasking_get_msg((uint32_t*)r.ebx);
       } else if (r.eax==7) {
-        tasking_send_msg(r.ebx,(void*)r.ecx);
+        tasking_send_msg(r.ebx,(void*)r.ecx,r.edx);
       }
     break;
     }
