@@ -13,4 +13,6 @@ void paging_init();
 void* new_address_space();
 void load_address_space(uint32_t cr3);
 void* virt_to_phys(void* virt_addr);
+uint32_t find_free_pages(int num_pages);
+
 #endif

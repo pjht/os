@@ -43,8 +43,7 @@ void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,ch
   }
 }
 
-void* alloc_pages(int num_pages) {
-  void* phys_addr=pmem_alloc(num_pages);
+uint32_t find_free_pages(int num_pages) {
   uint32_t bmap_index;
   uint32_t remaining_blks;
   for(uint32_t i=1;i<131072;i++) {
@@ -85,7 +84,12 @@ void* alloc_pages(int num_pages) {
   if (remaining_blks!=0) {
     klog("PANIC","Out of memory");
   }
-  void* addr=(void*)(bmap_index<<12);
+  return bmap_index;
+}
+
+void* alloc_pages(int num_pages) {
+  void* phys_addr=pmem_alloc(num_pages);
+  void* addr=(void*)(find_free_pages(num_pages)<<12);
   map_pages(addr,phys_addr,num_pages,1,1);
   return addr;
 }
