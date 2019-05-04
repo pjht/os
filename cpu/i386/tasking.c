@@ -83,12 +83,15 @@ void tasking_send_msg(uint32_t pid,void* msg,uint32_t size) {
     if (task->pid==pid) {
       uint32_t cr3;
       asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(cr3)::"%eax");
+      void* phys_addr=virt_to_phys(msg);
       load_address_space(task->regs.cr3);
+      uint32_t page=find_free_pages((size/4096)+1);
+      map_pages(page<<12,phys_addr,(size/4096)+1,1,0);
       if (task->msg_store==NULL) {
         task->msg_store=malloc(sizeof(void*)*256);
         task->sender_store=malloc(sizeof(uint32_t)*256);
       }
-      task->msg_store[task->wr]=msg;
+      task->msg_store[task->wr]=(void*)(page<<12);
       task->sender_store[task->wr]=currentTask->pid;
       load_address_space(cr3);
       task->wr++;
