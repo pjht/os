@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 void yield() {
   asm volatile("  \
     mov $1, %eax; \
