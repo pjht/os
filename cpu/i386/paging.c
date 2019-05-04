@@ -92,11 +92,11 @@ void* alloc_pages(int num_pages) {
 
 void* virt_to_phys(void* virt_addr_arg) {
   uint32_t virt_addr=(uint32_t)virt_addr_arg;
-  int offset=virt_addr&0xFFFF;
+  int offset=virt_addr&0x3FF;
   virt_addr=virt_addr&0xFFFFFC00;
   if (!is_page_present(virt_addr>>12)) return NULL;
-  int dir_idx=virt_addr&0xFFC00000;
-  int tbl_idx=virt_addr&0x3FFC00;
+  int dir_idx=(virt_addr&0xFFC00000)>>22;
+  int tbl_idx=(virt_addr&0x3FFC00)>>12;
   if ((smap[dir_idx]&0x1)==0) {
     return 0;
   }
