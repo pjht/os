@@ -1,23 +1,22 @@
 #include "../cpu/cpu_init.h"
 #include "../drivers/vga.h"
-#include "../drivers/pci.h"
-#include "../drivers/serial.h"
+// #include "../drivers/pci.h"
+// #include "../drivers/serial.h"
 // #include "../cpu/i386/ports.h"
-#include "vfs.h"
-#include "../fs/devfs.h"
-#include "../fs/initrd.h"
+// #include "vfs.h"
+// #include "../fs/devfs.h"
+// #include "../fs/initrd.h"
 #include <grub/text_fb_info.h>
 #include <stdlib.h>
-#include <tasking.h>
+// #include <tasking.h>
 #include <string.h>
 #include <memory.h>
 #include <grub/multiboot2.h>
-#include "klog.h"
+// #include "klog.h"
 #include "elf.h"
-#include <errno.h>
-#include "../drivers/ide.h"
-#include "parts.h"
-#include "../fs/ext2.h"
+// #include <errno.h>
+// #include "../drivers/ide.h"
+// #include "parts.h"
 #include <stdint.h>
 
 static long initrd_sz;
@@ -33,7 +32,7 @@ static void read_initrd(struct multiboot_boot_header_tag* tags) {
         struct multiboot_tag_module* mod=(struct multiboot_tag_module*) tag;
         initrd=malloc(sizeof(char)*(mod->mod_end-mod->mod_start));
         initrd_sz=mod->mod_end-mod->mod_start;
-        memcpy(initrd,mod->mod_start+0xC0000000,mod->mod_end-mod->mod_start);
+        memcpy(initrd,(void*)(mod->mod_start+0xC0000000),mod->mod_end-mod->mod_start);
       }
     }
     tag=(struct multiboot_tag*)((char*)tag+((tag->size+7)&0xFFFFFFF8));
@@ -59,12 +58,6 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
       name_sz_ptr[1]=initrd[pos+1];
       name_sz_ptr[2]=initrd[pos+2];
       name_sz_ptr[3]=initrd[pos+3];
-      char str[256];
-      str[0]='\0';
-      int_to_ascii(name_size,str);
-      vga_write_string("[INFO] NAME_SZ:");
-      vga_write_string(str);
-      vga_write_string("\n");
       pos+=4;
       if (name_size==0) {
         break;
@@ -79,17 +72,6 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
         cont_sz_ptr[3]=initrd[pos+3];
         pos+=4;
         datapos=pos;
-        char str[256];
-        str[0]='\0';
-        int_to_ascii(contents_size,str);
-        vga_write_string("[INFO] CONT_SZ:");
-        vga_write_string(str);
-        vga_write_string("\n");
-        str[0]='\0';
-        int_to_ascii(datapos,str);
-        vga_write_string("[INFO] DATAPOS:");
-        vga_write_string(str);
-        vga_write_string("\n");
         pos+=contents_size;
         break;
       }
@@ -105,7 +87,7 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
   elf_header header;
   pos=datapos;
   char* hdr_ptr=(char*)&header;
-  for (int i=0;i<sizeof(elf_header);i++) {
+  for (size_t i=0;i<sizeof(elf_header);i++) {
     hdr_ptr[i]=initrd[pos];
     pos++;
   }
@@ -116,7 +98,7 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
       elf_pheader pheader;
       pos=(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos;
       char* phdr_ptr=(char*)&pheader;
-      for (int i=0;i<sizeof(elf_pheader);i++) {
+      for (size_t i=0;i<sizeof(elf_pheader);i++) {
         phdr_ptr[i]=initrd[pos];
         pos++;
       }
@@ -125,11 +107,10 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
       if (pheader.filesz>0) {
         pos=pheader.offset+datapos;
         char* data_ptr=(char*)pheader.vaddr;
-        for (int i=0;i<pheader.filesz;i++) {
+        for (size_t i=0;i<pheader.filesz;i++) {
           data_ptr[i]=initrd[pos];
           pos++;
         }
-        vga_write_string("[INFO] Loaded section\n");
       }
     }
     func_ptr prog=(func_ptr)header.entry;
