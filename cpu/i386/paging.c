@@ -114,7 +114,7 @@ void alloc_pages_virt(int num_pages,void* addr) {
   map_pages(addr,phys_addr,num_pages,1,1);
 }
 
-void* new_address_space() {
+void* paging_new_address_space() {
   void* dir=pmem_alloc(1);
   smap_page_tables[0]=((uint32_t)dir)|0x3;
   for (uint32_t i=0;i<NUM_KERN_DIRS;i++) {

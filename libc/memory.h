@@ -7,5 +7,6 @@
 
 void* alloc_memory(uint32_t num_pages);
 void alloc_memory_virt(uint32_t num_pages,void* addr);
+void* new_address_space();
 
 #endif

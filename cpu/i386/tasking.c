@@ -20,7 +20,7 @@ static Task* createTaskKmodeCr3(void* eip,char kmode,void* cr3);
 void tasking_init() {
   currentTask=NULL;
   next_pid=0;
-  headTask=createTaskKmodeCr3(NULL,1,new_address_space());
+  headTask=createTaskKmodeCr3(NULL,1,paging_new_address_space());
   currentTask=headTask;
 }
 
@@ -75,7 +75,7 @@ char isPrivleged(uint32_t pid) {
 }
 
 Task* tasking_createTask(void* eip) {
-  return createTaskKmodeCr3(eip,0,new_address_space());
+  return createTaskKmodeCr3(eip,0,paging_new_address_space());
 }
 
 Task* tasking_createTaskCr3(void* eip,void* cr3) {
