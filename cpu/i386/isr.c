@@ -185,6 +185,8 @@ void isr_handler(registers_t r) {
         tasking_send_msg(r.ebx,(void*)r.ecx,r.edx);
       } else if (r.eax==8) {
         r.ebx=(uint32_t)paging_new_address_space();
+      } else if (r.eax==9) {
+        tasking_createTaskCr3((void*)r.ebx,(void*)r.ecx);
       }
     break;
     }

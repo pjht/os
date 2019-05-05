@@ -29,3 +29,10 @@ void send_msg(uint32_t pid,void* msg,uint32_t size) {
     int $80; \
   "::"b"(pid),"c"(msg),"d"(size));
 }
+
+void createTaskCr3(void* task,void* cr3) {
+  asm volatile("  \
+    mov $9, %%eax; \
+    int $80; \
+  "::"b"(task),"c"(cr3));
+}
