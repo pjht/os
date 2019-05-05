@@ -15,16 +15,16 @@ uint32_t next_pid;
 
 static Task* currentTask;
 static Task* headTask;
-static Task* createTaskKmode(void* eip,char kmode);
+static Task* createTaskKmodeCr3(void* eip,char kmode,void* cr3);
 
 void tasking_init() {
   currentTask=NULL;
   next_pid=0;
-  headTask=createTaskKmode(NULL,1);
+  headTask=createTaskKmodeCr3(NULL,1,new_address_space());
   currentTask=headTask;
 }
 
-static Task* createTaskKmode(void* eip,char kmode) {
+static Task* createTaskKmodeCr3(void* eip,char kmode,void* cr3) {
     Task* task=kmalloc(sizeof(Task));
     task->kmode=kmode;
     task->regs.eax=0;
@@ -35,12 +35,12 @@ static Task* createTaskKmode(void* eip,char kmode) {
     task->regs.edi=0;
     asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(task->regs.eflags)::"%eax");
     task->regs.eip=(uint32_t)eip;
-    task->regs.cr3=(uint32_t)new_address_space();
-    uint32_t cr3;
-    asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(cr3)::"%eax");
+    task->regs.cr3=(uint32_t)cr3;
+    uint32_t old_cr3;
+    asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(old_cr3)::"%eax");
     load_address_space(task->regs.cr3);
     task->regs.esp=((uint32_t)alloc_pages(1))+0xfff;
-    load_address_space(cr3);
+    load_address_space(old_cr3);
     task->regs.ebp=0;
     task->msg_store=NULL;
     task->rd=0;
@@ -75,7 +75,11 @@ char isPrivleged(uint32_t pid) {
 }
 
 Task* tasking_createTask(void* eip) {
-  return createTaskKmode(eip,0);
+  return createTaskKmodeCr3(eip,0,new_address_space());
+}
+
+Task* tasking_createTaskCr3(void* eip,void* cr3) {
+  return createTaskKmodeCr3(eip,0,cr3);
 }
 
 void tasking_send_msg(uint32_t pid,void* msg,uint32_t size) {
