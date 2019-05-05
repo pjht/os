@@ -1,5 +1,6 @@
 #include <grub/multiboot2.h>
 #include "../halt.h"
+#include "../../drivers/vga.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <klog.h>
@@ -38,7 +39,6 @@ void pmem_init(struct multiboot_boot_header_tag* tags) {
         struct multiboot_mmap_entry* orig_ptr=(struct multiboot_mmap_entry*)(((char*)tag)+16);
         for (struct multiboot_mmap_entry* ptr=orig_ptr;(char*)ptr<((char*)orig_ptr)+tag->size;ptr++) {
           if (ptr->type!=MULTIBOOT_MEMORY_AVAILABLE) continue;
-          uint32_t size=ptr->len;
           uint32_t start=ptr->addr;
           if (start<0x100000) continue;
           uint32_t end=start+ptr->len-1;
@@ -51,7 +51,6 @@ void pmem_init(struct multiboot_boot_header_tag* tags) {
             clear_bmap_bit(i);
           }
         }
-        char str[256];
         break;
       }
     }

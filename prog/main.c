@@ -1,4 +1,5 @@
 #include "../libc/string.h"
+#include "vga.h"
 #include <grub/text_fb_info.h>
 
 int main() {

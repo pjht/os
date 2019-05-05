@@ -86,7 +86,7 @@ void tasking_send_msg(uint32_t pid,void* msg,uint32_t size) {
       void* phys_addr=virt_to_phys(msg);
       load_address_space(task->regs.cr3);
       uint32_t page=find_free_pages((size/4096)+1);
-      map_pages(page<<12,phys_addr,(size/4096)+1,1,0);
+      map_pages((void*)(page<<12),phys_addr,(size/4096)+1,1,0);
       if (task->msg_store==NULL) {
         task->msg_store=malloc(sizeof(void*)*256);
         task->sender_store=malloc(sizeof(uint32_t)*256);
