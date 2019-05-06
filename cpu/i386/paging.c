@@ -114,9 +114,16 @@ void alloc_pages_virt(int num_pages,void* addr) {
   map_pages(addr,phys_addr,num_pages,1,1);
 }
 
+void invl_page(void* addr) {
+  asm volatile("invlpg (%0)"::"r"(addr):"memory");
+}
+
 void* paging_new_address_space() {
+  uint32_t cr3;
+  asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(cr3)::"%eax");
   void* dir=pmem_alloc(1);
   smap_page_tables[0]=((uint32_t)dir)|0x3;
+  invl_page(smap);
   for (uint32_t i=0;i<NUM_KERN_DIRS;i++) {
     uint32_t entry_virt=(uint32_t)&(kern_page_tables[i*1024]);
     smap[i+768]=(entry_virt-0xC0000000)|0x7;
@@ -126,10 +133,8 @@ void* paging_new_address_space() {
     uint32_t entry_virt=(uint32_t)&(smap_page_tables[i*1024]);
     smap[i+1022]=(entry_virt-0xC0000000)|0x3;
   }
-  smap_page_tables[0]=(((uint32_t)&(page_directory))-0xC0000000)|0x3;
-  for (uint32_t i=1;i<2048;i++) {
-    smap_page_tables[i]=0;
-  }
+  smap_page_tables[0]=cr3|0x3;
+  invl_page(smap);
   return dir;
 }
 
