@@ -1,23 +1,13 @@
-#include "../cpu/cpu_init.h"
-#include "../drivers/vga.h"
-// #include "../drivers/pci.h"
-// #include "../drivers/serial.h"
-// #include "../cpu/i386/ports.h"
-// #include "vfs.h"
-// #include "../fs/devfs.h"
-// #include "../fs/initrd.h"
 #include <grub/text_fb_info.h>
 #include <stdlib.h>
-// #include <tasking.h>
+#include <tasking.h>
 #include <string.h>
 #include <memory.h>
 #include <grub/multiboot2.h>
-// #include "klog.h"
-#include "elf.h"
-// #include <errno.h>
-// #include "../drivers/ide.h"
-// #include "parts.h"
 #include <stdint.h>
+#include "../cpu/cpu_init.h"
+#include "../drivers/vga.h"
+#include "elf.h"
 
 static long initrd_sz;
 static char* initrd;
@@ -112,9 +102,9 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
           pos++;
         }
       }
-      copy_data(cr3,ptr,pheader.memsz,pheader.vaddr);
+      copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
     }
-    createTaskCr3(header.entry,cr3);
+    createTaskCr3((void*)header.entry,cr3);
     for(;;) {
       yield();
     }
