@@ -7,6 +7,7 @@
 #include "../../drivers/vga.h"
 #include "../tasking.h"
 #include "interrupt.h"
+#include "address_spaces.h"
 #include <string.h>
 #include <stdint.h>
 void irq_handler(registers_t r);
@@ -187,6 +188,8 @@ void isr_handler(registers_t r) {
         r.ebx=(uint32_t)paging_new_address_space();
       } else if (r.eax==9) {
         tasking_createTaskCr3((void*)r.ebx,(void*)r.ecx);
+      } else if (r.eax==10) {
+        address_spaces_copy_data((void*)r.ebx,(void*)r.ecx,r.edx,(void*)r.esi);
       }
     break;
     }

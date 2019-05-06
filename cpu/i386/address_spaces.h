@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-void copy_data(void* cr3, void* data,uint32_t size,void* virt_addr);
+void address_spaces_copy_data(void* cr3, void* data,uint32_t size,void* virt_addr);
 
 #endif

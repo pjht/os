@@ -8,5 +8,6 @@
 void* alloc_memory(uint32_t num_pages);
 void alloc_memory_virt(uint32_t num_pages,void* addr);
 void* new_address_space();
+void copy_data(void* cr3, void* data,uint32_t size,void* virt_addr);
 
 #endif
