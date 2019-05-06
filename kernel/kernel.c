@@ -94,6 +94,7 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
   if (header.magic!=ELF_MAGIC) {
     vga_write_string("[INFO] Invalid magic number for prog.elf\n");
   } else {
+    void* cr3=new_address_space();
     for (int i=0;i<header.pheader_ent_nm;i++) {
       elf_pheader pheader;
       pos=(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos;
@@ -102,18 +103,20 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
         phdr_ptr[i]=initrd[pos];
         pos++;
       }
-      alloc_memory_virt(((pheader.memsz)/4096)+1,(void*)pheader.vaddr);
-      memset((void*)pheader.vaddr,0,pheader.memsz);
+      char* ptr=alloc_memory(((pheader.memsz)/4096)+1);
+      memset(ptr,0,pheader.memsz);
       if (pheader.filesz>0) {
         pos=pheader.offset+datapos;
-        char* data_ptr=(char*)pheader.vaddr;
         for (size_t i=0;i<pheader.filesz;i++) {
-          data_ptr[i]=initrd[pos];
+          ptr[i]=initrd[pos];
           pos++;
         }
       }
+      copy_data(cr3,ptr,pheader.memsz,pheader.vaddr);
     }
-    func_ptr prog=(func_ptr)header.entry;
-    prog();
+    createTaskCr3(header.entry,cr3);
+    for(;;) {
+      yield();
+    }
   }
 }
