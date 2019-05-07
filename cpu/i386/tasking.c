@@ -15,18 +15,17 @@ uint32_t next_pid;
 
 static Task* currentTask;
 static Task* headTask;
-static Task* createTaskKmodeCr3(void* eip,char kmode,void* cr3);
+static Task* createTaskCr3(void* eip,void* cr3);
 
 void tasking_init() {
   currentTask=NULL;
   next_pid=0;
-  headTask=createTaskKmodeCr3(NULL,1,paging_new_address_space());
+  headTask=tasking_createTask(NULL);
   currentTask=headTask;
 }
 
-static Task* createTaskKmodeCr3(void* eip,char kmode,void* cr3) {
+Task* tasking_createTaskCr3(void* eip,void* cr3) {
     Task* task=kmalloc(sizeof(Task));
-    task->kmode=kmode;
     task->regs.eax=0;
     task->regs.ebx=0;
     task->regs.ecx=0;
@@ -75,11 +74,7 @@ char isPrivleged(uint32_t pid) {
 }
 
 Task* tasking_createTask(void* eip) {
-  return createTaskKmodeCr3(eip,0,paging_new_address_space());
-}
-
-Task* tasking_createTaskCr3(void* eip,void* cr3) {
-  return createTaskKmodeCr3(eip,0,cr3);
+  return tasking_createTaskCr3(eip,paging_new_address_space());
 }
 
 void tasking_send_msg(uint32_t pid,void* msg,uint32_t size) {
@@ -142,27 +137,25 @@ void tasking_yield() {
     } else {
       block_all_ports();
     }
-    if (!task->kmode) {
-      asm volatile("  \
-        cli; \
-        mov $0x23, %ax; \
-        mov %ax, %ds; \
-        mov %ax, %es; \
-        mov %ax, %fs; \
-        mov %ax, %gs; \
-                      \
-        mov %esp, %eax; \
-        pushl $0x23; \
-        pushl %eax; \
-        pushf; \
-        pop %eax; \
-        or $0x200,%eax; \
-        push %eax; \
-        pushl $0x1B; \
-        push $1f; \
-        iret; \
-      1: \
-        ");
-    }
+    asm volatile("  \
+      cli; \
+      mov $0x23, %ax; \
+      mov %ax, %ds; \
+      mov %ax, %es; \
+      mov %ax, %fs; \
+      mov %ax, %gs; \
+                    \
+      mov %esp, %eax; \
+      pushl $0x23; \
+      pushl %eax; \
+      pushf; \
+      pop %eax; \
+      or $0x200,%eax; \
+      push %eax; \
+      pushl $0x1B; \
+      push $1f; \
+      iret; \
+    1: \
+      ");
     switchTask(&oldCurr->regs, &currentTask->regs);
 }
