@@ -15,7 +15,7 @@ isr_common_stub:
 	mov gs, ax
 
     ; 2. Call C handler
-	call isr_handler	
+	call isr_handler
     ; 3. Restore state
 	pop eax
 	mov ds, ax

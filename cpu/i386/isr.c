@@ -171,7 +171,10 @@ void isr_handler(registers_t r) {
     case 80:
       if (r.eax==1) {
         tss_stack_reset();
-        tasking_yield();
+        tasking_yield(r);
+        r.ds=0x23;
+        r.ss=0x23;
+        r.cs=0x1B;
       } else if (r.eax==2) {
         tasking_createTask((void*)r.ebx);
       } else if (r.eax==3) {

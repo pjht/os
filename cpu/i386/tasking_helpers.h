@@ -3,7 +3,7 @@
 
 #include "tasking.h"
 
-void switchTask(Registers *from, Registers *to);
+void switchTask(uint32_t stack);
 uint32_t readEip();
 
 #endif

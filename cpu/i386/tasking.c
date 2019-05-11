@@ -3,6 +3,7 @@
 #include "../tasking.h"
 #include "isr.h"
 #include <stdio.h>
+#include <string.h>
 #include "kmalloc.h"
 #include "memory.h"
 #include "gdt.h"
@@ -26,24 +27,34 @@ void tasking_init() {
 
 Task* tasking_createTaskCr3(void* eip,void* cr3) {
     Task* task=kmalloc(sizeof(Task));
-    task->regs.eax=0;
-    task->regs.ebx=0;
-    task->regs.ecx=0;
-    task->regs.edx=0;
-    task->regs.esi=0;
-    task->regs.edi=0;
-    asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(task->regs.eflags)::"%eax");
-    task->regs.eip=(uint32_t)eip;
-    task->regs.cr3=(uint32_t)cr3;
+    task->cr3=(uint32_t)cr3;
     uint32_t old_cr3;
     asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(old_cr3)::"%eax");
-    load_address_space(task->regs.cr3);
-    task->regs.esp=((uint32_t)alloc_pages(1))+0xfff;
+    load_address_space(task->cr3);
+    task->esp=((uint32_t)alloc_pages(1))+0xfff;
+    registers_t registers;
+    registers.ds=0x23;
+    registers.eip=(uint32_t)eip;
+    registers.cs=0x1B;
+    uint32_t eflags;
+    asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(eflags)::"%eax");
+    registers.eflags=eflags|0x200;
+    registers.useresp=task->esp;
+    registers.ss=0x23;
+    char* interrupt_data_char=(char*)task->esp;
+    char* registers_char=(char*)&registers;
+    for (int i=0;i<sizeof(registers_t);i++) {
+      interrupt_data_char[sizeof(registers_t)-i]=registers_char[i];
+    }
+    registers_t* interrupt_data=(registers_t*)task->esp;
+    interrupt_data->ds=0x23;
+    interrupt_data->eip=(uint32_t)eip;
+    interrupt_data->cs=0x1B;
+    asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(eflags)::"%eax");
+    interrupt_data->eflags=eflags|0x200;
+    interrupt_data->useresp=task->esp;
+    interrupt_data->ss=0x23;
     load_address_space(old_cr3);
-    task->regs.ebp=0;
-    task->msg_store=NULL;
-    task->rd=0;
-    task->wr=0;
     task->next=NULL;
     task->pid=next_pid;
     task->priv=0;
@@ -83,7 +94,7 @@ void tasking_send_msg(uint32_t pid,void* msg,uint32_t size) {
       uint32_t cr3;
       asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(cr3)::"%eax");
       void* phys_addr=virt_to_phys(msg);
-      load_address_space(task->regs.cr3);
+      load_address_space(task->cr3);
       uint32_t page=find_free_pages((size/4096)+1);
       map_pages((void*)(page<<12),phys_addr,(size/4096)+1,1,0);
       if (task->msg_store==NULL) {
@@ -124,14 +135,22 @@ void* tasking_get_msg(uint32_t* sender) {
   return data;
 }
 
-void tasking_yield() {
+void tasking_yield(registers_t registers) {
     Task* task=currentTask->next;
     if (!task) {
       task=headTask;
     }
     Task* oldCurr=currentTask;
     currentTask=task;
-    load_address_space(task->regs.cr3);
+    oldCurr->esp=registers.useresp;
+    registers_t* interrupt_data=(registers_t*)registers.useresp;
+    load_address_space(task->cr3);
+    char* interrupt_data_char=(char*)interrupt_data;
+    char* registers_char=(char*)&registers;
+    for (int i=0;i<sizeof(registers_t);i++) {
+      interrupt_data_char[sizeof(registers_t)-i]=registers_char[i];
+    }
+    // memcpy(interrupt_data,&registers,sizeof(registers_t));
     if (task->priv) {
       allow_all_ports();
     } else {
@@ -157,5 +176,5 @@ void tasking_yield() {
       iret; \
     1: \
       ");
-    switchTask(&oldCurr->regs, &currentTask->regs);
+    switchTask(task->esp);
 }
