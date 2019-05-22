@@ -126,9 +126,9 @@ void* paging_new_address_space() {
   invl_page(smap);
   for (uint32_t i=0;i<NUM_KERN_DIRS;i++) {
     uint32_t entry_virt=(uint32_t)&(kern_page_tables[i*1024]);
-    smap[i+768]=(entry_virt-0xC0000000)|0x7;
+    smap[i+768]=(entry_virt-0xC0000000)|0x3;
   }
-  smap[1021]=(((uint32_t)kmalloc_page_tables)-0xC0000000)|0x7;
+  smap[1021]=(((uint32_t)kmalloc_page_tables)-0xC0000000)|0x3;
   for (uint32_t i=0;i<2;i++) {
     uint32_t entry_virt=(uint32_t)&(smap_page_tables[i*1024]);
     smap[i+1022]=(entry_virt-0xC0000000)|0x3;
@@ -148,10 +148,10 @@ void load_address_space(uint32_t cr3) {
 
 void paging_init() {
   for (uint32_t i=0;i<NUM_KERN_DIRS*1024;i++) {
-    kern_page_tables[i]=(i<<12)|0x7;
+    kern_page_tables[i]=(i<<12)|0x3;
   }
   for (uint32_t i=0;i<1024;i++) {
-    kmalloc_page_tables[i]=(uint32_t)pmem_alloc(1)|0x7;
+    kmalloc_page_tables[i]=(uint32_t)pmem_alloc(1)|0x3;
   }
   smap_page_tables[0]=(((uint32_t)&(page_directory))-0xC0000000)|0x3;
   for (uint32_t i=1;i<2048;i++) {
@@ -159,9 +159,9 @@ void paging_init() {
   }
   for (uint32_t i=0;i<NUM_KERN_DIRS;i++) {
     uint32_t entry_virt=(uint32_t)&(kern_page_tables[i*1024]);
-    page_directory[i+768]=(entry_virt-0xC0000000)|0x7;
+    page_directory[i+768]=(entry_virt-0xC0000000)|0x3;
   }
-  page_directory[1021]=(((uint32_t)kmalloc_page_tables)-0xC0000000)|0x7;
+  page_directory[1021]=(((uint32_t)kmalloc_page_tables)-0xC0000000)|0x3;
   for (uint32_t i=0;i<2;i++) {
     uint32_t entry_virt=(uint32_t)&(smap_page_tables[i*1024]);
     page_directory[i+1022]=(entry_virt-0xC0000000)|0x3;
