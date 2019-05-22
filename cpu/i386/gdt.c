@@ -53,7 +53,7 @@ typedef struct {
 
 static gdt_entry gdt[NUM_ENTRIES];
 static gdt_description gdt_desc;
-static tss_entry tss;
+tss_entry tss;
 
 void tss_stack_reset() {
   tss.esp0=int_stack_top+0xC0000000;

@@ -12,48 +12,49 @@
 #include <stdlib.h>
 #define STACK_PAGES 2
 
+extern void task_init();
+
+
 uint32_t next_pid;
 
-static Task* currentTask;
+Task* currentTask;
 static Task* headTask;
-static Task* createTaskCr3(void* eip,void* cr3);
+Task* tasking_createTaskCr3Kmode(void* eip,void* cr3,char kmode);
 
-void tasking_init() {
+void tasking_init(void* esp) {
   currentTask=NULL;
   next_pid=0;
-  headTask=tasking_createTask(NULL);
+  headTask=tasking_createTaskCr3Kmode(NULL,paging_new_address_space(),1);
   currentTask=headTask;
 }
 
-Task* tasking_createTaskCr3(void* eip,void* cr3) {
+Task* tasking_createTaskCr3Kmode(void* eip,void* cr3,char kmode) {
     Task* task=kmalloc(sizeof(Task));
     task->cr3=(uint32_t)cr3;
     uint32_t old_cr3;
     asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(old_cr3)::"%eax");
     load_address_space(task->cr3);
-    task->esp=((uint32_t)alloc_pages(1))+0xfff;
-    registers_t registers;
-    registers.ds=0x23;
-    registers.eip=(uint32_t)eip;
-    registers.cs=0x1B;
-    uint32_t eflags;
-    asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(eflags)::"%eax");
-    registers.eflags=eflags|0x200;
-    registers.useresp=task->esp;
-    registers.ss=0x23;
-    char* interrupt_data_char=(char*)task->esp;
-    char* registers_char=(char*)&registers;
-    for (int i=0;i<sizeof(registers_t);i++) {
-      interrupt_data_char[sizeof(registers_t)-i]=registers_char[i];
+    task->kernel_esp=(((uint32_t)alloc_pages(1))+0xfff);
+    task->kernel_esp_top=task->kernel_esp;
+    if (kmode) {
+      task->kernel_esp-=7*4;
+      uint32_t* stack_top_val=(uint32_t*)task->kernel_esp;
+      stack_top_val[0]=0;
+      stack_top_val[1]=0;
+      stack_top_val[2]=0;
+      stack_top_val[3]=0;
+      stack_top_val[4]=task_init;
+      stack_top_val[5]=(((uint32_t)alloc_pages(1))+0xfff);;
+      stack_top_val[6]=eip;
+    } else {
+      task->kernel_esp-=5*4;
+      uint32_t* stack_top_val=(uint32_t*)task->kernel_esp;
+      stack_top_val[0]=0;
+      stack_top_val[1]=0;
+      stack_top_val[2]=0;
+      stack_top_val[3]=0;
+      stack_top_val[4]=eip;
     }
-    registers_t* interrupt_data=(registers_t*)task->esp;
-    interrupt_data->ds=0x23;
-    interrupt_data->eip=(uint32_t)eip;
-    interrupt_data->cs=0x1B;
-    asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(eflags)::"%eax");
-    interrupt_data->eflags=eflags|0x200;
-    interrupt_data->useresp=task->esp;
-    interrupt_data->ss=0x23;
     load_address_space(old_cr3);
     task->next=NULL;
     task->pid=next_pid;
@@ -85,7 +86,7 @@ char isPrivleged(uint32_t pid) {
 }
 
 Task* tasking_createTask(void* eip) {
-  return tasking_createTaskCr3(eip,paging_new_address_space());
+  return tasking_createTaskCr3Kmode(eip,paging_new_address_space(),0);
 }
 
 void tasking_send_msg(uint32_t pid,void* msg,uint32_t size) {
@@ -136,45 +137,9 @@ void* tasking_get_msg(uint32_t* sender) {
 }
 
 void tasking_yield(registers_t registers) {
-    Task* task=currentTask->next;
-    if (!task) {
-      task=headTask;
-    }
-    Task* oldCurr=currentTask;
-    currentTask=task;
-    oldCurr->esp=registers.useresp;
-    registers_t* interrupt_data=(registers_t*)registers.useresp;
-    load_address_space(task->cr3);
-    char* interrupt_data_char=(char*)interrupt_data;
-    char* registers_char=(char*)&registers;
-    for (int i=0;i<sizeof(registers_t);i++) {
-      interrupt_data_char[sizeof(registers_t)-i]=registers_char[i];
-    }
-    // memcpy(interrupt_data,&registers,sizeof(registers_t));
-    if (task->priv) {
-      allow_all_ports();
-    } else {
-      block_all_ports();
-    }
-    asm volatile("  \
-      cli; \
-      mov $0x23, %ax; \
-      mov %ax, %ds; \
-      mov %ax, %es; \
-      mov %ax, %fs; \
-      mov %ax, %gs; \
-                    \
-      mov %esp, %eax; \
-      pushl $0x23; \
-      pushl %eax; \
-      pushf; \
-      pop %eax; \
-      or $0x200,%eax; \
-      push %eax; \
-      pushl $0x1B; \
-      push $1f; \
-      iret; \
-    1: \
-      ");
-    switchTask(task->esp);
+  Task* task=currentTask->next;
+  if (!task) {
+    task=headTask;
+  }
+  switch_to_task(task);
 }

@@ -105,26 +105,6 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
       copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
     }
     createTaskCr3((void*)header.entry,cr3);
-    asm volatile("  \
-      cli; \
-      mov $0x23, %ax; \
-      mov %ax, %ds; \
-      mov %ax, %es; \
-      mov %ax, %fs; \
-      mov %ax, %gs; \
-                    \
-      mov %esp, %eax; \
-      pushl $0x23; \
-      pushl %eax; \
-      pushf; \
-      pop %eax; \
-      or $0x200,%eax; \
-      push %eax; \
-      pushl $0x1B; \
-      push $1f; \
-      iret; \
-    1: \
-      ");
     for(;;) {
       yield();
     }

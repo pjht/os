@@ -172,9 +172,9 @@ void isr_handler(registers_t r) {
       if (r.eax==1) {
         tss_stack_reset();
         tasking_yield(r);
-        r.ds=0x23;
-        r.ss=0x23;
-        r.cs=0x1B;
+        // r.ds=0x23;
+        // r.ss=0x23;
+        // r.cs=0x1B;
       } else if (r.eax==2) {
         tasking_createTask((void*)r.ebx);
       } else if (r.eax==3) {
@@ -190,7 +190,7 @@ void isr_handler(registers_t r) {
       } else if (r.eax==8) {
         r.ebx=(uint32_t)paging_new_address_space();
       } else if (r.eax==9) {
-        tasking_createTaskCr3((void*)r.ebx,(void*)r.ecx);
+        tasking_createTaskCr3Kmode((void*)r.ebx,(void*)r.ecx,0);
       } else if (r.eax==10) {
         address_spaces_copy_data((void*)r.ebx,(void*)r.ecx,r.edx,(void*)r.esi);
       }
