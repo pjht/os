@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "paging_helpers.h"
 
-#define NUM_KERN_DIRS 2
+#define NUM_KERN_DIRS 1
 
 void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,char wr);
 void* alloc_pages(int num_pages);

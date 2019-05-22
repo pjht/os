@@ -4,7 +4,7 @@
 #include "ports.h"
 #include "paging.h"
 #include "../halt.h"
-#include "../../drivers/vga.h"
+#include "../../kernel/vga_err.h"
 #include "../tasking.h"
 #include "interrupt.h"
 #include "address_spaces.h"

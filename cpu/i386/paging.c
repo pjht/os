@@ -3,6 +3,7 @@
 #include "paging_helpers.h"
 #include "paging.h"
 #include "pmem.h"
+#include "../../kernel/vga_err.h"
 #include <klog.h>
 
 static uint32_t page_directory[1024] __attribute__((aligned(4096)));
@@ -82,7 +83,7 @@ uint32_t find_free_pages(int num_pages) {
     }
   }
   if (remaining_blks!=0) {
-    klog("PANIC","Out of memory");
+    vga_write_string("[PANIC] Out of memory");
   }
   return bmap_index;
 }

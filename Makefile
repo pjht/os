@@ -22,41 +22,41 @@ QFLAGS =  -hda ext2.img -m 2G -boot d -cdrom os.iso -serial vc #-chardev socket,
 all: os.iso
 
 run: os.iso
-	$(EMU) $(QFLAGS) -monitor stdio
+	@$(EMU) $(QFLAGS) -monitor stdio
 
 debug: os.iso kernel/kernel.elf
-	$(EMU) -s $(QFLAGS) &
-	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file kernel/kernel.elf"
+	@$(EMU) -s $(QFLAGS) &
+	@$(GDB) -ex "target remote localhost:1234" -ex "symbol-file kernel/kernel.elf"
 
 os.iso: kernel/kernel.elf initrd/* initrd/prog.elf
-	cp kernel/kernel.elf iso/boot
-	ruby makeinitrd.rb initrd iso/boot/initrd
-	grub-mkrescue -o $@ iso
+	@cp kernel/kernel.elf iso/boot
+	@ruby makeinitrd.rb initrd iso/boot/initrd
+	@grub-mkrescue -o $@ iso
 
 initrd/prog.elf: prog/* kernel/start.o
-	cd prog && make
-	cp prog/prog.elf initrd/init
+	@cd prog && make
+	@cp prog/prog.elf initrd/init
 
 kernel/kernel.elf: $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) libc/libc.a
-	$(CC) -z max-page-size=4096 -Xlinker -n -T cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc
+	@$(CC) -z max-page-size=4096 -Xlinker -n -T cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc
 
 sysroot: $(LIBC_HEADERS)
-	mkdir -p sysroot/usr/include
-	cp -r libc/* sysroot/usr/include
-	rm -f sysroot/usr/include/libc.a sysroot/usr/include/*.o sysroot/usr/include/*/*.o sysroot/usr/include/*.c sysroot/usr/include/*/*.c
+	@mkdir -p sysroot/usr/include
+	@cp -r libc/* sysroot/usr/include
+	@rm -f sysroot/usr/include/libc.a sysroot/usr/include/*.o sysroot/usr/include/*/*.o sysroot/usr/include/*.c sysroot/usr/include/*/*.c
 
 
 libc/libc.a: $(LIBC_OBJ)
-	$(AR) rcs $@ $^
+	@$(AR) rcs $@ $^
 
 %.o: %.c sysroot
-	$(CC) $(CFLAGS)  -c $< -o $@
+	@$(CC) $(CFLAGS)  -c $< -o $@
 
 %.o: %.asm
-	$(NASM) $< -o $@
+	@$(NASM) $< -o $@
 
 %.o: %.s
-	$(AS) $< -o $@
+	@$(AS) $< -o $@
 
 clean:
-	rm -rf $(OBJ) $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) libc/libc.a kernel/cstart.o cpu/memory.h os.iso */*.elf iso/boot/initrd.tar
+	@rm -rf $(OBJ) $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) libc/libc.a kernel/cstart.o cpu/memory.h os.iso */*.elf iso/boot/initrd.tar

@@ -6,7 +6,7 @@
 #include <grub/multiboot2.h>
 #include <stdint.h>
 #include "../cpu/cpu_init.h"
-#include "../drivers/vga.h"
+#include "vga_err.h"
 #include "elf.h"
 
 static long initrd_sz;
@@ -33,11 +33,7 @@ static void read_initrd(struct multiboot_boot_header_tag* tags) {
 void kmain(struct multiboot_boot_header_tag* hdr) {
   tags=hdr;
   cpu_init(tags);
-  text_fb_info info;
-  info.address=(char*)0xC00B8000;
-  info.width=80;
-  info.height=25;
-  vga_init(info);
+  vga_init((char*)0xC00B8000);
   read_initrd(tags);
   int pos=0;
   uint32_t datapos;
