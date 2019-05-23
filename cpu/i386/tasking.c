@@ -37,6 +37,14 @@ Task* tasking_createTaskCr3Kmode(void* eip,void* cr3,char kmode) {
     task->kernel_esp=(((uint32_t)alloc_pages(1))+0xfff);
     task->kernel_esp_top=task->kernel_esp;
     if (kmode) {
+      task->kernel_esp-=5*4;
+      uint32_t* stack_top_val=(uint32_t*)task->kernel_esp;
+      stack_top_val[0]=0;
+      stack_top_val[1]=0;
+      stack_top_val[2]=0;
+      stack_top_val[3]=0;
+      stack_top_val[4]=eip;
+    } else {
       task->kernel_esp-=7*4;
       uint32_t* stack_top_val=(uint32_t*)task->kernel_esp;
       stack_top_val[0]=0;
@@ -46,14 +54,6 @@ Task* tasking_createTaskCr3Kmode(void* eip,void* cr3,char kmode) {
       stack_top_val[4]=task_init;
       stack_top_val[5]=(((uint32_t)alloc_pages(1))+0xfff);;
       stack_top_val[6]=eip;
-    } else {
-      task->kernel_esp-=5*4;
-      uint32_t* stack_top_val=(uint32_t*)task->kernel_esp;
-      stack_top_val[0]=0;
-      stack_top_val[1]=0;
-      stack_top_val[2]=0;
-      stack_top_val[3]=0;
-      stack_top_val[4]=eip;
     }
     load_address_space(old_cr3);
     task->next=NULL;
