@@ -37,3 +37,12 @@ void copy_data(void* cr3, void* data,uint32_t size,void* virt_addr) {
   // map_pages(virt_addr,phys_addr,(size/4096)+1,1,1);
   // load_address_space(old_cr3);
 }
+
+void* map_phys(void* phys_addr,uint32_t num_pages) {
+  void* virt_addr;
+  asm volatile("  \
+    mov $11, %%eax; \
+    int $80; \
+  ":"=b"(virt_addr):"b"(phys_addr),"c"(num_pages));
+  return virt_addr;
+}

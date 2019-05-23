@@ -13,6 +13,8 @@
 void irq_handler(registers_t r);
 static isr_t interrupt_handlers[256];
 
+extern Task* currentTask;
+
 /* Can't do this with a loop because we need the address
  * of the function names */
 void isr_install() {
@@ -193,6 +195,15 @@ void isr_handler(registers_t r) {
         tasking_createTaskCr3Kmode((void*)r.ebx,(void*)r.ecx,0);
       } else if (r.eax==10) {
         address_spaces_copy_data((void*)r.ebx,(void*)r.ecx,r.edx,(void*)r.esi);
+      } else if (r.eax==11) {
+        if (!currentTask->priv) {
+          r.ebx=0;
+          return;
+        }
+        uint32_t page_idx=find_free_pages(r.ecx);
+        void* virt_addr=(void*)(page_idx<<12);
+        map_pages(virt_addr,(void*)r.ebx,r.ecx,1,1);
+        r.ebx=virt_addr;
       }
     break;
     }
