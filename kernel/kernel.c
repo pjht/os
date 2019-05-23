@@ -9,6 +9,17 @@
 #include "vga_err.h"
 #include "elf.h"
 
+typedef struct {
+  char filename[100];
+  char mode[8];
+  char uid[8];
+  char gid[8];
+  char size[12];
+  char mtime[12];
+  char chksum[8];
+  char typeflag[1];
+} tar_header;
+
 static long initrd_sz;
 static char* initrd;
 typedef int (*func_ptr)();
@@ -29,6 +40,15 @@ static void read_initrd(struct multiboot_boot_header_tag* tags) {
   }
 }
 
+uint32_t getsize(const char *in) {
+    uint32_t size=0;
+    uint32_t j;
+    uint32_t count=1;
+    for (j=11;j>0;j--,count*=8) {
+        size+=((in[j-1]-'0')*count);
+    }
+    return size;
+}
 
 void kmain(struct multiboot_boot_header_tag* hdr) {
   tags=hdr;
@@ -37,38 +57,20 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
   read_initrd(tags);
   int pos=0;
   uint32_t datapos;
-  for (uint32_t i=0;i<1;i++) {
-      uint32_t name_size;
-      char* name_sz_ptr=(char*)&name_size;
-      name_sz_ptr[0]=initrd[pos];
-      name_sz_ptr[1]=initrd[pos+1];
-      name_sz_ptr[2]=initrd[pos+2];
-      name_sz_ptr[3]=initrd[pos+3];
-      pos+=4;
-      if (name_size==0) {
-        break;
-      }
-      if (strcmp("init",&initrd[pos])==0) {
-        pos+=5;
-        uint32_t contents_size;
-        char* cont_sz_ptr=(char*)&contents_size;
-        cont_sz_ptr[0]=initrd[pos];
-        cont_sz_ptr[1]=initrd[pos+1];
-        cont_sz_ptr[2]=initrd[pos+2];
-        cont_sz_ptr[3]=initrd[pos+3];
-        pos+=4;
-        datapos=pos;
-        pos+=contents_size;
-        break;
-      }
-      uint32_t contents_size;
-      char* cont_sz_ptr=(char*)&contents_size;
-      cont_sz_ptr[0]=initrd[pos];
-      cont_sz_ptr[1]=initrd[pos+1];
-      cont_sz_ptr[2]=initrd[pos+2];
-      cont_sz_ptr[3]=initrd[pos+3];
-      pos+=4;
-      pos+=contents_size;
+  tar_header tar_hdr;
+  for (int i=0;;i++) {
+    char* tar_hdr_ptr=(char*)&tar_hdr;
+    for (size_t i=0;i<sizeof(tar_hdr);i++) {
+      tar_hdr_ptr[i]=initrd[pos+i];
+    }
+    if (tar_hdr.filename[0]=='\0') break;
+    uint32_t size=getsize(tar_hdr.size);
+    pos+=512;
+    if (strcmp(tar_hdr.filename,"init")==0) {
+      datapos=pos;
+      break;
+    }
+    pos+=size;
   }
   elf_header header;
   pos=datapos;

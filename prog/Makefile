@@ -4,11 +4,11 @@ CFLAGS = -I../sysroot/usr/include -Wall -g -ffreestanding
 CC = i386-elf-gcc
 
 prog.elf: $(OBJ)
-	i386-elf-ld -o $@ $^ ../libc/libc.a
-	rm -rf *.o
+	@i386-elf-ld -o $@ $^ ../libc/libc.a
+	@rm -rf *.o
 
 %.o: %.c
-	$(CC) $(CFLAGS)  -c $< -o $@
+	@$(CC) $(CFLAGS)  -c $< -o $@
 
 clean:
-	rm -rf *.o prog.elf
+	@rm -rf *.o prog.elf

@@ -30,7 +30,8 @@ debug: os.iso kernel/kernel.elf
 
 os.iso: kernel/kernel.elf initrd/* initrd/prog.elf
 	@cp kernel/kernel.elf iso/boot
-	@ruby makeinitrd.rb initrd iso/boot/initrd
+	@cd initrd; tar -f ../iso/boot/initrd.tar -c *
+	@# ruby makeinitrd.rb initrd iso/boot/initrd
 	@grub-mkrescue -o $@ iso
 
 initrd/prog.elf: prog/* kernel/start.o
