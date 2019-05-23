@@ -147,6 +147,14 @@ void load_address_space(uint32_t cr3) {
   load_page_directory((uint32_t*)cr3);
 }
 
+void load_smap(uint32_t cr3) {
+  smap_page_tables[0]=cr3|0x3;
+  for (uint32_t i=1;i<2048;i++) {
+    smap_page_tables[i]=0;
+  }
+}
+
+
 void paging_init() {
   for (uint32_t i=0;i<NUM_KERN_DIRS*1024;i++) {
     kern_page_tables[i]=(i<<12)|0x3;

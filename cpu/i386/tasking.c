@@ -141,5 +141,6 @@ void tasking_yield(registers_t registers) {
   if (!task) {
     task=headTask;
   }
+  load_smap(task->cr3);
   switch_to_task(task);
 }
