@@ -60,6 +60,9 @@ task_init:
   push 0x23
   push eax
   pushf
+  pop eax
+  or eax, 0x200
+  push eax
   push 0x1B
   push ebx
   iret
