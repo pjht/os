@@ -59,4 +59,4 @@ libc/libc.a: $(LIBC_OBJ)
 	@$(AS) $< -o $@
 
 clean:
-	@rm -rf $(OBJ) $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) libc/libc.a kernel/cstart.o cpu/memory.h os.iso */*.elf iso/boot/initrd.tar
+	@rm -rf kernel/*.o drivers/*/*.o drivers/*/*/*.o cpu/*/*.o fs/*.o libc/libc.a kernel/cstart.o cpu/memory.h os.iso */*.elf iso/boot/initrd.tar
