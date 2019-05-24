@@ -71,6 +71,9 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
       break;
     }
     pos+=size;
+    if (pos%512!=0) {
+      pos+=512-(pos%512);
+    }
   }
   elf_header header;
   pos=datapos;

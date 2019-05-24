@@ -1,4 +1,4 @@
-#include "../libc/string.h"
+#include <string.h>
 #include "vga.h"
 #include <grub/text_fb_info.h>
 
@@ -40,10 +40,13 @@ int main(char* initrd, uint32_t initrd_sz) {
     if (hdr.filename[0]=='\0') break;
     uint32_t size=getsize(hdr.size);
     pos+=512;
-    if (strcmp(hdr.filename,"init")==0) {
-      vga_write_string("Init found");
+    if (strcmp(hdr.filename,"vfs")==0) {
+      vga_write_string("VFS found");
     }
     pos+=size;
+    if (pos%512!=0) {
+      pos+=512-(pos%512);
+    }
   }
   for (;;);
 }
