@@ -1,6 +1,6 @@
 #include <grub/multiboot2.h>
 #include "../halt.h"
-#include "../../kernel/vga_err.h"
+#include "../..//vga_err.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <klog.h>

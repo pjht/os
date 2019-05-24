@@ -3,7 +3,7 @@
 #include "paging_helpers.h"
 #include "paging.h"
 #include "pmem.h"
-#include "../../kernel/vga_err.h"
+#include "../..//vga_err.h"
 #include <klog.h>
 
 static uint32_t page_directory[1024] __attribute__((aligned(4096)));

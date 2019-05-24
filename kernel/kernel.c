@@ -5,7 +5,7 @@
 #include <memory.h>
 #include <grub/multiboot2.h>
 #include <stdint.h>
-#include "../cpu/cpu_init.h"
+#include "cpu/cpu_init.h"
 #include "vga_err.h"
 #include "elf.h"
 

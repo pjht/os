@@ -1,10 +1,10 @@
 PLAT=i386
-C_SOURCES = $(wildcard kernel/*.c drivers/$(PLAT)/*.c drivers/$(PLAT)/*/*.c cpu/$(PLAT)/*.c fs/*.c)
-ASM = $(wildcard cpu/$(PLAT)/*.asm)
-S_ASM = $(wildcard cpu/$(PLAT)/*.s)
+C_SOURCES = $(wildcard kernel/*.c drivers/$(PLAT)/*.c drivers/$(PLAT)/*/*.c kernel/cpu/$(PLAT)/*.c fs/*.c)
+ASM = $(wildcard kernel/cpu/$(PLAT)/*.asm)
+S_ASM = $(wildcard kernel/cpu/$(PLAT)/*.s)
 LIBC_SOURCES = $(wildcard libc/*.c libc/*/*.c)
 LIBC_HEADERS = $(wildcard libc/*.h libc/*/*.h)
-OBJ = $(C_SOURCES:.c=.o cpu/$(PLAT)/boot.o)
+OBJ = $(C_SOURCES:.c=.o kernel/cpu/$(PLAT)/boot.o)
 ASM_OBJ = $(S_ASM:.s=.o)
 S_ASM_OBJ = $(ASM:.asm=.o)
 LIBC_OBJ = $(LIBC_SOURCES:.c=.o)
@@ -39,7 +39,7 @@ initrd/init: init/* kernel/start.o
 	@cp init/init initrd/init
 
 kernel/kernel.elf: $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) libc/libc.a
-	@$(CC) -z max-page-size=4096 -Xlinker -n -T cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc
+	@$(CC) -z max-page-size=4096 -Xlinker -n -T kernel/cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc
 
 sysroot: $(LIBC_HEADERS)
 	@mkdir -p sysroot/usr/include
