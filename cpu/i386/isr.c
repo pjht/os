@@ -192,7 +192,7 @@ void isr_handler(registers_t r) {
       } else if (r.eax==8) {
         r.ebx=(uint32_t)paging_new_address_space();
       } else if (r.eax==9) {
-        tasking_createTaskCr3Kmode((void*)r.ebx,(void*)r.ecx,0);
+        tasking_createTaskCr3KmodeParam((void*)r.ebx,(void*)r.ecx,0,0,0,0,0);
       } else if (r.eax==10) {
         address_spaces_copy_data((void*)r.ebx,(void*)r.ecx,r.edx,(void*)r.esi);
       } else if (r.eax==11) {

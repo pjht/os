@@ -19,17 +19,29 @@ uint32_t next_pid;
 
 Task* currentTask;
 static Task* headTask;
-Task* tasking_createTaskCr3Kmode(void* eip,void* cr3,char kmode);
+Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1_exists,uint32_t param1_arg,char param2_exists,uint32_t param2_arg);
 
 void tasking_init(void* esp) {
   currentTask=NULL;
   next_pid=0;
-  headTask=tasking_createTaskCr3Kmode(NULL,paging_new_address_space(),1);
+  headTask=tasking_createTaskCr3KmodeParam(NULL,paging_new_address_space(),1,0,0,0,0);
   currentTask=headTask;
 }
 
-Task* tasking_createTaskCr3Kmode(void* eip,void* cr3,char kmode) {
+Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1_exists,uint32_t param1_arg,char param2_exists,uint32_t param2_arg) {
     Task* task=kmalloc(sizeof(Task));
+    uint32_t param1;
+    if (param1_exists) {
+      param1=param1_arg;
+    } else {
+      param1=1;
+    }
+    uint32_t param2;
+    if (param2_exists) {
+      param2=param2_arg;
+    } else {
+      param2=2;
+    }
     task->cr3=(uint32_t)cr3;
     uint32_t old_cr3;
     asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(old_cr3)::"%eax");
@@ -52,7 +64,11 @@ Task* tasking_createTaskCr3Kmode(void* eip,void* cr3,char kmode) {
       stack_top_val[2]=0;
       stack_top_val[3]=0;
       stack_top_val[4]=task_init;
-      stack_top_val[5]=(((uint32_t)alloc_pages(1))+0xfff);;
+      uint32_t* user_stack=(((uint32_t)alloc_pages(1))+0xfff);
+      user_stack-=4*2;
+      user_stack[0]=param1;
+      user_stack[1]=param2;
+      stack_top_val[5]=user_stack;
       stack_top_val[6]=eip;
     }
     load_address_space(old_cr3);
@@ -86,7 +102,7 @@ char isPrivleged(uint32_t pid) {
 }
 
 Task* tasking_createTask(void* eip) {
-  return tasking_createTaskCr3Kmode(eip,paging_new_address_space(),0);
+  return tasking_createTaskCr3KmodeParam(eip,paging_new_address_space(),0,0,0,0,0);
 }
 
 void tasking_send_msg(uint32_t pid,void* msg,uint32_t size) {
