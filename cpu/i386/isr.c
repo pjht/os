@@ -204,9 +204,9 @@ void isr_handler(registers_t r) {
         void* virt_addr=(void*)(page_idx<<12);
         map_pages(virt_addr,(void*)r.ebx,r.ecx,1,1);
         r.ebx=virt_addr;
-      } else if (r.eax=12) {
+      } else if (r.eax==12) {
         tasking_createTaskCr3KmodeParam((void*)r.ebx,(void*)r.ecx,0,1,r.edx,1,r.esi);
-      } else if (r.eax=13) {
+      } else if (r.eax==13) {
         r.ebx=(uint32_t)address_spaces_put_data((void*)r.ebx,(void*)r.ecx,r.edx);
       }
     break;
