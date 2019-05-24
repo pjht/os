@@ -104,7 +104,8 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
     }
     char* initrd2=alloc_memory((initrd_sz/4096)+1);
     memcpy(initrd2,initrd,initrd_sz);
-    createTaskCr3((void*)header.entry,cr3);
+    initrd2=put_data(cr3,initrd2,initrd_sz);
+    createTaskCr3Param((void*)header.entry,cr3,(uint32_t)initrd2,initrd_sz);
     for(;;) {
       yield();
     }
