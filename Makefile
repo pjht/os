@@ -25,11 +25,11 @@ os.iso: kernel.elf initrd/* initrd/init
 	@cd initrd; tar -f ../iso/boot/initrd.tar -c *
 	@grub-mkrescue -o $@ iso > /dev/null 2>/dev/null
 
-initrd/init: kernel/start.o
-	@$(MAKE) -C init
-	@cp init/init initrd/init
+.PHONY: kernel.elf initrd/init
 
-.PHONY: kernel.elf
+initrd/init:
+	$(MAKE) -C init
+	cp init/init initrd/init
 
 kernel.elf:
 	@$(MAKE) -C kernel
