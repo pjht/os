@@ -35,7 +35,7 @@ void copy_data(void* cr3, void* data,uint32_t size,void* virt_addr) {
 void* put_data(void* cr3, void* data,uint32_t size) {
   void* virt_addr;
   asm volatile("  \
-    mov $10, %%eax; \
+    mov $13, %%eax; \
     int $80; \
   ":"=b"(virt_addr):"b"(cr3),"c"(data),"d"(size));
   return virt_addr;
