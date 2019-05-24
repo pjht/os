@@ -1,20 +1,12 @@
-PLAT=i386
-C_SOURCES = $(wildcard kernel/*.c drivers/$(PLAT)/*.c drivers/$(PLAT)/*/*.c kernel/cpu/$(PLAT)/*.c fs/*.c)
-ASM = $(wildcard kernel/cpu/$(PLAT)/*.asm)
-S_ASM = $(wildcard kernel/cpu/$(PLAT)/*.s)
-LIBC_SOURCES = $(wildcard libc/*.c libc/*/*.c)
-LIBC_HEADERS = $(wildcard libc/*.h libc/*/*.h)
-OBJ = $(C_SOURCES:.c=.o kernel/cpu/$(PLAT)/boot.o)
-ASM_OBJ = $(S_ASM:.s=.o)
-S_ASM_OBJ = $(ASM:.asm=.o)
-LIBC_OBJ = $(LIBC_SOURCES:.c=.o)
-CC = $(shell cat psinfo/$(PLAT)/cc.txt)
-AS = $(shell cat psinfo/$(PLAT)/as.txt)
-AR = $(shell cat psinfo/$(PLAT)/ar.txt)
-NASM = $(shell cat psinfo/$(PLAT)/nasm.txt)
+export PLAT=i386
+export CC = $(shell cat psinfo/$(PLAT)/cc.txt)
+export AS = $(shell cat psinfo/$(PLAT)/as.txt)
+export AR = $(shell cat psinfo/$(PLAT)/ar.txt)
+export NASM = $(shell cat psinfo/$(PLAT)/nasm.txt)
 EMU = $(shell cat psinfo/$(PLAT)/emu.txt)
 GDB = $(shell cat psinfo/$(PLAT)/gdb.txt)
-CFLAGS =  -Isysroot/usr/include -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
+LINK_OBJ = $(wildcard kernel/kernel.a libc/libc.a cpu/$(PLAT)/boot.o)
+export CFLAGS = -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
 QFLAGS =  -hda ext2.img -m 2G -boot d -cdrom os.iso -serial vc #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
 
 .PHONY: sysroot
@@ -24,40 +16,27 @@ all: os.iso
 run: os.iso
 	@$(EMU) $(QFLAGS) -monitor stdio
 
-debug: os.iso kernel/kernel.elf
+debug: os.iso kernel.elf
 	@$(EMU) -s $(QFLAGS) &
 	@$(GDB) -ex "target remote localhost:1234" -ex "symbol-file kernel/kernel.elf"
 
-os.iso: kernel/kernel.elf initrd/* initrd/init
+os.iso: kernel.elf initrd/* initrd/init
 	@cp kernel/kernel.elf iso/boot
 	@cd initrd; tar -f ../iso/boot/initrd.tar -c *
-	@# ruby makeinitrd.rb initrd iso/boot/initrd
-	@grub-mkrescue -o $@ iso
+	@grub-mkrescue -o $@ iso > /dev/null 2>/dev/null
 
-initrd/init: init/* kernel/start.o
-	@cd init && make
+initrd/init: kernel/start.o
+	@$(MAKE) -C init
 	@cp init/init initrd/init
 
-kernel/kernel.elf: $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) libc/libc.a
-	@$(CC) -z max-page-size=4096 -Xlinker -n -T kernel/cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc
+.PHONY: kernel.elf
 
-sysroot: $(LIBC_HEADERS)
-	@mkdir -p sysroot/usr/include
-	@cp -r libc/* sysroot/usr/include
-	@rm -f sysroot/usr/include/libc.a sysroot/usr/include/*.o sysroot/usr/include/*/*.o sysroot/usr/include/*.c sysroot/usr/include/*/*.c
-
-
-libc/libc.a: $(LIBC_OBJ)
-	@$(AR) rcs $@ $^
-
-%.o: %.c sysroot
-	@$(CC) $(CFLAGS)  -c $< -o $@
-
-%.o: %.asm
-	@$(NASM) $< -o $@
-
-%.o: %.s
-	@$(AS) $< -o $@
+kernel.elf:
+	@$(MAKE) -C kernel
+	@$(MAKE) -C libc
+	@$(CC) -z max-page-size=4096 -Xlinker -n -T kernel/cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $(LINK_OBJ) -lgcc
 
 clean:
-	@rm -rf kernel/*.o drivers/*/*.o drivers/*/*/*.o cpu/*/*.o fs/*.o libc/libc.a kernel/cstart.o cpu/memory.h os.iso */*.elf iso/boot/initrd.tar
+	@$(MAKE) clean -C kernel
+	@$(MAKE) clean -C libc
+	@$(MAKE) clean -C kernel/cpu

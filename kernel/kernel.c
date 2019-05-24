@@ -7,12 +7,12 @@
 #include <stdint.h>
 #include "cpu/cpu_init.h"
 #include "vga_err.h"
-#include "elf.h"
+#include <elf.h>
 
 typedef struct {
   char filename[100];
   char mode[8];
-  char uid[8];
+  char uid[6];
   char gid[8];
   char size[12];
   char mtime[12];

@@ -1,3 +1,5 @@
+.extern kmain
+
 # Declare a multiboot header that marks the program as a kernel.
 .section .multiboot
  header_start:
