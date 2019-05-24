@@ -206,6 +206,8 @@ void isr_handler(registers_t r) {
         r.ebx=virt_addr;
       } else if (r.eax=12) {
         tasking_createTaskCr3KmodeParam((void*)r.ebx,(void*)r.ecx,0,1,r.edx,1,r.esi);
+      } else if (r.eax=13) {
+        r.ebx=(uint32_t)address_spaces_put_data((void*)r.ebx,(void*)r.ecx,r.edx);
       }
     break;
     }
