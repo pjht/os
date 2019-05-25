@@ -27,13 +27,16 @@ os.iso: kernel.elf initrd/* initrd/init initrd/vfs
 
 .PHONY: kernel.elf initrd/init initrd/vfs
 
-initrd/init: kernel.elf #Programs must have this so the current start.o is built
+initrd/init: start.o #Programs must have this so the current start.o is built
 	$(MAKE) -C init
 	cp init/init initrd/init
 
-initrd/vfs: kernel.elf #Programs must have this so the current start.o is built
+initrd/vfs: start.o #Programs must have this so the current start.o is built
 	$(MAKE) -C vfs
 	cp vfs/vfs initrd/vfs
+
+start.o:
+	@$(MAKE) start.o -C kernel
 
 kernel.elf:
 	@$(MAKE) -C kernel
