@@ -1,6 +1,6 @@
 #include "isr.h"
 #include "idt.h"
-#include "ports.h"
+#include <cpu/ports.h>
 // #include "paging.h"
 #include "../halt.h"
 #include "../../drivers/vga.h"
