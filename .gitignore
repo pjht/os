@@ -2,10 +2,12 @@
 *.dis
 *.o
 *.elf
-*/*.o
 bochsout.txt
 cpu/memory.h
 os.iso
 disk.img
-libc/libc.a
-iso/boot/initrds
+*.a
+init/init
+vfs/vfs
+initrd/*
+iso/boot/initrd.tar
