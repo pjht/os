@@ -140,10 +140,7 @@ void* paging_new_address_space() {
 }
 
 void load_address_space(uint32_t cr3) {
-  smap_page_tables[0]=cr3|0x3;
-  for (uint32_t i=1;i<2048;i++) {
-    smap_page_tables[i]=0;
-  }
+  load_smap(cr3);
   load_page_directory((uint32_t*)cr3);
 }
 
