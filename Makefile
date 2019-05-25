@@ -1,12 +1,20 @@
-export PLAT=i386
-export CC = $(shell cat psinfo/$(PLAT)/cc.txt)
-export AS = $(shell cat psinfo/$(PLAT)/as.txt)
-export AR = $(shell cat psinfo/$(PLAT)/ar.txt)
-export NASM = $(shell cat psinfo/$(PLAT)/nasm.txt)
+PLAT=i386
+C_SOURCES = $(wildcard kernel/*.c drivers/$(PLAT)/*.c drivers/$(PLAT)/*/*.c kernel/cpu/$(PLAT)/*.c fs/*.c)
+ASM = $(wildcard kernel/cpu/$(PLAT)/*.asm)
+S_ASM = $(wildcard kernel/cpu/$(PLAT)/*.s)
+LIBC_SOURCES = $(wildcard libc/*.c libc/*/*.c)
+LIBC_HEADERS = $(wildcard libc/*.h libc/*/*.h)
+OBJ = $(C_SOURCES:.c=.o kernel/cpu/$(PLAT)/boot.o)
+ASM_OBJ = $(S_ASM:.s=.o)
+S_ASM_OBJ = $(ASM:.asm=.o)
+LIBC_OBJ = $(LIBC_SOURCES:.c=.o)
+CC = $(shell cat psinfo/$(PLAT)/cc.txt)
+AS = $(shell cat psinfo/$(PLAT)/as.txt)
+AR = $(shell cat psinfo/$(PLAT)/ar.txt)
+NASM = $(shell cat psinfo/$(PLAT)/nasm.txt)
 EMU = $(shell cat psinfo/$(PLAT)/emu.txt)
 GDB = $(shell cat psinfo/$(PLAT)/gdb.txt)
-LINK_OBJ = $(wildcard kernel/kernel.a libc/libc.a cpu/$(PLAT)/boot.o)
-export CFLAGS = -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
+CFLAGS =  -Isysroot/usr/include -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
 QFLAGS =  -hda ext2.img -m 2G -boot d -cdrom os.iso -serial vc #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
 
 .PHONY: sysroot
@@ -16,34 +24,34 @@ all: os.iso
 run: os.iso
 	@$(EMU) $(QFLAGS) -monitor stdio
 
-debug: os.iso kernel.elf
+debug: os.iso kernel/kernel.elf
 	@$(EMU) -s $(QFLAGS) &
 	@$(GDB) -ex "target remote localhost:1234" -ex "symbol-file kernel/kernel.elf"
 
-os.iso: kernel.elf initrd/* initrd/init initrd/vfs
+os.iso: kernel/kernel.elf initrd/* initrd/init
 	@cp kernel/kernel.elf iso/boot
 	@cd initrd; tar -f ../iso/boot/initrd.tar -c *
-	@grub-mkrescue -o $@ iso > /dev/null 2>/dev/null
+	@# ruby makeinitrd.rb initrd iso/boot/initrd
+	@grub-mkrescue -o $@ iso
 
-.PHONY: kernel.elf initrd/init initrd/vfs
+initrd/init: init/* kernel/start.o
+	@cd init && make
+	@cp init/init initrd/init
 
-initrd/init: start.o #Programs must have this so the current start.o is built
-	$(MAKE) -C init
-	cp init/init initrd/init
+kernel/kernel.elf: $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) libc/libc.a
+	@$(CC) -z max-page-size=4096 -Xlinker -n -T kernel/cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc
 
-initrd/vfs: start.o #Programs must have this so the current start.o is built
-	$(MAKE) -C vfs
-	cp vfs/vfs initrd/vfs
+libc/libc.a: $(LIBC_OBJ)
+	@$(AR) rcs $@ $^
 
-start.o:
-	@$(MAKE) start.o -C kernel
+%.o: %.c
+	@$(CC) $(CFLAGS)  -c $< -o $@
 
-kernel.elf:
-	@$(MAKE) -C kernel
-	@$(MAKE) -C libc
-	@$(CC) -z max-page-size=4096 -Xlinker -n -T kernel/cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $(LINK_OBJ) -lgcc
+%.o: %.asm
+	@$(NASM) $< -o $@
+
+%.o: %.s
+	@$(AS) $< -o $@
 
 clean:
-	@$(MAKE) clean -C kernel
-	@$(MAKE) clean -C libc
-	@$(MAKE) clean -C kernel/cpu
+	@rm -rf kernel/*.o drivers/*/*.o drivers/*/*/*.o cpu/*/*.o fs/*.o libc/libc.a kernel/cstart.o cpu/memory.h os.iso */*.elf iso/boot/initrd.tar
