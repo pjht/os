@@ -149,7 +149,9 @@ void load_address_space(uint32_t cr3) {
 
 void load_smap(uint32_t cr3) {
   smap_page_tables[0]=cr3|0x3;
+  invl_page(&smap[0]);
   for (uint32_t i=1;i<2048;i++) {
+    invl_page(&smap[i*1024]);
     smap_page_tables[i]=0;
   }
 }
