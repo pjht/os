@@ -5,7 +5,6 @@ CC = i386-elf-gcc
 
 init: $(OBJ)
 	@i386-elf-ld -o $@ $^ ../libc/libc.a
-	@rm -rf *.o
 
 %.o: %.c
 	@$(CC) $(CFLAGS)  -c $< -o $@
