@@ -4,7 +4,6 @@
 *.elf
 */*.o
 bochsout.txt
-stuff/*
 cpu/memory.h
 os.iso
 disk.img
