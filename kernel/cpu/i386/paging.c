@@ -153,6 +153,22 @@ void load_smap(uint32_t cr3) {
   }
 }
 
+void unmap_pages(void* start_virt,uint32_t num_pages) {
+  uint32_t virt_addr=(uint32_t)start_virt;
+  int dir_entry=(virt_addr&0xFFC00000)>>22;
+  int table_entry=(virt_addr&0x3FF000)>>12;
+  for (int i=0;i<=num_pages;i++) {
+    if (smap[dir_entry]&0x1) {
+      smap_page_tables[dir_entry+1]=(smap[dir_entry]&0xFFFFFC00)|0x3;
+      smap[(1024+(1024*dir_entry))+table_entry]=0;
+      table_entry++;
+      if (table_entry==1024) {
+        dir_entry++;
+        table_entry=0;
+      }
+    }
+  }
+}
 
 void paging_init() {
   for (uint32_t i=0;i<NUM_KERN_DIRS*1024;i++) {
