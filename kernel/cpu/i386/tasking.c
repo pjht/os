@@ -13,6 +13,7 @@
 #define STACK_PAGES 2
 
 extern void task_init();
+static uint32_t* kstacks=(uint32_t*)0xF7400000;
 
 
 uint32_t next_pid;
@@ -83,6 +84,9 @@ Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1
       task->priv=1;
     }
     next_pid++;
+    if (next_pid>1024*24) {
+      halt(); //Cannot ever create more than 24k tasks, as I don't currently reuse PIDs.
+    }
     if (currentTask) {
       currentTask->next=task;
     }
