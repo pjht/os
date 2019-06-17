@@ -161,6 +161,7 @@ void unmap_pages(void* start_virt,uint32_t num_pages) {
     if (smap[dir_entry]&0x1) {
       smap_page_tables[dir_entry+1]=(smap[dir_entry]&0xFFFFFC00)|0x3;
       smap[(1024+(1024*dir_entry))+table_entry]=0;
+      invl_page(start_virt+(i*1024));
       table_entry++;
       if (table_entry==1024) {
         dir_entry++;
