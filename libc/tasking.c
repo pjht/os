@@ -14,12 +14,12 @@ void createTask(void* task) {
   "::"b"(task));
 }
 
-void* get_msg(uint32_t* sender) {
+void* get_msg(uint32_t* sender,uint32_t* size) {
   void* msg;
   asm volatile("  \
     mov $6, %%eax; \
     int $80; \
-  ":"=b"(msg):"b"(sender));
+  ":"=b"(msg):"b"(sender),"c"(size));
   return msg;
 }
 

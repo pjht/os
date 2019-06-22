@@ -120,6 +120,7 @@ void tasking_send_msg(uint32_t pid,char* msg,uint32_t size) {
       }
       task->msg_store[task->wr]=data;
       task->sender_store[task->wr]=currentTask->pid;
+      task->size_store[task->wr]=size;
       task->wr++;
       if (task->wr==16) {
         task->wr=0;
@@ -135,7 +136,7 @@ void tasking_send_msg(uint32_t pid,char* msg,uint32_t size) {
   }
 }
 
-void* tasking_get_msg(uint32_t* sender) {
+void* tasking_get_msg(uint32_t* sender,uint32_t* size) {
   if (!currentTask->msg_store) {
     return NULL;
   }
@@ -153,6 +154,7 @@ void* tasking_get_msg(uint32_t* sender) {
     }
   }
   *sender=currentTask->sender_store[currentTask->rd];
+  *size=currentTask->size_store[currentTask->rd];
   char* data=currentTask->msg_store[currentTask->rd];
   currentTask->msg_store[currentTask->rd]=NULL;
   currentTask->sender_store[currentTask->rd]=0;

@@ -14,6 +14,7 @@ typedef struct Task {
   uint32_t pid;
   char* msg_store[16];
   uint32_t sender_store[16];
+  uint32_t size_store[16];
   uint8_t rd;
   uint8_t wr;
   struct Task* next;

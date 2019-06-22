@@ -28,16 +28,16 @@ debug: os.iso kernel/kernel.elf
 	@$(EMU) -s $(QFLAGS) &
 	@$(GDB) -ex "target remote localhost:1234" -ex "symbol-file kernel/kernel.elf"
 
-os.iso: kernel/kernel.elf initrd/* initrd/init initrd/vfs
+os.iso: kernel/kernel.elf init vfs initrd/*
 	@cp kernel/kernel.elf iso/boot
 	@cd initrd; tar -f ../iso/boot/initrd.tar -c *
 	@grub-mkrescue -o $@ iso
 
-initrd/init: init/* kernel/start.o
+init: init/* kernel/start.o
 	@cd init && make
 	@cp init/init initrd/init
 
-initrd/vfs: vfs/* kernel/start.o
+vfs: vfs/* kernel/start.o
 	@cd vfs && make
 	@cp vfs/vfs initrd/vfs
 
