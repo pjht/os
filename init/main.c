@@ -87,8 +87,16 @@ int main(char* initrd, uint32_t initrd_sz) {
     }
     vga_write_string("Loaded VFS into memory, creating task\n");
     createTaskCr3((void*)header.entry,cr3);
-    vga_write_string("Creted VFS task, yielding to task\n");
+    vga_write_string("Created VFS task, sending test message\n");
+    send_msg(2,"hi",3);
+    vga_write_string("Sent test message, yielding to task\n");
     yield();
+    vga_write_string("Yielded and got control, getting message\n");
+    int sender=&sender;
+    char* msg=get_msg(&sender);
+    vga_write_string("Message: ");
+    vga_write_string(msg);
+    vga_write_string("\n");
   }
   for(;;);
 }

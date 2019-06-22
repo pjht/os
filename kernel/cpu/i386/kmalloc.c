@@ -3,8 +3,8 @@
 #include <math.h>
 #include <stdint.h>
 
-static char bitmap[1048576];
-static void* data=(void*)0xFF400000;
+static char bitmap[2097152];
+static void* data=(void*)0xFE800000;
 
 
 static char get_bmap_bit(uint32_t index) {

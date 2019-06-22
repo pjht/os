@@ -13,7 +13,7 @@
 #define STACK_PAGES 2
 
 extern void task_init();
-static uint32_t* kstacks=(char*)0xF7400000;
+static uint32_t* kstacks=(char*)0xF6800000;
 
 
 uint32_t next_pid;
@@ -85,8 +85,8 @@ Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1
       task->priv=1;
     }
     next_pid++;
-    if (next_pid>1024*24) {
-      halt(); //Cannot ever create more than 24k tasks, as I don't currently reuse PIDs.
+    if (next_pid>1024*32) {
+      halt(); //Cannot ever create more than 32k tasks, as I don't currently reuse PIDs.
     }
     if (currentTask) {
       currentTask->next=task;
@@ -111,17 +111,15 @@ Task* tasking_createTask(void* eip) {
   return tasking_createTaskCr3KmodeParam(eip,paging_new_address_space(),0,0,0,0,0);
 }
 
-void tasking_send_msg(uint32_t pid,void* msg,uint32_t size) {
+void tasking_send_msg(uint32_t pid,char* msg,uint32_t size) {
   for (Task* task=headTask;task!=NULL;task=task->next) {
     if (task->pid==pid) {
-      uint32_t cr3;
-      void* phys_addr=virt_to_phys(msg);
-      load_address_space(task->cr3);
-      uint32_t page=find_free_pages((size/4096)+1);
-      map_pages((void*)(page<<12),phys_addr,(size/4096)+1,1,0);
-      task->msg_store[task->wr]=(void*)(page<<12);
+      char* data=kmalloc(size);
+      for (int i=0;i<size;i++) {
+        data[i]=msg[i];
+      }
+      task->msg_store[task->wr]=data;
       task->sender_store[task->wr]=currentTask->pid;
-      load_address_space(cr3);
       task->wr++;
       if (task->wr==16) {
         task->wr=0;
