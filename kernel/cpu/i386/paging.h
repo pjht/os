@@ -7,6 +7,7 @@
 #define NUM_KERN_DIRS 1
 
 void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,char wr);
+void map_kstack(uint32_t pid);
 void unmap_pages(void* start_virt,uint32_t num_pages);
 void* alloc_pages(int num_pages);
 void alloc_pages_virt(int num_pages,void* addr);

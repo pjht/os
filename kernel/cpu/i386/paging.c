@@ -8,6 +8,7 @@
 
 static uint32_t page_directory[1024] __attribute__((aligned(4096)));
 static uint32_t kern_page_tables[NUM_KERN_DIRS*1024] __attribute__((aligned(4096)));
+static uint32_t kstack_page_tables[32*1024] __attribute__((aligned(4096)));
 static uint32_t kmalloc_page_tables[1024] __attribute__((aligned(4096)));
 static uint32_t smap_page_tables[2048] __attribute__((aligned(4096)));
 static uint32_t* smap=(uint32_t*)0xFF800000;
@@ -41,6 +42,12 @@ void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,ch
     smap[(1024+(1024*dir_entry))+table_entry]=phys_addr|flags;
     table_entry++;
     phys_addr+=0x1000;
+  }
+}
+
+void map_kstack(uint32_t pid) {
+  if (kstack_page_tables[pid]==NULL) {
+    kstack_page_tables[pid]=(uint32_t)pmem_alloc(1)|0x3;
   }
 }
 
@@ -129,6 +136,10 @@ void* paging_new_address_space() {
     uint32_t entry_virt=(uint32_t)&(kern_page_tables[i*1024]);
     smap[i+768]=(entry_virt-0xC0000000)|0x3;
   }
+  for (uint32_t i=0;i<32;i++) {
+    uint32_t entry_virt=(uint32_t)&(kstack_page_tables[i*1024]);
+    smap[i+989]=(entry_virt-0xC0000000)|0x3;
+  }
   smap[1021]=(((uint32_t)kmalloc_page_tables)-0xC0000000)|0x3;
   for (uint32_t i=0;i<2;i++) {
     uint32_t entry_virt=(uint32_t)&(smap_page_tables[i*1024]);
@@ -175,6 +186,9 @@ void paging_init() {
   for (uint32_t i=0;i<NUM_KERN_DIRS*1024;i++) {
     kern_page_tables[i]=(i<<12)|0x3;
   }
+  for (uint32_t i=0;i<32*1024;i++) {
+    kstack_page_tables[i]=0;
+  }
   for (uint32_t i=0;i<1024;i++) {
     kmalloc_page_tables[i]=(uint32_t)pmem_alloc(1)|0x3;
   }
@@ -185,6 +199,10 @@ void paging_init() {
   for (uint32_t i=0;i<NUM_KERN_DIRS;i++) {
     uint32_t entry_virt=(uint32_t)&(kern_page_tables[i*1024]);
     page_directory[i+768]=(entry_virt-0xC0000000)|0x3;
+  }
+  for (uint32_t i=0;i<32;i++) {
+    uint32_t entry_virt=(uint32_t)&(kstack_page_tables[i*1024]);
+    page_directory[i+989]=(entry_virt-0xC0000000)|0x3;
   }
   page_directory[1021]=(((uint32_t)kmalloc_page_tables)-0xC0000000)|0x3;
   for (uint32_t i=0;i<2;i++) {

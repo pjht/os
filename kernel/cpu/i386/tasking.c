@@ -13,7 +13,7 @@
 #define STACK_PAGES 2
 
 extern void task_init();
-static uint32_t* kstacks=(uint32_t*)0xF7400000;
+static uint32_t* kstacks=(char*)0xF7400000;
 
 
 uint32_t next_pid;
@@ -31,6 +31,7 @@ void tasking_init(void* esp) {
 
 Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1_exists,uint32_t param1_arg,char param2_exists,uint32_t param2_arg) {
     Task* task=kmalloc(sizeof(Task));
+    map_kstack(next_pid);
     uint32_t param1;
     if (param1_exists) {
       param1=param1_arg;
@@ -47,30 +48,30 @@ Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1
     uint32_t old_cr3;
     asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(old_cr3)::"%eax");
     load_address_space(task->cr3);
-    task->kernel_esp=(((uint32_t)alloc_pages(1))+0xfff);
-    task->kernel_esp_top=task->kernel_esp;
     if (kmode) {
-      task->kernel_esp-=5*4;
-      uint32_t* stack_top_val=(uint32_t*)task->kernel_esp;
-      stack_top_val[0]=0;
-      stack_top_val[1]=0;
-      stack_top_val[2]=0;
-      stack_top_val[3]=0;
-      stack_top_val[4]=eip;
+      uint32_t top_idx=(1024*(next_pid+1));
+      task->kernel_esp=((uint32_t)(&kstacks[top_idx-5]));
+      task->kernel_esp_top=task->kernel_esp;
+      kstacks[top_idx-5]=0;
+      kstacks[top_idx-4]=0;
+      kstacks[top_idx-3]=0;
+      kstacks[top_idx-2]=0;
+      kstacks[top_idx-1]=eip;
     } else {
-      task->kernel_esp-=7*4;
-      uint32_t* stack_top_val=(uint32_t*)task->kernel_esp;
-      stack_top_val[0]=0;
-      stack_top_val[1]=0;
-      stack_top_val[2]=0;
-      stack_top_val[3]=0;
-      stack_top_val[4]=task_init;
-      uint32_t* user_stack=(((uint32_t)alloc_pages(1))+0xfff);
-      user_stack-=4*2;
+      uint32_t top_idx=(1024*(next_pid+1));
+      task->kernel_esp=((uint32_t)(&kstacks[top_idx-7]));
+      task->kernel_esp_top=task->kernel_esp;
+      kstacks[top_idx-7]=0;
+      kstacks[top_idx-6]=0;
+      kstacks[top_idx-5]=0;
+      kstacks[top_idx-4]=0;
+      kstacks[top_idx-3]=task_init;
+      uint32_t* user_stack=(((uint32_t)alloc_pages(1))+0x1000);
+      user_stack-=2;
       user_stack[0]=param1;
       user_stack[1]=param2;
-      stack_top_val[5]=user_stack;
-      stack_top_val[6]=eip;
+      kstacks[top_idx-2]=user_stack;
+      kstacks[top_idx-1]=eip;
     }
     load_address_space(old_cr3);
     task->next=NULL;
@@ -91,6 +92,7 @@ Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1
       currentTask->next=task;
     }
     return task;
+
 }
 
 int* tasking_get_errno_address() {
