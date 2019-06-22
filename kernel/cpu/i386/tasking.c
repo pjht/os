@@ -156,6 +156,11 @@ void* tasking_get_msg(uint32_t* sender,uint32_t* size) {
   *sender=currentTask->sender_store[currentTask->rd];
   *size=currentTask->size_store[currentTask->rd];
   char* data=currentTask->msg_store[currentTask->rd];
+  char* msg=alloc_pages((*size/4096)+1);
+  for (int i=0;i<*size;i++) {
+    msg[i]=data[i];
+  }
+  kfree(data);
   currentTask->msg_store[currentTask->rd]=NULL;
   currentTask->sender_store[currentTask->rd]=0;
   currentTask->rd++;
@@ -168,7 +173,7 @@ void* tasking_get_msg(uint32_t* sender,uint32_t* size) {
       currentTask->rd=15;
     }
   }
-  return data;
+  return msg;
 }
 
 void tasking_yield(registers_t registers) {
