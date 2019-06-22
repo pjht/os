@@ -1,6 +1,7 @@
 #include <string.h>
 #include "vga.h"
 #include <grub/text_fb_info.h>
+#include <ipc/vfs.h>
 #include <elf.h>
 
 typedef struct {
@@ -88,19 +89,41 @@ int main(char* initrd, uint32_t initrd_sz) {
     vga_write_string("Loaded VFS into memory, creating task\n");
     createTaskCr3((void*)header.entry,cr3);
     vga_write_string("Created VFS task, sending test message\n");
-    send_msg(2,"hello",6);
+    vfs_message* msg=malloc(sizeof(vfs_message)+strlen("/dev/sda")+1);
+    msg->type=VFS_OPEN;
+    msg->id=1;
+    msg->mode[0]='r';
+    msg->mode[1]='\0';
+    strcpy(&msg->path,"/dev/sda");
+    send_msg(2,msg,sizeof(vfs_message)+strlen("/dev/sda")+1);
+    free(msg);
     vga_write_string("Sent test message, yielding to task\n");
     yield();
     vga_write_string("Yielded and got control, getting message\n");
     int sender;
     int size;
-    char* msg=get_msg(&sender,&size);
-    vga_write_string("Message of size ");
+    msg=get_msg(&sender,&size);
+    vga_write_string("Message of type ");
     char str[256];
-    int_to_ascii(size,str);
+    str[0]='\0';
+    int_to_ascii(msg->type,str);
     vga_write_string(str);
-    vga_write_string(": ");
-    vga_write_string(msg);
+    vga_write_string("\n");
+    vga_write_string("ID ");
+    str[0]='\0';
+    int_to_ascii(msg->id,str);
+    vga_write_string(str);
+    vga_write_string("\n");
+    vga_write_string("Mode ");
+    vga_write_string(&msg->mode);
+    vga_write_string("\n");
+    vga_write_string("FD ");
+    str[0]='\0';
+    int_to_ascii(msg->fd,str);
+    vga_write_string(str);
+    vga_write_string("\n");
+    vga_write_string("Path ");
+    vga_write_string(&msg->path);
     vga_write_string("\n");
   }
   for(;;);
