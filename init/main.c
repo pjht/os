@@ -1,6 +1,7 @@
 #include <string.h>
 #include "vga.h"
 #include <grub/text_fb_info.h>
+#include <elf.h>
 
 typedef struct {
   char filename[100];
@@ -31,22 +32,63 @@ int main(char* initrd, uint32_t initrd_sz) {
   vga_init(info);
   vga_write_string("INIT VGA\n");
   int pos=0;
-  tar_header hdr;
+  uint32_t datapos;
+  tar_header tar_hdr;
   for (int i=0;;i++) {
-    char* hdr_ptr=(char*)&hdr;
-    for (size_t i=0;i<sizeof(tar_header);i++) {
-      hdr_ptr[i]=initrd[pos+i];
+    char* tar_hdr_ptr=(char*)&tar_hdr;
+    for (size_t i=0;i<sizeof(tar_hdr);i++) {
+      tar_hdr_ptr[i]=initrd[pos+i];
     }
-    if (hdr.filename[0]=='\0') break;
-    uint32_t size=getsize(hdr.size);
+    if (tar_hdr.filename[0]=='\0') break;
+    uint32_t size=getsize(tar_hdr.size);
     pos+=512;
-    if (strcmp(hdr.filename,"vfs")==0) {
-      vga_write_string("VFS found");
+    if (strcmp(tar_hdr.filename,"vfs")==0) {
+      vga_write_string("VFS found, loading\n");
+      datapos=pos;
+      break;
+    } else {
+      vga_write_string("VFS not found\n");
+      // for(;;);
     }
     pos+=size;
     if (pos%512!=0) {
       pos+=512-(pos%512);
     }
   }
-  for (;;);
+  elf_header header;
+  pos=datapos;
+  char* hdr_ptr=(char*)&header;
+  for (size_t i=0;i<sizeof(elf_header);i++) {
+    hdr_ptr[i]=initrd[pos];
+    pos++;
+  }
+  if (header.magic!=ELF_MAGIC) {
+    vga_write_string("[INFO] Invalid magic number for vfs\n");
+  } else {
+    void* cr3=new_address_space();
+    for (int i=0;i<header.pheader_ent_nm;i++) {
+      elf_pheader pheader;
+      pos=(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos;
+      char* phdr_ptr=(char*)&pheader;
+      for (size_t i=0;i<sizeof(elf_pheader);i++) {
+        phdr_ptr[i]=initrd[pos];
+        pos++;
+      }
+      char* ptr=alloc_memory(((pheader.memsz)/4096)+1);
+      memset(ptr,0,pheader.memsz);
+      if (pheader.filesz>0) {
+        pos=pheader.offset+datapos;
+        for (size_t i=0;i<pheader.filesz;i++) {
+          ptr[i]=initrd[pos];
+          pos++;
+        }
+      }
+      copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
+    }
+    vga_write_string("Loaded VFS into memory, creating task\n");
+    createTaskCr3((void*)header.entry,cr3);
+    vga_write_string("Creted VFS task, yielding to task\n");
+    yield();
+  }
+  for(;;);
 }

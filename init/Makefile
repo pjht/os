@@ -10,4 +10,4 @@ init: $(OBJ)
 	@$(CC) $(CFLAGS)  -c $< -o $@
 
 clean:
-	@rm -rf *.o prog.elf
+	@rm -rf *.o init

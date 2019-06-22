@@ -28,7 +28,7 @@ debug: os.iso kernel/kernel.elf
 	@$(EMU) -s $(QFLAGS) &
 	@$(GDB) -ex "target remote localhost:1234" -ex "symbol-file kernel/kernel.elf"
 
-os.iso: kernel/kernel.elf initrd/* initrd/init
+os.iso: kernel/kernel.elf initrd/* initrd/init initrd/vfs
 	@cp kernel/kernel.elf iso/boot
 	@cd initrd; tar -f ../iso/boot/initrd.tar -c *
 	@grub-mkrescue -o $@ iso
@@ -36,6 +36,10 @@ os.iso: kernel/kernel.elf initrd/* initrd/init
 initrd/init: init/* kernel/start.o
 	@cd init && make
 	@cp init/init initrd/init
+
+initrd/vfs: vfs/* kernel/start.o
+	@cd vfs && make
+	@cp vfs/vfs initrd/vfs
 
 kernel/kernel.elf: $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) libc/libc.a
 	@$(CC) -z max-page-size=4096 -Xlinker -n -T kernel/cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc
