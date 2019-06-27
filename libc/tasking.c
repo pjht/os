@@ -14,22 +14,6 @@ void createTask(void* task) {
   "::"b"(task));
 }
 
-void* get_msg(uint32_t* sender,uint32_t* size) {
-  void* msg;
-  asm volatile("  \
-    mov $6, %%eax; \
-    int $80; \
-  ":"=b"(msg):"b"(sender),"c"(size));
-  return msg;
-}
-
-void send_msg(uint32_t pid,void* msg,uint32_t size) {
-  asm volatile("  \
-    mov $7, %%eax; \
-    int $80; \
-  "::"b"(pid),"c"(msg),"d"(size));
-}
-
 void createTaskCr3(void* task,void* cr3) {
   asm volatile("  \
     mov $9, %%eax; \

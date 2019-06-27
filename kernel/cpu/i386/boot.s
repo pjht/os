@@ -118,6 +118,11 @@ _start:
 	orl $0x80010000, %ecx
 	movl %ecx, %cr0
 
+  #Enable PSE (Page Size Extension, allows for 4MiB pages)
+  movl %cr4, %ecx
+  orl $0x00000010, %ecx
+  movl %ecx, %cr4
+  
 	# Jump to higher half with an absolute jump.
 	lea 4f, %ecx
 	jmp *%ecx

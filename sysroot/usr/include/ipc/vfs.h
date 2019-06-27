@@ -10,7 +10,7 @@ typedef struct {
   uint32_t id;
   char mode[10];
   uint32_t fd;
-  char path[0];
+  char path[4096];
 } vfs_message;
 
 #endif

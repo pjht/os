@@ -8,6 +8,7 @@
 #include "../tasking.h"
 #include "interrupt.h"
 #include "address_spaces.h"
+#include "mailboxes.h"
 #include <string.h>
 #include <stdint.h>
 void irq_handler(registers_t r);
@@ -186,9 +187,9 @@ void isr_handler(registers_t r) {
       } else if (r.eax==5) {
         r.ebx=(uint32_t)tasking_get_errno_address();
       } else if (r.eax==6) {
-        r.ebx=(uint32_t)tasking_get_msg((uint32_t*)r.ebx,(uint32_t*)r.ecx);
+        kernel_mailbox_get_msg(r.ebx,r.ecx,r.edx);
       } else if (r.eax==7) {
-        tasking_send_msg(r.ebx,(void*)r.ecx,r.edx);
+        kernel_mailbox_send_msg((Message*)r.ebx);
       } else if (r.eax==8) {
         r.ebx=(uint32_t)paging_new_address_space();
       } else if (r.eax==9) {
@@ -208,8 +209,10 @@ void isr_handler(registers_t r) {
         tasking_createTaskCr3KmodeParam((void*)r.ebx,(void*)r.ecx,0,1,r.edx,1,r.esi);
       } else if (r.eax==13) {
         r.ebx=(uint32_t)address_spaces_put_data((void*)r.ebx,(void*)r.ecx,r.edx);
+      } else if (r.eax==14) {
+        r.ebx=kernel_mailbox_new((uint16_t)r.ebx);
       }
-    break;
+      break;
     }
   }
 }

@@ -3,6 +3,10 @@
 #include <grub/text_fb_info.h>
 #include <ipc/vfs.h>
 #include <elf.h>
+#include <mailboxes.h>
+#include <memory.h>
+#include <tasking.h>
+#include <stdlib.h>
 
 typedef struct {
   char filename[100];
@@ -27,7 +31,7 @@ uint32_t getsize(const char *in) {
 
 int main(char* initrd, uint32_t initrd_sz) {
   text_fb_info info;
-  info.address=map_phys(0xB8000,10);
+  info.address=map_phys((void*)0xB8000,10);
   info.width=80;
   info.height=25;
   vga_init(info);
@@ -88,42 +92,49 @@ int main(char* initrd, uint32_t initrd_sz) {
     }
     vga_write_string("Loaded VFS into memory, creating task\n");
     createTaskCr3((void*)header.entry,cr3);
-    vga_write_string("Created VFS task, sending test message\n");
-    vfs_message* msg=malloc(sizeof(vfs_message)+strlen("/dev/sda")+1);
-    msg->type=VFS_OPEN;
-    msg->id=1;
-    msg->mode[0]='r';
-    msg->mode[1]='\0';
-    strcpy(&msg->path,"/dev/sda");
-    send_msg(2,msg,sizeof(vfs_message)+strlen("/dev/sda")+1);
-    free(msg);
+    vga_write_string("Created VFS task, creating mailbox\n");
+    uint32_t box=mailbox_new(16);
+    vga_write_string("Created mailbox, yielding to VFS so it can create it's mailbox.\n");
+    yield();
+    vga_write_string("VFS yielded back, sending test message\n");
+    vfs_message* msg_data=malloc(sizeof(vfs_message));
+    msg_data->type=VFS_OPEN;
+    msg_data->id=1;
+    strcpy(&msg_data->mode,"r");
+    strcpy(&msg_data->path,"/dev/sda");
+    Message msg;
+    msg.from=box;
+    msg.to=1;
+    msg.msg=msg_data;
+    msg.size=sizeof(vfs_message);
+    mailbox_send_msg(&msg);
     vga_write_string("Sent test message, yielding to task\n");
     yield();
     vga_write_string("Yielded and got control, getting message\n");
-    int sender;
-    int size;
-    msg=get_msg(&sender,&size);
+    msg.msg=malloc(sizeof(vfs_message));
+    mailbox_get_msg(box,&msg,sizeof(vfs_message));
+    vfs_message* vfs_msg=(vfs_message*)msg.msg;
     vga_write_string("Message of type ");
     char str[256];
     str[0]='\0';
-    int_to_ascii(msg->type,str);
+    int_to_ascii(vfs_msg->type,str);
     vga_write_string(str);
     vga_write_string("\n");
     vga_write_string("ID ");
     str[0]='\0';
-    int_to_ascii(msg->id,str);
+    int_to_ascii(vfs_msg->id,str);
     vga_write_string(str);
     vga_write_string("\n");
     vga_write_string("Mode ");
-    vga_write_string(&msg->mode);
+    vga_write_string(&vfs_msg->mode);
     vga_write_string("\n");
     vga_write_string("FD ");
     str[0]='\0';
-    int_to_ascii(msg->fd,str);
+    int_to_ascii(vfs_msg->fd,str);
     vga_write_string(str);
     vga_write_string("\n");
     vga_write_string("Path ");
-    vga_write_string(&msg->path);
+    vga_write_string(&vfs_msg->path);
     vga_write_string("\n");
   }
   for(;;);
