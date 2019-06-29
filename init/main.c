@@ -59,15 +59,8 @@ void display_msg(vfs_message* vfs_msg) {
   vga_write_string("\n");
 }
 
-int main(char* initrd, uint32_t initrd_sz) {
-  text_fb_info info;
-  info.address=map_phys((void*)0xB8000,10);
-  info.width=80;
-  info.height=25;
-  vga_init(info);
-  vga_write_string("INIT VGA\n");
-  int pos=0;
-  uint32_t datapos;
+uint32_t find_loc(char* name,char* initrd) {
+  uint32_t pos=0;
   tar_header tar_hdr;
   for (int i=0;;i++) {
     char* tar_hdr_ptr=(char*)&tar_hdr;
@@ -77,17 +70,21 @@ int main(char* initrd, uint32_t initrd_sz) {
     if (tar_hdr.filename[0]=='\0') break;
     uint32_t size=getsize(tar_hdr.size);
     pos+=512;
-    if (strcmp(tar_hdr.filename,"vfs")==0) {
-      datapos=pos;
+    if (strcmp(tar_hdr.filename,name)==0) {
+      return pos;
       break;
     } else {
-      // for(;;);
     }
     pos+=size;
     if (pos%512!=0) {
       pos+=512-(pos%512);
     }
   }
+  return 0;
+}
+
+char load_task(uint32_t datapos,char* initrd) {
+  int pos=0;
   elf_header header;
   pos=datapos;
   char* hdr_ptr=(char*)&header;
@@ -96,7 +93,8 @@ int main(char* initrd, uint32_t initrd_sz) {
     pos++;
   }
   if (header.magic!=ELF_MAGIC) {
-    vga_write_string("[INFO] Invalid magic number for vfs\n");
+    vga_write_string("[INFO] Invalid magic number\n");
+    return 0;
   } else {
     void* cr3=new_address_space();
     for (int i=0;i<header.pheader_ent_nm;i++) {
@@ -119,43 +117,57 @@ int main(char* initrd, uint32_t initrd_sz) {
       copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
     }
     createTaskCr3((void*)header.entry,cr3);
-    uint32_t box=mailbox_new(16);
-    yield();
-    vga_write_string("Sending first test message\n");
-    vfs_message* msg_data=malloc(sizeof(vfs_message));
-    msg_data->type=VFS_OPEN;
-    msg_data->id=1;
-    strcpy(&msg_data->mode[0],"r");
-    strcpy(&msg_data->path[0],"/dev/sda");
-    Message msg;
-    msg.from=box;
-    msg.to=1;
-    msg.msg=msg_data;
-    msg.size=sizeof(vfs_message);
-    mailbox_send_msg(&msg);
-    yield();
-    vga_write_string("Getting message\n");
-    msg.msg=malloc(sizeof(vfs_message));
-    mailbox_get_msg(box,&msg,sizeof(vfs_message));
-    vfs_message* vfs_msg=(vfs_message*)msg.msg;
-    display_msg(vfs_msg);
-    vga_write_string("Sending second test message\n");
-    msg_data=malloc(sizeof(vfs_message));
-    msg_data->type=VFS_OPEN;
-    msg_data->id=2;
-    strcpy(&msg_data->mode[0],"r");
-    strcpy(&msg_data->path[0],"/dev/sdb");
-    msg.from=box;
-    msg.to=1;
-    msg.msg=msg_data;
-    msg.size=sizeof(vfs_message);
-    mailbox_send_msg(&msg);
-    yield();
-    vga_write_string("Getting message\n");
-    msg.msg=malloc(sizeof(vfs_message));
-    mailbox_get_msg(box,&msg,sizeof(vfs_message));
-    vfs_msg=(vfs_message*)msg.msg;
-    display_msg(vfs_msg);
   }
+  return 1;
+}
+
+vfs_message* make_msg(vfs_message_type type, char* mode, char* path) {
+  static uint32_t id=0;
+  vfs_message* msg_data=malloc(sizeof(vfs_message));
+  msg_data->type=type;
+  msg_data->id=id;
+  id++;
+  strcpy(&msg_data->mode[0],mode);
+  strcpy(&msg_data->path[0],path);
+  return msg_data;
+}
+
+int main(char* initrd, uint32_t initrd_sz) {
+  text_fb_info info;
+  info.address=map_phys((void*)0xB8000,10);
+  info.width=80;
+  info.height=25;
+  vga_init(info);
+  vga_write_string("INIT VGA\n");
+  uint32_t datapos=find_loc("vfs",initrd);
+  load_task(datapos,initrd);
+  uint32_t box=mailbox_new(16);
+  yield();
+  vga_write_string("Sending first test message\n");
+  vfs_message* msg_data=make_msg(VFS_OPEN,"r","/dev/sda");
+  Message msg;
+  msg.from=box;
+  msg.to=1;
+  msg.msg=msg_data;
+  msg.size=sizeof(vfs_message);
+  mailbox_send_msg(&msg);
+  free(msg.msg);
+  yield();
+  vga_write_string("Getting message\n");
+  msg.msg=malloc(sizeof(vfs_message));
+  mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  vfs_message* vfs_msg=(vfs_message*)msg.msg;
+  display_msg(vfs_msg);
+  vga_write_string("Sending second test message\n");
+  msg_data=make_msg(VFS_OPEN,"r","/dev/sdb");
+  msg.msg=msg_data;
+  mailbox_send_msg(&msg);
+  free(msg.msg);
+  yield();
+  vga_write_string("Getting message\n");
+  msg.msg=malloc(sizeof(vfs_message));
+  mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  vfs_msg=(vfs_message*)msg.msg;
+  display_msg(vfs_msg);
   for(;;);
 }
