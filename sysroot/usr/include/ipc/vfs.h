@@ -2,7 +2,13 @@
 #define IPC_VFS_H
 
 typedef enum {
-  VFS_OPEN
+  VFS_OPEN,
+  VFS_PUTC,
+  VFS_GETC,
+  VFS_CLOSE,
+  VFS_REGISTER_FS,
+  VFS_MOUNT,
+  VFS_UMOUNT
 } vfs_message_type;
 
 typedef struct {
