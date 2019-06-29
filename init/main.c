@@ -136,6 +136,11 @@ int main(char* initrd, uint32_t initrd_sz) {
     vga_write_string("Path ");
     vga_write_string(&vfs_msg->path[0]);
     vga_write_string("\n");
+    vga_write_string("Flags ");
+    str[0]='\0';
+    hex_to_ascii(vfs_msg->flags,str);
+    vga_write_string(str);
+    vga_write_string("\n");
   }
   for(;;);
 }
