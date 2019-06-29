@@ -29,6 +29,36 @@ uint32_t getsize(const char *in) {
     return size;
 }
 
+void display_msg(vfs_message* vfs_msg) {
+  vga_write_string("Message of type ");
+  char str[256];
+  str[0]='\0';
+  int_to_ascii(vfs_msg->type,str);
+  vga_write_string(str);
+  vga_write_string("\n");
+  vga_write_string("ID ");
+  str[0]='\0';
+  int_to_ascii(vfs_msg->id,str);
+  vga_write_string(str);
+  vga_write_string("\n");
+  vga_write_string("Mode ");
+  vga_write_string(&vfs_msg->mode[0]);
+  vga_write_string("\n");
+  vga_write_string("FD ");
+  str[0]='\0';
+  int_to_ascii(vfs_msg->fd,str);
+  vga_write_string(str);
+  vga_write_string("\n");
+  vga_write_string("Path ");
+  vga_write_string(&vfs_msg->path[0]);
+  vga_write_string("\n");
+  vga_write_string("Flags ");
+  str[0]='\0';
+  hex_to_ascii(vfs_msg->flags,str);
+  vga_write_string(str);
+  vga_write_string("\n");
+}
+
 int main(char* initrd, uint32_t initrd_sz) {
   text_fb_info info;
   info.address=map_phys((void*)0xB8000,10);
@@ -48,11 +78,9 @@ int main(char* initrd, uint32_t initrd_sz) {
     uint32_t size=getsize(tar_hdr.size);
     pos+=512;
     if (strcmp(tar_hdr.filename,"vfs")==0) {
-      vga_write_string("VFS found, loading\n");
       datapos=pos;
       break;
     } else {
-      vga_write_string("VFS not found\n");
       // for(;;);
     }
     pos+=size;
@@ -90,13 +118,10 @@ int main(char* initrd, uint32_t initrd_sz) {
       }
       copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
     }
-    vga_write_string("Loaded VFS into memory, creating task\n");
     createTaskCr3((void*)header.entry,cr3);
-    vga_write_string("Created VFS task, creating mailbox\n");
     uint32_t box=mailbox_new(16);
-    vga_write_string("Created mailbox, yielding to VFS so it can create it's mailbox.\n");
     yield();
-    vga_write_string("VFS yielded back, sending test message\n");
+    vga_write_string("Sending first test message\n");
     vfs_message* msg_data=malloc(sizeof(vfs_message));
     msg_data->type=VFS_OPEN;
     msg_data->id=1;
@@ -108,39 +133,29 @@ int main(char* initrd, uint32_t initrd_sz) {
     msg.msg=msg_data;
     msg.size=sizeof(vfs_message);
     mailbox_send_msg(&msg);
-    vga_write_string("Sent test message, yielding to task\n");
     yield();
-    vga_write_string("Yielded and got control, getting message\n");
+    vga_write_string("Getting message\n");
     msg.msg=malloc(sizeof(vfs_message));
     mailbox_get_msg(box,&msg,sizeof(vfs_message));
     vfs_message* vfs_msg=(vfs_message*)msg.msg;
-    vga_write_string("Message of type ");
-    char str[256];
-    str[0]='\0';
-    int_to_ascii(vfs_msg->type,str);
-    vga_write_string(str);
-    vga_write_string("\n");
-    vga_write_string("ID ");
-    str[0]='\0';
-    int_to_ascii(vfs_msg->id,str);
-    vga_write_string(str);
-    vga_write_string("\n");
-    vga_write_string("Mode ");
-    vga_write_string(&vfs_msg->mode[0]);
-    vga_write_string("\n");
-    vga_write_string("FD ");
-    str[0]='\0';
-    int_to_ascii(vfs_msg->fd,str);
-    vga_write_string(str);
-    vga_write_string("\n");
-    vga_write_string("Path ");
-    vga_write_string(&vfs_msg->path[0]);
-    vga_write_string("\n");
-    vga_write_string("Flags ");
-    str[0]='\0';
-    hex_to_ascii(vfs_msg->flags,str);
-    vga_write_string(str);
-    vga_write_string("\n");
+    display_msg(vfs_msg);
+    vga_write_string("Sending second test message\n");
+    msg_data=malloc(sizeof(vfs_message));
+    msg_data->type=VFS_OPEN;
+    msg_data->id=2;
+    strcpy(&msg_data->mode[0],"r");
+    strcpy(&msg_data->path[0],"/dev/sdb");
+    msg.from=box;
+    msg.to=1;
+    msg.msg=msg_data;
+    msg.size=sizeof(vfs_message);
+    mailbox_send_msg(&msg);
+    yield();
+    vga_write_string("Getting message\n");
+    msg.msg=malloc(sizeof(vfs_message));
+    mailbox_get_msg(box,&msg,sizeof(vfs_message));
+    vfs_msg=(vfs_message*)msg.msg;
+    display_msg(vfs_msg);
   }
   for(;;);
 }

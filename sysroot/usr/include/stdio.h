@@ -5,26 +5,17 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef struct {
-  char* mntpnt;
-  const char* path;
-  int wr;
-  int rd;
-  uint32_t type;
-  unsigned long pos;
-  int eof;
-  int error;
-  void* data;
-} FILE;
+#define FILE uint32_t
 
 #define SEEK_CUR 1
 #define SEEK_END 2
 #define SEEK_SET 3
 #define EOF -1
 
-extern FILE* stdin;
-extern FILE* stdout;
-extern FILE* stderr;
+#define stdin 0
+#define stdout 1
+#define stderr 2
+
 
 FILE* fopen(const char* filename,const char* mode);
 int fgetc(FILE* stream);
@@ -42,7 +33,7 @@ int printf(const char* format,...);
 int fseek(FILE* stream,long offset,int origin);
 long ftell(FILE* stream);
 int fclose(FILE* file);
-int feof(FILE *stream);
-int ferror(FILE *stream);
+int feof(FILE* stream);
+int ferror(FILE* stream);
 
 #endif
