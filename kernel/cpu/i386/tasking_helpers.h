@@ -3,7 +3,7 @@
 
 #include "tasking.h"
 
-void switchTask(uint32_t stack);
+void switch_to_task(Task* task);
 uint32_t readEip();
 
 #endif

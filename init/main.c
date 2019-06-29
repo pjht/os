@@ -100,8 +100,8 @@ int main(char* initrd, uint32_t initrd_sz) {
     vfs_message* msg_data=malloc(sizeof(vfs_message));
     msg_data->type=VFS_OPEN;
     msg_data->id=1;
-    strcpy(&msg_data->mode,"r");
-    strcpy(&msg_data->path,"/dev/sda");
+    strcpy(&msg_data->mode[0],"r");
+    strcpy(&msg_data->path[0],"/dev/sda");
     Message msg;
     msg.from=box;
     msg.to=1;
@@ -126,7 +126,7 @@ int main(char* initrd, uint32_t initrd_sz) {
     vga_write_string(str);
     vga_write_string("\n");
     vga_write_string("Mode ");
-    vga_write_string(&vfs_msg->mode);
+    vga_write_string(&vfs_msg->mode[0]);
     vga_write_string("\n");
     vga_write_string("FD ");
     str[0]='\0';
@@ -134,7 +134,7 @@ int main(char* initrd, uint32_t initrd_sz) {
     vga_write_string(str);
     vga_write_string("\n");
     vga_write_string("Path ");
-    vga_write_string(&vfs_msg->path);
+    vga_write_string(&vfs_msg->path[0]);
     vga_write_string("\n");
   }
   for(;;);

@@ -9,6 +9,7 @@
 #include "interrupt.h"
 #include "address_spaces.h"
 #include "mailboxes.h"
+#include <mailboxes.h>
 #include <string.h>
 #include <stdint.h>
 void irq_handler(registers_t r);
@@ -187,7 +188,7 @@ void isr_handler(registers_t r) {
       } else if (r.eax==5) {
         r.ebx=(uint32_t)tasking_get_errno_address();
       } else if (r.eax==6) {
-        kernel_mailbox_get_msg(r.ebx,r.ecx,r.edx);
+        kernel_mailbox_get_msg(r.ebx,(Message*)r.ecx,r.edx);
       } else if (r.eax==7) {
         kernel_mailbox_send_msg((Message*)r.ebx);
       } else if (r.eax==8) {
@@ -204,7 +205,7 @@ void isr_handler(registers_t r) {
         uint32_t page_idx=find_free_pages(r.ecx);
         void* virt_addr=(void*)(page_idx<<12);
         map_pages(virt_addr,(void*)r.ebx,r.ecx,1,1);
-        r.ebx=virt_addr;
+        r.ebx=(uint32_t)virt_addr;
       } else if (r.eax==12) {
         tasking_createTaskCr3KmodeParam((void*)r.ebx,(void*)r.ecx,0,1,r.edx,1,r.esi);
       } else if (r.eax==13) {

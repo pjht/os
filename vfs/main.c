@@ -1,6 +1,7 @@
 #include <tasking.h>
 #include <ipc/vfs.h>
 #include <mailboxes.h>
+#include <stdlib.h>
 
 int main() {
   uint32_t box=mailbox_new(16);

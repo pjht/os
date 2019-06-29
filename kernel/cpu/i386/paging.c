@@ -46,7 +46,7 @@ void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,ch
 }
 
 void map_kstack(uint32_t pid) {
-  if (kstack_page_tables[pid]==NULL) {
+  if (!(kstack_page_tables[pid]&0x1)) {
     kstack_page_tables[pid]=(uint32_t)pmem_alloc(1)|0x3;
   }
 }
@@ -158,7 +158,7 @@ void unmap_pages(void* start_virt,uint32_t num_pages) {
   uint32_t virt_addr=(uint32_t)start_virt;
   int dir_entry=(virt_addr&0xFFC00000)>>22;
   int table_entry=(virt_addr&0x3FF000)>>12;
-  for (int i=0;i<=num_pages;i++) {
+  for (uint32_t i=0;i<=num_pages;i++) {
     if (smap[dir_entry]&0x1) {
       smap_page_tables[dir_entry+1]=(smap[dir_entry]&0xFFFFFC00)|0x3;
       smap[(1024+(1024*dir_entry))+table_entry]=0;

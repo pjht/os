@@ -10,10 +10,11 @@
 #include "paging.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include "../halt.h"
 #define STACK_PAGES 2
 
 extern void task_init();
-static uint32_t* kstacks=(char*)0xF6800000;
+static uint32_t* kstacks=(uint32_t*)0xF6800000;
 
 
 uint32_t next_pid;
@@ -56,7 +57,7 @@ Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1
       kstacks[top_idx-4]=0;
       kstacks[top_idx-3]=0;
       kstacks[top_idx-2]=0;
-      kstacks[top_idx-1]=eip;
+      kstacks[top_idx-1]=(uint32_t)eip;
     } else {
       uint32_t top_idx=(1024*(next_pid+1));
       task->kernel_esp=((uint32_t)(&kstacks[top_idx-7]));
@@ -65,13 +66,13 @@ Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1
       kstacks[top_idx-6]=0;
       kstacks[top_idx-5]=0;
       kstacks[top_idx-4]=0;
-      kstacks[top_idx-3]=task_init;
-      uint32_t* user_stack=(((uint32_t)alloc_pages(1))+0x1000);
+      kstacks[top_idx-3]=(uint32_t)task_init;
+      uint32_t* user_stack=(uint32_t*)(((uint32_t)alloc_pages(1))+0x1000);
       user_stack-=2;
       user_stack[0]=param1;
       user_stack[1]=param2;
-      kstacks[top_idx-2]=user_stack;
-      kstacks[top_idx-1]=eip;
+      kstacks[top_idx-2]=(uint32_t)user_stack;
+      kstacks[top_idx-1]=(uint32_t)eip;
     }
     load_address_space(old_cr3);
     task->next=NULL;
