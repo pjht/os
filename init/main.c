@@ -160,7 +160,10 @@ int main(char* initrd, uint32_t initrd_sz) {
   display_msg(vfs_msg);
   vga_write_string("Sending second test message\n");
   msg_data=make_msg(VFS_OPEN,"r","/dev/sdb");
+  msg.from=box;
+  msg.to=1;
   msg.msg=msg_data;
+  msg.size=sizeof(vfs_message);
   mailbox_send_msg(&msg);
   free(msg.msg);
   yield();
