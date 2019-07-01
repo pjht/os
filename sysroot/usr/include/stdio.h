@@ -5,8 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define FILE uint32_t
-
+#define FILE uint32_t //We're using pointers to FILE even though it's a uint32_t so we can expand to a struct if needed
 #define SEEK_CUR 1
 #define SEEK_END 2
 #define SEEK_SET 3
@@ -17,7 +16,7 @@
 #define stderr 2
 
 
-FILE* fopen(const char* filename,const char* mode);
+FILE* fopen(char* filename,char* mode);
 int fgetc(FILE* stream);
 int getc();
 char* fgets(char* str,int count,FILE* stream);

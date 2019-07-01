@@ -132,19 +132,9 @@ vfs_message* make_msg(vfs_message_type type, char* mode, char* path) {
   return msg_data;
 }
 
-int main(char* initrd, uint32_t initrd_sz) {
-  text_fb_info info;
-  info.address=map_phys((void*)0xB8000,10);
-  info.width=80;
-  info.height=25;
-  vga_init(info);
-  vga_write_string("INIT VGA\n");
-  uint32_t datapos=find_loc("vfs",initrd);
-  load_task(datapos,initrd);
-  uint32_t box=mailbox_new(16);
-  yield();
-  vga_write_string("Sending first test message\n");
-  vfs_message* msg_data=make_msg(VFS_OPEN,"r","/dev/sda");
+void test_vfs(char* path,uint32_t box,uint32_t fs_box) {
+  vga_write_string("Sending test message\n");
+  vfs_message* msg_data=make_msg(VFS_OPEN,"r",path);
   Message msg;
   msg.from=box;
   msg.to=1;
@@ -153,24 +143,47 @@ int main(char* initrd, uint32_t initrd_sz) {
   mailbox_send_msg(&msg);
   free(msg.msg);
   yield();
-  vga_write_string("Getting message\n");
+  vga_write_string("Getting fs_box message\n");
   msg.msg=malloc(sizeof(vfs_message));
-  mailbox_get_msg(box,&msg,sizeof(vfs_message));
-  vfs_message* vfs_msg=(vfs_message*)msg.msg;
-  display_msg(vfs_msg);
-  vga_write_string("Sending second test message\n");
-  msg_data=make_msg(VFS_OPEN,"r","/dev/sdb");
-  msg.from=box;
-  msg.to=1;
-  msg.msg=msg_data;
-  msg.size=sizeof(vfs_message);
-  mailbox_send_msg(&msg);
+  mailbox_get_msg(fs_box,&msg,sizeof(vfs_message));
+  if (msg.from==0) {
+    vga_write_string("No message\n");
+  } else {
+    vfs_message* vfs_msg=(vfs_message*)msg.msg;
+    display_msg(vfs_msg);
+    msg.to=msg.from;
+    msg.from=fs_box;
+    vfs_msg->flags=13;
+    mailbox_send_msg(&msg);
+  }
   free(msg.msg);
   yield();
   vga_write_string("Getting message\n");
   msg.msg=malloc(sizeof(vfs_message));
   mailbox_get_msg(box,&msg,sizeof(vfs_message));
-  vfs_msg=(vfs_message*)msg.msg;
-  display_msg(vfs_msg);
-  for(;;);
+  if (msg.from==0) {
+    vga_write_string("No message\n");
+  } else {
+    vfs_message* vfs_msg=(vfs_message*)msg.msg;
+    display_msg(vfs_msg);
+  }
+  free(msg.msg);
+}
+
+int main(char* initrd, uint32_t initrd_sz) {
+  text_fb_info info;
+  info.address=map_phys((void*)0xB8000,10);
+  info.width=80;
+  info.height=25;
+  vga_init(info);
+  // uint32_t datapos=find_loc("vfs",initrd);
+  // load_task(datapos,initrd);
+  // uint32_t box=mailbox_new(16);
+  // yield();
+  // // uint32_t fs_box=mailbox_new(16);
+  // // test_vfs("/dev/sda",box,fs_box);
+  // // test_vfs("/dev/sdb",box,fs_box);
+  for(;;) {
+    yield();
+  }
 }

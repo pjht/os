@@ -11,6 +11,8 @@ static int x;
 static int y;
 static vga_colors fg_color;
 static vga_colors bg_color;
+static char* scroll_buf[0xfa0];
+
 
 static void set_char(int x,int y,char c) {
   screen[xy_to_indx(x,y)]=c;
@@ -55,6 +57,9 @@ void vga_write_string(const char* string) {
     if (c=='\n') {
       x=0;
       y++;
+      for (int i=0;i<67108864;i++) {
+        1+1;
+      }
     } else {
       set_char(x,y,c);
       x++;
@@ -65,11 +70,10 @@ void vga_write_string(const char* string) {
     }
     if (y==height) {
       x=0;
-      y=0;
-      // char* pg1=(char*)((uint32_t)screen+0xfa0);
-      // memcpy(pg1,&screen[xy_to_indx(0,1)],xy_to_indx(0,24));
-      // vga_clear();
-      // memcpy(&screen,pg1,xy_to_indx(0,25));
+      y=24;
+      memcpy(scroll_buf,&screen[xy_to_indx(0,1)],xy_to_indx(0,24));
+      vga_clear();
+      memcpy(screen,scroll_buf,xy_to_indx(0,25));
     }
   }
   set_cursor(x,y);
