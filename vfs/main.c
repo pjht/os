@@ -2,6 +2,7 @@
 #include <ipc/vfs.h>
 #include <mailboxes.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define PROC_FD_LIMIT 1024
 
@@ -77,7 +78,6 @@ uint32_t register_fs(uint32_t drv,const char* type) {
 char vfs_fopen(vfs_message* vfs_msg,uint32_t from) {
   vfs_mapping* mnt=head_mapping;
   vfs_mapping* mntpnt=NULL;
-  const char* path;
   uint32_t mntpnt_len=0;
   for (;mnt!=NULL;mnt=mnt->next) {
     char* root=mnt->mntpnt;
@@ -93,7 +93,7 @@ char vfs_fopen(vfs_message* vfs_msg,uint32_t from) {
     char* path_buf=malloc(sizeof(char)*4096);
     strcpy(path_buf,&(vfs_msg->path[0]));
     memset(&(vfs_msg->path[0]),0,sizeof(char)*4096);
-    for (int i=0;i<strlen(path_buf)+1-mntpnt_len;i++) {
+    for (size_t i=0;i<strlen(path_buf)+1-mntpnt_len;i++) {
       vfs_msg->path[i]=path_buf[i+mntpnt_len];
     }
     free(path_buf);

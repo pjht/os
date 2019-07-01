@@ -65,36 +65,34 @@ void* malloc(size_t size) {
       char* bmap=entry.bitmap;
       uint32_t bmap_byt_sz=entry.bitmap_byt_size;
       for(uint32_t i=0;i<bmap_byt_sz;i++) {
-        if (bmap[i]!=0xFF) {
-          char got_0=0;
-          remaining_blks=num_4b_grps;
-          uint32_t old_j;
-          for (uint32_t j=i*8;;j++) {
-            char bit=get_bmap_bit(bmap,j);
-            if (got_0) {
-              if (bit) {
-                if (remaining_blks==0) {
-                    bmap_index=old_j;
-                    break;
-                } else {
-                  i+=j/8;
-                  i--;
+        char got_0=0;
+        remaining_blks=num_4b_grps;
+        uint32_t old_j;
+        for (uint32_t j=i*8;;j++) {
+          char bit=get_bmap_bit(bmap,j);
+          if (got_0) {
+            if (bit) {
+              if (remaining_blks==0) {
+                  bmap_index=old_j;
                   break;
-                }
               } else {
-                remaining_blks--;
+                i+=j/8;
+                i--;
+                break;
               }
             } else {
-              if (!bit) {
-                got_0=1;
-                old_j=j;
-                remaining_blks--;
-              }
+              remaining_blks--;
             }
-            if (remaining_blks==0) {
-              bmap_index=old_j;
-              break;
+          } else {
+            if (!bit) {
+              got_0=1;
+              old_j=j;
+              remaining_blks--;
             }
+          }
+          if (remaining_blks==0) {
+            bmap_index=old_j;
+            break;
           }
         }
         if (remaining_blks==0) {

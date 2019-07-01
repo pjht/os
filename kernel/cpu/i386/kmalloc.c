@@ -32,36 +32,34 @@ void* kmalloc(uint32_t size) {
   uint32_t bmap_index;
   uint32_t remaining_blks;
   for(uint32_t i=0;i<2097152;i++) {
-    if (bitmap[i]!=0xFF) {
-      char got_0=0;
-      remaining_blks=num_4b_grps;
-      uint32_t old_j;
-      for (uint32_t j=i*8;;j++) {
-        char bit=get_bmap_bit(j);
-        if (got_0) {
-          if (bit) {
-            if (remaining_blks==0) {
-                bmap_index=old_j;
-                break;
-            } else {
-              i+=j/8;
-              i--;
+    char got_0=0;
+    remaining_blks=num_4b_grps;
+    uint32_t old_j;
+    for (uint32_t j=i*8;;j++) {
+      char bit=get_bmap_bit(j);
+      if (got_0) {
+        if (bit) {
+          if (remaining_blks==0) {
+              bmap_index=old_j;
               break;
-            }
           } else {
-            remaining_blks--;
+            i+=j/8;
+            i--;
+            break;
           }
         } else {
-          if (!bit) {
-            got_0=1;
-            old_j=j;
-            remaining_blks--;
-          }
+          remaining_blks--;
         }
-        if (remaining_blks==0) {
-          bmap_index=old_j;
-          break;
+      } else {
+        if (!bit) {
+          got_0=1;
+          old_j=j;
+          remaining_blks--;
         }
+      }
+      if (remaining_blks==0) {
+        bmap_index=old_j;
+        break;
       }
     }
     if (remaining_blks==0) {

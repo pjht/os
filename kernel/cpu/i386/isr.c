@@ -88,7 +88,8 @@ void isr_install() {
 
 
 /* To print the message which defines every exception */
-static char *exception_messages[] = {
+
+__attribute__((unused)) static char *exception_messages[] = {
     "Division By Zero",
     "Debug",
     "Non Maskable Interrupt",
