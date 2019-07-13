@@ -8,8 +8,6 @@ int main() {
   info.address=map_phys((void*)0xB8000,10);
   info.width=80;
   info.height=25;
-  vga_init(info);
-  vga_write_string("FSDRV");
   for(;;) {
     yield();
   }
