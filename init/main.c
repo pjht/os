@@ -73,7 +73,6 @@ uint32_t find_loc(char* name,char* initrd) {
     if (strcmp(tar_hdr.filename,name)==0) {
       return pos;
       break;
-    } else {
     }
     pos+=size;
     if (pos%512!=0) {
@@ -176,8 +175,9 @@ int main(char* initrd, uint32_t initrd_sz) {
   info.width=80;
   info.height=25;
   vga_init(info);
-  // uint32_t datapos=find_loc("vfs",initrd);
-  // load_task(datapos,initrd);
+  vga_write_string("INIT");
+  uint32_t datapos=find_loc("fsdrv",initrd);
+  load_task(datapos,initrd);
   // uint32_t box=mailbox_new(16);
   // yield();
   // // uint32_t fs_box=mailbox_new(16);

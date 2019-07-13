@@ -12,7 +12,7 @@
 typedef struct {
   char filename[100];
   char mode[8];
-  char uid[6];
+  char uid[8];
   char gid[8];
   char size[12];
   char mtime[12];
@@ -57,16 +57,13 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
   read_initrd(tags);
   int pos=0;
   uint32_t datapos;
-  tar_header tar_hdr;
+  tar_header* tar_hdr;
   for (int i=0;;i++) {
-    char* tar_hdr_ptr=(char*)&tar_hdr;
-    for (size_t i=0;i<sizeof(tar_hdr);i++) {
-      tar_hdr_ptr[i]=initrd[pos+i];
-    }
-    if (tar_hdr.filename[0]=='\0') break;
-    uint32_t size=getsize(tar_hdr.size);
+    tar_hdr=(tar_header*)&initrd[pos];
+    if (tar_hdr->filename[0]=='\0') break;
+    uint32_t size=getsize(tar_hdr->size);
     pos+=512;
-    if (strcmp(tar_hdr.filename,"init")==0) {
+    if (strcmp(&tar_hdr->filename,"init")==0) {
       datapos=pos;
       break;
     }

@@ -16,6 +16,7 @@ EMU = $(shell cat psinfo/$(PLAT)/emu.txt)
 GDB = $(shell cat psinfo/$(PLAT)/gdb.txt)
 CFLAGS =  -Isysroot/usr/include -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
 QFLAGS =  -hda ext2.img -m 2G -boot d -cdrom os.iso -serial vc #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
+CWD = $(shell pwd)
 
 .PHONY: sysroot
 
@@ -26,20 +27,26 @@ run: os.iso
 
 debug: os.iso kernel/kernel.elf
 	@$(EMU) -s $(QFLAGS) &
-	@$(GDB) -ex "target remote localhost:1234" -ex "symbol-file kernel/kernel.elf"
+	@$(GDB)
+	# gdbgui -g i386-elf-gdb --project $(CWD)
 
-os.iso: kernel/kernel.elf init vfs initrd/*
+os.iso: kernel/kernel.elf init vfs fsdrv initrd/*
 	@cp kernel/kernel.elf iso/boot
 	@cd initrd; tar -f ../iso/boot/initrd.tar -c *
 	@grub-mkrescue -o $@ iso >/dev/null 2>/dev/null
 
 init: init/* kernel/start.o
-	@cd init && make
-	@cp init/init initrd/init
+	@cd $@ && make
+	@cp $@/$@ initrd/$@
 
 vfs: vfs/* kernel/start.o
-	@cd vfs && make
-	@cp vfs/vfs initrd/vfs
+	@cd $@ && make
+	@cp $@/$@ initrd/$@
+
+fsdrv: fsdrv/* kernel/start.o
+	@cd $@ && make
+	@cp $@/$@ initrd/$@
+
 
 kernel/kernel.elf: $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) libc/libc.a
 	@$(CC) -z max-page-size=4096 -Xlinker -n -T kernel/cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc
