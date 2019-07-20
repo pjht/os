@@ -5,7 +5,7 @@
 #include <mailboxes.h>
 
 Mailbox* mailboxes=(Mailbox*)0xF6400000;
-uint32_t next_box=0;
+uint32_t next_box=1;
 
 uint32_t kernel_mailbox_new(uint16_t size) {
   if (next_box==262144) {

@@ -21,6 +21,7 @@ uint32_t next_pid;
 
 Task* currentTask;
 static Task* headTask;
+static Task* tailTask;
 Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1_exists,uint32_t param1_arg,char param2_exists,uint32_t param2_arg);
 
 void tasking_init(void* esp) {
@@ -28,6 +29,7 @@ void tasking_init(void* esp) {
   next_pid=0;
   headTask=tasking_createTaskCr3KmodeParam(NULL,paging_new_address_space(),1,0,0,0,0);
   currentTask=headTask;
+  tailTask=headTask;
 }
 
 Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1_exists,uint32_t param1_arg,char param2_exists,uint32_t param2_arg) {
@@ -89,8 +91,9 @@ Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1
     if (next_pid>1024*32) {
       halt(); //Cannot ever create more than 32k tasks, as I don't currently reuse PIDs.
     }
-    if (currentTask) {
-      currentTask->next=task;
+    if (tailTask) {
+      tailTask->next=task;
+      tailTask=task;
     }
     return task;
 
@@ -119,4 +122,8 @@ void tasking_yield(registers_t registers) {
   }
   load_smap(task->cr3);
   switch_to_task(task);
+}
+
+uint32_t getPID() {
+  return currentTask->pid;
 }

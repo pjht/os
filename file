@@ -1,0 +1,12 @@
+vfs/main.c: In function 'vfs_putc':
+vfs/main.c:133:1: warning: control reaches end of non-void function [-Wreturn-type]
+ }
+ ^
+main.c: In function 'vfs_putc':
+main.c:133:1: warning: control reaches end of non-void function [-Wreturn-type]
+ }
+ ^
+WARNING: Image format was not specified for 'ext2.img' and probing guessed raw.
+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+         Specify the 'raw' format explicitly to remove the restrictions.
+qemu-system-i386: terminating on signal 1 from pid 58353 (<unknown process>)

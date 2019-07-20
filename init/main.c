@@ -7,6 +7,7 @@
 #include <memory.h>
 #include <tasking.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 typedef struct {
   char filename[100];
@@ -143,19 +144,6 @@ void test_vfs(char* path,uint32_t box,uint32_t fs_box) {
   free(msg.msg);
   yield();
   vga_write_string("Getting fs_box message\n");
-  msg.msg=malloc(sizeof(vfs_message));
-  mailbox_get_msg(fs_box,&msg,sizeof(vfs_message));
-  if (msg.from==0) {
-    vga_write_string("No message\n");
-  } else {
-    vfs_message* vfs_msg=(vfs_message*)msg.msg;
-    display_msg(vfs_msg);
-    msg.to=msg.from;
-    msg.from=fs_box;
-    vfs_msg->flags=13;
-    mailbox_send_msg(&msg);
-  }
-  free(msg.msg);
   yield();
   vga_write_string("Getting message\n");
   msg.msg=malloc(sizeof(vfs_message));
@@ -175,10 +163,19 @@ int main(char* initrd, uint32_t initrd_sz) {
   info.width=80;
   info.height=25;
   vga_init(info);
-  vga_write_string("INIT");
-  uint32_t datapos=find_loc("fsdrv",initrd);
+  vga_write_string("INIT\n");
+  uint32_t datapos=find_loc("vfs",initrd);
   load_task(datapos,initrd);
-  // uint32_t box=mailbox_new(16);
+  yield();
+  datapos=find_loc("fsdrv",initrd);
+  load_task(datapos,initrd);
+  yield();
+  vga_write_string("CALLING FOPEN\n");
+  FILE* file=fopen("/dev/sda","w");
+  vga_write_string("FOPEN RETURNED\n");
+  vga_write_string("CALLING FPUTC\n");
+  fputc('a',file);
+  vga_write_string("FPUTC RETURNED\n");
   // yield();
   // // uint32_t fs_box=mailbox_new(16);
   // // test_vfs("/dev/sda",box,fs_box);

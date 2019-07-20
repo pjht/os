@@ -28,7 +28,7 @@ run: os.iso
 debug: os.iso kernel/kernel.elf
 	@$(EMU) -s $(QFLAGS) &
 	@$(GDB)
-	# gdbgui -g i386-elf-gdb --project $(CWD)
+	#gdbgui -g i386-elf-gdb --project $(CWD)
 
 os.iso: kernel/kernel.elf init vfs fsdrv initrd/*
 	@cp kernel/kernel.elf iso/boot

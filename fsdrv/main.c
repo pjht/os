@@ -12,11 +12,12 @@ int main() {
     msg.msg=malloc(sizeof(vfs_message));
     mailbox_get_msg(box,&msg,sizeof(vfs_message));
     if (msg.from==0) {
+      yield();
     } else {
       vfs_message* vfs_msg=(vfs_message*)msg.msg;
       msg.to=msg.from;
       msg.from=box;
-      vfs_msg->flags=13;
+      vfs_msg->flags=0;
       mailbox_send_msg(&msg);
       yield();
     }

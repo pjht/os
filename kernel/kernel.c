@@ -63,7 +63,7 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
     if (tar_hdr->filename[0]=='\0') break;
     uint32_t size=getsize(tar_hdr->size);
     pos+=512;
-    if (strcmp(&tar_hdr->filename,"init")==0) {
+    if (strcmp(&tar_hdr->filename[0],"init")==0) {
       datapos=pos;
       break;
     }

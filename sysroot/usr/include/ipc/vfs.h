@@ -17,8 +17,9 @@ typedef struct {
   char mode[10];
   uint32_t fd;
   char path[4096];
+  uint32_t pos;
   char flags;
-  char data;
+  int data;
 } vfs_message;
 
 #endif

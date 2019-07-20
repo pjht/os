@@ -41,6 +41,10 @@ void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,ch
     flags=flags|((usr&1)<<2);
     smap[(1024+(1024*dir_entry))+table_entry]=phys_addr|flags;
     table_entry++;
+    if (table_entry==1024) {
+      table_entry=0;
+      dir_entry++;
+    }
     phys_addr+=0x1000;
   }
 }

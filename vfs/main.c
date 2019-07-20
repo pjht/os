@@ -13,8 +13,9 @@ typedef struct _vfs_mapping_struct {
 } vfs_mapping;
 
 typedef struct {
-  char* mntpnt;
+  vfs_mapping* mntpnt;
   char* path;
+  char* mode;
   uint32_t pos;
   char error;
 } vfs_file;
@@ -25,7 +26,7 @@ static uint32_t max_drvs;
 static uint32_t next_drv_indx;
 static vfs_mapping* head_mapping;
 static vfs_mapping* tail_mapping;
-uint32_t* fd_tables[32768];
+vfs_file* fd_tables[32768];
 uint16_t open_fds[32768];
 
 vfs_message* get_message(Message* msg,uint32_t box) {
@@ -52,7 +53,7 @@ static int vfsstrcmp(const char* s1,const char* s2) {
 
 void init_vfs() {
   drvs=malloc(sizeof(uint32_t)*32);
-  drvs[0]=2;
+  drvs[0]=5;
   drv_names=malloc(sizeof(const char**)*32);
   max_drvs=32;
   next_drv_indx=0;
@@ -117,10 +118,38 @@ char vfs_fopen(vfs_message* vfs_msg,uint32_t from) {
     }
     uint16_t fd=open_fds[from];
     open_fds[from]++;
+    fd_tables[from][fd].mntpnt=mntpnt;
+    fd_tables[from][fd].path=malloc(sizeof(char)*(strlen(&vfs_msg->path[0])+1));
+    strcpy(fd_tables[from][fd].path,&vfs_msg->path[0]);
+    fd_tables[from][fd].mode=malloc(sizeof(char)*(strlen(&vfs_msg->mode[0])+1));
+    strcpy(fd_tables[from][fd].mode,&vfs_msg->mode[0]);
+    fd_tables[from][fd].pos=0;
+    fd_tables[from][fd].error=0;
     vfs_msg->fd=fd;
     return 0;
   }
   return 1;
+}
+
+char vfs_putc(vfs_message* vfs_msg,uint32_t from) {
+  uint32_t fd=vfs_msg->fd;
+  vfs_file file_info=fd_tables[from][fd];
+  strcpy(&vfs_msg->path[0],file_info.path);
+  strcpy(&vfs_msg->mode[0],file_info.mode);
+  vfs_msg->pos=file_info.pos;
+  Message msg;
+  msg.from=1;
+  msg.to=file_info.mntpnt->type;
+  msg.size=sizeof(vfs_message);
+  msg.msg=vfs_msg;
+  mailbox_send_msg(&msg);
+  yield();
+  vfs_msg=get_message(&msg,1);
+  if (vfs_msg->flags!=0) {
+    return vfs_msg->flags;
+  }
+  fd_tables[from][fd].pos++;
+  return 0;
 }
 
 int main() {
@@ -135,6 +164,7 @@ int main() {
       vfs_msg->flags=vfs_fopen(vfs_msg,msg.from);
       break;
       case VFS_PUTC:
+      vfs_msg->flags=vfs_putc(vfs_msg,msg.from);
       vfs_msg->flags=1;
       break;
       case VFS_GETC:
