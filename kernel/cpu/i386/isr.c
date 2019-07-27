@@ -136,6 +136,10 @@ void isr_handler(registers_t r) {
       char str[11];
       int_to_ascii(getPID(),str);
       vga_write_string(str);
+      vga_write_string(" and address ");
+      str[0]='\0';
+      hex_to_ascii(r.eip,str);
+      vga_write_string(str);
       if (r.err_code==0) {
         vga_write_string(", kernel process tried to read a non-present page entry at address ");
       } else if (r.err_code==1) {
@@ -156,7 +160,12 @@ void isr_handler(registers_t r) {
       str[0]='\0';
       hex_to_ascii(addr,str);
       vga_write_string(str);
-      vga_write_string("\n");
+      vga_write_string(".");
+      vga_write_string(" Stack is at ");
+      str[0]='\0';
+      hex_to_ascii(r.useresp,str);
+      vga_write_string(str);
+      vga_write_string(".\n");
       // if ((r.err_code&1)==0) {
       //   // int dir_entry=(addr&0xFFC00000)>>22;
       //   // int table_entry=(addr&0x3FF000)>12;

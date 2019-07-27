@@ -28,8 +28,8 @@ static vfs_mapping* head_mapping;
 static vfs_mapping* tail_mapping;
 vfs_file* fd_tables[32768];
 uint16_t open_fds[32768];
-
-vfs_message* get_message(Message* msg,uint32_t box) {
+uint32_t box;
+vfs_message* get_message(Message* msg) {
   msg->msg=malloc(sizeof(vfs_message));
   mailbox_get_msg(box,msg,sizeof(vfs_message));
   while (msg->from==0 && msg->size==0) {
@@ -37,8 +37,6 @@ vfs_message* get_message(Message* msg,uint32_t box) {
     yield();
   }
   vfs_message* vfs_msg=(vfs_message*)msg->msg;
-  msg->to=msg->from;
-  msg->from=box;
   return vfs_msg;
 }
 
@@ -98,13 +96,13 @@ char vfs_fopen(vfs_message* vfs_msg,uint32_t from) {
       vfs_msg->path[i]=path_buf[i+mntpnt_len];
     }
     free(path_buf);
-    msg.from=1;
+    msg.from=box;
     msg.to=drvs[mntpnt->type];
     msg.size=sizeof(vfs_message);
     msg.msg=vfs_msg;
     mailbox_send_msg(&msg);
     yield();
-    vfs_message* vfs_msg=get_message(&msg,1);
+    vfs_message* vfs_msg=get_message(&msg);
     if (vfs_msg->flags!=0) {
       return vfs_msg->flags;
     }
@@ -138,13 +136,13 @@ char vfs_putc(vfs_message* vfs_msg,uint32_t from) {
   strcpy(&vfs_msg->mode[0],file_info.mode);
   vfs_msg->pos=file_info.pos;
   Message msg;
-  msg.from=1;
+  msg.from=box;
   msg.to=file_info.mntpnt->type;
   msg.size=sizeof(vfs_message);
   msg.msg=vfs_msg;
   mailbox_send_msg(&msg);
   yield();
-  vfs_msg=get_message(&msg,1);
+  vfs_msg=get_message(&msg);
   if (vfs_msg->flags!=0) {
     return vfs_msg->flags;
   }
@@ -154,11 +152,11 @@ char vfs_putc(vfs_message* vfs_msg,uint32_t from) {
 
 int main() {
   init_vfs();
-  uint32_t box=mailbox_new(16);
+  box=mailbox_new(16);
   yield();
   while (1) {
     Message msg;
-    vfs_message* vfs_msg=get_message(&msg,box);
+    vfs_message* vfs_msg=get_message(&msg);
     switch (vfs_msg->type) {
       case VFS_OPEN:
       vfs_msg->flags=vfs_fopen(vfs_msg,msg.from);
