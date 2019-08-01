@@ -1,0 +1,651 @@
+GNU gdb (GDB) 8.2
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "swarning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+Quit
+uration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
+0x0000091f in ?? ()
+Start at kernel
+Breakpoint 1 at 0xc0102726: file kernel/cpu/i386/tasking.c, line 123.
+Breakpoint 2 at 0xc01023b7: file kernel/cpu/i386/tasking.c, line 35.
+Breakpoint 3 at 0xc01014ab: file kernel/cpu/i386/mailboxes.c, line 14.
+Breakpoint 4 at 0xc010155b: file kernel/cpu/i386/mailboxes.c, line 27.
+Breakpoint 5 at 0xc0101669: file kernel/cpu/i386/mailboxes.c, line 48.
+Wed Jul 31 17:54:11 CDT 2019
+Kernel task registered
+Wed Jul 31 17:54:11 CDT 2019
+Init created
+Wed Jul 31 17:54:11 CDT 2019
+Yield to init
+Wed Jul 31 17:54:11 CDT 2019
+Mailbox 1 created.
+Wed Jul 31 17:54:12 CDT 2019
+VFS created
+Wed Jul 31 17:54:12 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:12 CDT 2019
+Mailbox 2 created.
+Wed Jul 31 17:54:12 CDT 2019
+Mailbox 3 created.
+Wed Jul 31 17:54:12 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:12 CDT 2019
+Yield to init
+Wed Jul 31 17:54:12 CDT 2019
+fsdrv created
+Wed Jul 31 17:54:12 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:12 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:12 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:12 CDT 2019
+Mailbox 4 created.
+Wed Jul 31 17:54:12 CDT 2019
+Mailbox 5 created.
+Wed Jul 31 17:54:12 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:12 CDT 2019
+Yield to init
+Wed Jul 31 17:54:13 CDT 2019
+Message sent from box 1 to box 3
+Wed Jul 31 17:54:13 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:13 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:13 CDT 2019
+Message sent from box 3 to box 5
+Wed Jul 31 17:54:13 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:13 CDT 2019
+Box 5 got a message.
+Wed Jul 31 17:54:13 CDT 2019
+Message sent from box 5 to box 3
+Wed Jul 31 17:54:13 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:13 CDT 2019
+Yield to init
+Wed Jul 31 17:54:13 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:13 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:13 CDT 2019
+Message sent from box 3 to box 1
+Wed Jul 31 17:54:13 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:13 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:13 CDT 2019
+Yield to init
+Wed Jul 31 17:54:13 CDT 2019
+Box 1 got a message.
+Wed Jul 31 17:54:15 CDT 2019
+Message sent from box 1 to box 3
+Wed Jul 31 17:54:15 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:15 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:15 CDT 2019
+Message sent from box 3 to box 5
+Wed Jul 31 17:54:15 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:15 CDT 2019
+Box 5 got a message.
+Wed Jul 31 17:54:15 CDT 2019
+Message sent from box 5 to box 3
+Wed Jul 31 17:54:15 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:15 CDT 2019
+Yield to init
+Wed Jul 31 17:54:15 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:15 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:15 CDT 2019
+Message sent from box 3 to box 1
+Wed Jul 31 17:54:15 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:15 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:15 CDT 2019
+Yield to init
+Wed Jul 31 17:54:15 CDT 2019
+Box 1 got a message.
+Wed Jul 31 17:54:15 CDT 2019
+Message sent from box 1 to box 3
+Wed Jul 31 17:54:15 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:15 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:15 CDT 2019
+Message sent from box 3 to box 5
+Wed Jul 31 17:54:15 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:15 CDT 2019
+Box 5 got a message.
+Wed Jul 31 17:54:15 CDT 2019
+Message sent from box 5 to box 3
+Wed Jul 31 17:54:15 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:15 CDT 2019
+Yield to init
+Wed Jul 31 17:54:15 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:15 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:15 CDT 2019
+Message sent from box 3 to box 1
+Wed Jul 31 17:54:15 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:15 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:15 CDT 2019
+Yield to init
+Wed Jul 31 17:54:15 CDT 2019
+Box 1 got a message.
+Wed Jul 31 17:54:15 CDT 2019
+Message sent from box 1 to box 3
+Wed Jul 31 17:54:15 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:15 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:15 CDT 2019
+Message sent from box 3 to box 5
+Wed Jul 31 17:54:15 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:15 CDT 2019
+Box 5 got a message.
+Wed Jul 31 17:54:15 CDT 2019
+Message sent from box 5 to box 3
+Wed Jul 31 17:54:15 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:15 CDT 2019
+Yield to init
+Wed Jul 31 17:54:15 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:15 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:15 CDT 2019
+Message sent from box 3 to box 1
+Wed Jul 31 17:54:15 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:15 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:15 CDT 2019
+Yield to init
+Wed Jul 31 17:54:16 CDT 2019
+Box 1 got a message.
+Wed Jul 31 17:54:16 CDT 2019
+Message sent from box 1 to box 3
+Wed Jul 31 17:54:16 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:16 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:16 CDT 2019
+Message sent from box 3 to box 5
+Wed Jul 31 17:54:16 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:16 CDT 2019
+Box 5 got a message.
+Wed Jul 31 17:54:16 CDT 2019
+Message sent from box 5 to box 3
+Wed Jul 31 17:54:16 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:16 CDT 2019
+Yield to init
+Wed Jul 31 17:54:16 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:16 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:16 CDT 2019
+Message sent from box 3 to box 1
+Wed Jul 31 17:54:16 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:16 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:16 CDT 2019
+Yield to init
+Wed Jul 31 17:54:16 CDT 2019
+Box 1 got a message.
+Wed Jul 31 17:54:16 CDT 2019
+Message sent from box 1 to box 3
+Wed Jul 31 17:54:16 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:16 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:16 CDT 2019
+Message sent from box 3 to box 5
+Wed Jul 31 17:54:16 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:16 CDT 2019
+Box 5 got a message.
+Wed Jul 31 17:54:16 CDT 2019
+Message sent from box 5 to box 3
+Wed Jul 31 17:54:16 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:16 CDT 2019
+Yield to init
+Wed Jul 31 17:54:16 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:16 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:16 CDT 2019
+Message sent from box 3 to box 1
+Wed Jul 31 17:54:16 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:16 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:16 CDT 2019
+Yield to init
+Wed Jul 31 17:54:16 CDT 2019
+Box 1 got a message.
+Wed Jul 31 17:54:16 CDT 2019
+Message sent from box 1 to box 3
+Wed Jul 31 17:54:16 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:16 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:16 CDT 2019
+Message sent from box 3 to box 5
+Wed Jul 31 17:54:16 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:16 CDT 2019
+Box 5 got a message.
+Wed Jul 31 17:54:16 CDT 2019
+Message sent from box 5 to box 3
+Wed Jul 31 17:54:17 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:17 CDT 2019
+Yield to init
+Wed Jul 31 17:54:17 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:17 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:17 CDT 2019
+Message sent from box 3 to box 1
+Wed Jul 31 17:54:17 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:17 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:17 CDT 2019
+Yield to init
+Wed Jul 31 17:54:17 CDT 2019
+Box 1 got a message.
+Wed Jul 31 17:54:17 CDT 2019
+Message sent from box 1 to box 3
+Wed Jul 31 17:54:17 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:17 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:17 CDT 2019
+Message sent from box 3 to box 5
+Wed Jul 31 17:54:17 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:17 CDT 2019
+Box 5 got a message.
+Wed Jul 31 17:54:17 CDT 2019
+Message sent from box 5 to box 3
+Wed Jul 31 17:54:17 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:17 CDT 2019
+Yield to init
+Wed Jul 31 17:54:17 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:17 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:17 CDT 2019
+Message sent from box 3 to box 1
+Wed Jul 31 17:54:17 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:17 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:17 CDT 2019
+Yield to init
+Wed Jul 31 17:54:17 CDT 2019
+Box 1 got a message.
+Wed Jul 31 17:54:17 CDT 2019
+Message sent from box 1 to box 3
+Wed Jul 31 17:54:17 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:17 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:17 CDT 2019
+Message sent from box 3 to box 5
+Wed Jul 31 17:54:17 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:17 CDT 2019
+Box 5 got a message.
+Wed Jul 31 17:54:17 CDT 2019
+Message sent from box 5 to box 3
+Wed Jul 31 17:54:17 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:17 CDT 2019
+Yield to init
+Wed Jul 31 17:54:17 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:17 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:17 CDT 2019
+Message sent from box 3 to box 1
+Wed Jul 31 17:54:17 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:17 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:17 CDT 2019
+Yield to init
+Wed Jul 31 17:54:17 CDT 2019
+Box 1 got a message.
+Wed Jul 31 17:54:17 CDT 2019
+Message sent from box 1 to box 3
+Wed Jul 31 17:54:17 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:17 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:18 CDT 2019
+Message sent from box 3 to box 5
+Wed Jul 31 17:54:18 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:18 CDT 2019
+Box 5 got a message.
+Wed Jul 31 17:54:18 CDT 2019
+Message sent from box 5 to box 3
+Wed Jul 31 17:54:18 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:18 CDT 2019
+Yield to init
+Wed Jul 31 17:54:18 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:18 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:18 CDT 2019
+Message sent from box 3 to box 1
+Wed Jul 31 17:54:18 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:18 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:18 CDT 2019
+Yield to init
+Wed Jul 31 17:54:18 CDT 2019
+Box 1 got a message.
+Wed Jul 31 17:54:18 CDT 2019
+Message sent from box 1 to box 3
+Wed Jul 31 17:54:18 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:18 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:18 CDT 2019
+Message sent from box 3 to box 5
+Wed Jul 31 17:54:18 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:18 CDT 2019
+Box 5 got a message.
+Wed Jul 31 17:54:18 CDT 2019
+Message sent from box 5 to box 3
+Wed Jul 31 17:54:18 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:18 CDT 2019
+Yield to init
+Wed Jul 31 17:54:18 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:18 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:18 CDT 2019
+Message sent from box 3 to box 1
+Wed Jul 31 17:54:18 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:18 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:18 CDT 2019
+Yield to init
+Wed Jul 31 17:54:18 CDT 2019
+Box 1 got a message.
+Wed Jul 31 17:54:18 CDT 2019
+Message sent from box 1 to box 3
+Wed Jul 31 17:54:18 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:18 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:18 CDT 2019
+Message sent from box 3 to box 5
+Wed Jul 31 17:54:18 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:18 CDT 2019
+Box 5 got a message.
+Wed Jul 31 17:54:18 CDT 2019
+Message sent from box 5 to box 3
+Wed Jul 31 17:54:18 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:18 CDT 2019
+Yield to init
+Wed Jul 31 17:54:18 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:18 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:18 CDT 2019
+Message sent from box 3 to box 1
+Wed Jul 31 17:54:18 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:18 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:18 CDT 2019
+Yield to init
+Wed Jul 31 17:54:19 CDT 2019
+Box 1 got a message.
+Wed Jul 31 17:54:19 CDT 2019
+Message sent from box 1 to box 3
+Wed Jul 31 17:54:19 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:19 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:19 CDT 2019
+Message sent from box 3 to box 5
+Wed Jul 31 17:54:19 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:19 CDT 2019
+Box 5 got a message.
+Wed Jul 31 17:54:19 CDT 2019
+Message sent from box 5 to box 3
+Wed Jul 31 17:54:19 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:19 CDT 2019
+Yield to init
+Wed Jul 31 17:54:19 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:19 CDT 2019
+Box 3 got a message.
+Wed Jul 31 17:54:19 CDT 2019
+Message sent from box 3 to box 1
+Wed Jul 31 17:54:19 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:19 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:19 CDT 2019
+Yield to init
+Wed Jul 31 17:54:19 CDT 2019
+Box 1 got a message.
+Wed Jul 31 17:54:20 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:20 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:20 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:20 CDT 2019
+Box 5 attempted to get a message, but there were none.
+Wed Jul 31 17:54:20 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:20 CDT 2019
+Yield to init
+Wed Jul 31 17:54:20 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:20 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:20 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:20 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:20 CDT 2019
+Yield to init
+Wed Jul 31 17:54:20 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:20 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:20 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:20 CDT 2019
+Box 5 attempted to get a message, but there were none.
+Wed Jul 31 17:54:20 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:20 CDT 2019
+Yield to init
+Wed Jul 31 17:54:20 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:20 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:20 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:20 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:20 CDT 2019
+Yield to init
+Wed Jul 31 17:54:20 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:20 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:20 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:20 CDT 2019
+Box 5 attempted to get a message, but there were none.
+Wed Jul 31 17:54:20 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:20 CDT 2019
+Yield to init
+Wed Jul 31 17:54:20 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:20 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:20 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:20 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:20 CDT 2019
+Yield to init
+Wed Jul 31 17:54:20 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:20 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:20 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:21 CDT 2019
+Box 5 attempted to get a message, but there were none.
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:21 CDT 2019
+Yield to init
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:21 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:21 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:21 CDT 2019
+Yield to init
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:21 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:21 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:21 CDT 2019
+Box 5 attempted to get a message, but there were none.
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:21 CDT 2019
+Yield to init
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:21 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:21 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:21 CDT 2019
+Yield to init
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:21 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:21 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:21 CDT 2019
+Box 5 attempted to get a message, but there were none.
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:21 CDT 2019
+Yield to init
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:21 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:21 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:21 CDT 2019
+Yield to init
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:21 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:21 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:21 CDT 2019
+Box 5 attempted to get a message, but there were none.
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:21 CDT 2019
+Yield to init
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:21 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:21 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:21 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:21 CDT 2019
+Yield to init
+Wed Jul 31 17:54:22 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:22 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:22 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:22 CDT 2019
+Box 5 attempted to get a message, but there were none.
+Wed Jul 31 17:54:22 CDT 2019
+Yield to the kernel
+Wed Jul 31 17:54:22 CDT 2019
+Yield to init
+Wed Jul 31 17:54:22 CDT 2019
+Yield to the VFS
+Wed Jul 31 17:54:22 CDT 2019
+Box 3 attempted to get a message, but there were none.
+Wed Jul 31 17:54:22 CDT 2019
+Yield to fsdrv
+Wed Jul 31 17:54:22 CDT 2019
+Yield to the kernel
+[Inferior 1 (process 1) exited normally]
+[?1034h(gdb) ^C(gdb) quit

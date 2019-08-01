@@ -173,9 +173,9 @@ int main(char* initrd, uint32_t initrd_sz) {
   vga_write_string("CALLING FOPEN\n");
   FILE* file=fopen("/dev/sda","w");
   vga_write_string("FOPEN RETURNED\n");
-  vga_write_string("CALLING FPUTC\n");
-  fputc('a',file);
-  vga_write_string("FPUTC RETURNED\n");
+  vga_write_string("CALLING FPUTS\n");
+  fputs("FPUTS String",file);
+  vga_write_string("FPUTS RETURNED\n");
   // yield();
   // // uint32_t fs_box=mailbox_new(16);
   // // test_vfs("/dev/sda",box,fs_box);

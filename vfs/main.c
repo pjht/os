@@ -108,7 +108,7 @@ void vfs_fopen(vfs_message* vfs_msg,uint32_t from) {
     }
     if (fd_tables[from]==NULL) {
       fd_tables[from]=malloc(PROC_FD_LIMIT*sizeof(vfs_file));
-      open_fds[from]=1;
+      open_fds[from]=0;
     } else {
       if (open_fds[from]==PROC_FD_LIMIT) {
         vfs_msg->flags=4;

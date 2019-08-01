@@ -88,3 +88,9 @@ int fputc(int c, FILE* stream) {
     return c;
   }
 }
+
+int fputs(const char* s, FILE* stream) {
+  for (int i=0;s[i]!='\0';i++) {
+    fputc(s[i],stream);
+  }
+}

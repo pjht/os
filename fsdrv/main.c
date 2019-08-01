@@ -3,8 +3,15 @@
 #include <mailboxes.h>
 #include <ipc/vfs.h>
 #include <memory.h>
+#include <grub/text_fb_info.h>
+#include "vga.h"
 
 int main() {
+  text_fb_info info;
+  info.address=map_phys((void*)0xB8000,10);
+  info.width=80;
+  info.height=25;
+  vga_init(info);
   uint32_t box=mailbox_new(16);
   for (;;) {
     yield();
@@ -15,6 +22,8 @@ int main() {
       yield();
     } else {
       vfs_message* vfs_msg=(vfs_message*)msg.msg;
+      char str[]={(char)vfs_msg->data,'\0'};
+      vga_write_string(&str[0]);
       msg.to=msg.from;
       msg.from=box;
       vfs_msg->flags=0;
