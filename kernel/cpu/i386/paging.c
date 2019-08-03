@@ -209,5 +209,4 @@ void paging_init() {
     page_directory[i+1022]=(entry_virt-0xC0000000)|0x3;
   }
   load_page_directory((uint32_t*)((uint32_t)page_directory-0xC0000000));
-  asm volatile("xchgw %bx, %bx");
 }
