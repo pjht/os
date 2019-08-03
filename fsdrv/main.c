@@ -5,8 +5,11 @@
 #include <memory.h>
 #include <grub/text_fb_info.h>
 #include "vga.h"
+#include <vfs.h>
 
 int main() {
+  register_fs("devfs");
+  // mount("devfs","","/dev");
   text_fb_info info;
   info.address=map_phys((void*)0xB8000,10);
   info.width=80;

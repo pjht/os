@@ -50,19 +50,14 @@ static int vfsstrcmp(const char* s1,const char* s2) {
 }
 
 void init_vfs() {
-  drvs=malloc(sizeof(uint32_t)*32);
-  drvs[0]=5;
   drv_names=malloc(sizeof(const char**)*32);
   max_drvs=32;
   next_drv_indx=0;
-  head_mapping=malloc(sizeof(vfs_mapping));
-  head_mapping->mntpnt="/dev/";
-  head_mapping->type=0;
-  head_mapping->next=NULL;
+  head_mapping=NULL;
   tail_mapping=NULL;
 }
 
-uint32_t register_fs(uint32_t drv,const char* type) {
+uint32_t register_fs_intern(uint32_t drv,const char* type) {
   if (next_drv_indx==max_drvs) {
     drvs=realloc(drvs,sizeof(uint32_t)*(max_drvs+32));
     drv_names=realloc(drv_names,sizeof(char*)*(max_drvs+32));
@@ -152,6 +147,14 @@ void vfs_putc(vfs_message* vfs_msg,uint32_t from) {
   vfs_msg->flags=0;
 }
 
+void vfs_register_fs(vfs_message* vfs_msg, uint32_t from) {
+  char* name=malloc(sizeof(char)*(strlen(vfs_msg->path)+1));
+  name[0]='\0';
+  strcpy(name,&vfs_msg->path[0]);
+  register_fs_intern(from,name);
+  vfs_msg->flags=0;
+}
+
 int main() {
   init_vfs();
   box=mailbox_new(16);
@@ -178,6 +181,9 @@ int main() {
       break;
       case VFS_UMOUNT:
       vfs_msg->flags=1;
+      break;
+      case VFS_REGISTER_FS:
+      vfs_register_fs(vfs_msg,msg.from);
       break;
       default:
       vfs_msg->flags=2;

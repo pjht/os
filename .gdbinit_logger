@@ -64,7 +64,7 @@ silent
   if mailbox.msg_store[mailbox.rd].size==0
     printf "Box %d attempted to get a message, but there were none.\n",box
   else
-    printf "Box %d got a message.\n",box
+    printf "Box %d got a message from box %d.\n",box,mailbox.msg_store[mailbox.rd].from
   end
   c
 end

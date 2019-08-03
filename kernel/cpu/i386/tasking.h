@@ -13,7 +13,7 @@ typedef struct Task {
   int errno;
   uint32_t pid;
   struct Task* next;
-} Task;
+}Task;
 
 int* tasking_get_errno_address();
 

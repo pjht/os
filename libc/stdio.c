@@ -13,7 +13,7 @@ void __stdio_init() {
   box=mailbox_new(16);
 }
 
-static vfs_message* make_msg(vfs_message_type type, char* mode, char* path, uint32_t fd, int data) {
+static vfs_message* make_msg(vfs_message_type type,const char* mode,const char* path, uint32_t fd, int data) {
   static uint32_t id=0;
   vfs_message* msg_data=malloc(sizeof(vfs_message));
   msg_data->type=type;
@@ -93,4 +93,24 @@ int fputs(const char* s, FILE* stream) {
   for (int i=0;s[i]!='\0';i++) {
     fputc(s[i],stream);
   }
+}
+
+void register_fs(const char* name) {
+  vfs_message* msg_data=make_msg(VFS_REGISTER_FS,NULL,name,0,0);
+  Message msg;
+  msg.from=box;
+  msg.to=VFS_MBOX;
+  msg.msg=msg_data;
+  msg.size=sizeof(vfs_message);
+  mailbox_send_msg(&msg);
+  free(msg.msg);
+  yield();
+  msg.msg=malloc(sizeof(vfs_message));
+  yield();
+  mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  while (msg.from==0) {
+    yield();
+    mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  }
+  free(msg.msg);
 }

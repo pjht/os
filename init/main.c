@@ -166,21 +166,24 @@ int main(char* initrd, uint32_t initrd_sz) {
   vga_write_string("INIT\n");
   uint32_t datapos=find_loc("vfs",initrd);
   load_task(datapos,initrd);
-  yield();
-  datapos=find_loc("fsdrv",initrd);
-  load_task(datapos,initrd);
-  yield();
-  vga_write_string("CALLING FOPEN\n");
-  FILE* file=fopen("/dev/sda","w");
-  vga_write_string("FOPEN RETURNED\n");
-  vga_write_string("CALLING FPUTS\n");
-  fputs("FPUTS String",file);
-  vga_write_string("FPUTS RETURNED\n");
   // yield();
-  // // uint32_t fs_box=mailbox_new(16);
-  // // test_vfs("/dev/sda",box,fs_box);
-  // // test_vfs("/dev/sdb",box,fs_box);
+  // datapos=find_loc("fsdrv",initrd);
+  // load_task(datapos,initrd);
+  // yield();
+  // FILE* file;
+  // do {
+  //   vga_write_string("CALLING FOPEN\n");
+  //   file=fopen("/dev/sda","w");
+  //   vga_write_string("FOPEN RETURNED\n");
+  // } while(file==NULL);
+  // vga_write_string("CALLING FPUTS\n");
+  // fputs("FPUTS String",file);
+  // vga_write_string("FPUTS RETURNED\n");
+  // // yield();
+  // // // uint32_t fs_box=mailbox_new(16);
+  // // // test_vfs("/dev/sda",box,fs_box);
+  // // // test_vfs("/dev/sdb",box,fs_box);
   for(;;) {
-    yield();
+    //yield();
   }
 }
