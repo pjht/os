@@ -27,3 +27,10 @@ void createTaskCr3Param(void* task,void* cr3,uint32_t param1,uint32_t param2) {
     int $80; \
   "::"b"(task),"c"(cr3),"d"(param1),"S"(param2));
 }
+
+void yieldToPID(uint32_t pid) {
+  asm volatile("  \
+    mov $15, %%eax; \
+    int $80; \
+  "::"b"(pid));
+}

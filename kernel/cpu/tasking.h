@@ -6,6 +6,7 @@
 
 void tasking_init();
 void tasking_yield();
+void tasking_yieldToPID();
 Task* tasking_createTask(void* eip);
 Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1_exists,uint32_t param1_arg,char param2_exists,uint32_t param2_arg);
 char isPrivleged(uint32_t pid);

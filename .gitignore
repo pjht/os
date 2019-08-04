@@ -12,3 +12,4 @@ vfs/vfs
 fsdrv/fsdrv
 initrd/*
 iso/boot/initrd.tar
+serout

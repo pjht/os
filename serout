@@ -1,0 +1,284 @@
+Created task with PID 1.
+Yielding to PID 1.
+Created mailbox 1
+Created task with PID 2.
+Yielding to PID 2.
+Created mailbox 2
+Created mailbox 3
+Yielding to PID 0.
+Yielding to PID 1.
+Created task with PID 3.
+Yielding to PID 3.
+Created mailbox 4
+Message sent from box 4 to box 3
+Yielding to PID 0.
+Yielding to PID 1.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.
+Message sent from box 1 to box 3
+Yielding to PID 2.
+Box 3 got a message from box 0.
+Message sent from box 3 to box 1
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Yielding to PID 2.
+Box 3 attempted to get a message, but there were none.
+Yielding to PID 3.
+Box 4 attempted to get a message, but there were none.
+Yielding to PID 0.
+Yielding to PID 1.
+Box 1 got a message from box 0.

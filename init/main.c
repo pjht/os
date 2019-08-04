@@ -169,7 +169,7 @@ int main(char* initrd, uint32_t initrd_sz) {
   yield(); // Bochs fails here
   datapos=find_loc("fsdrv",initrd);
   load_task(datapos,initrd);
-  yield();
+  yieldToPID(3);
   FILE* file;
   do {
     vga_write_string("CALLING FOPEN\n");

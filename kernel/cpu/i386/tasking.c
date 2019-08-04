@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "../halt.h"
+#include "serial.h"
 #define STACK_PAGES 2
 
 extern void task_init();
@@ -22,6 +23,7 @@ uint32_t next_pid;
 Task* currentTask;
 static Task* headTask;
 static Task* tailTask;
+static Task* tasks[32768];
 Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1_exists,uint32_t param1_arg,char param2_exists,uint32_t param2_arg);
 
 void tasking_init(void* esp) {
@@ -79,6 +81,7 @@ Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1
     load_address_space(old_cr3);
     task->next=NULL;
     task->pid=next_pid;
+    tasks[next_pid]=task;
     task->priv=0;
     task->errno=0;
     if (currentTask) {
@@ -89,14 +92,17 @@ Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1
     }
     next_pid++;
     if (next_pid>1024*32) {
+      serial_printf("Failed to create a task, as 32k tasks have been created already.\n");
       halt(); //Cannot ever create more than 32k tasks, as I don't currently reuse PIDs.
     }
     if (tailTask) {
       tailTask->next=task;
       tailTask=task;
     }
+    if (task->pid!=0) {
+      serial_printf("Created task with PID %d.\n",task->pid);
+    }
     return task;
-
 }
 
 int* tasking_get_errno_address() {
@@ -120,6 +126,17 @@ void tasking_yield(registers_t registers) {
   if (!task) {
     task=headTask;
   }
+  serial_printf("Yielding to PID %d.\n",task->pid);
+  load_smap(task->cr3);
+  switch_to_task(task);
+}
+
+void tasking_yieldToPID(uint32_t pid) {
+  Task* task=tasks[pid];
+  if (!task) {
+    return;
+  }
+  serial_printf("Yielding to PID %d.\n",task->pid);
   load_smap(task->cr3);
   switch_to_task(task);
 }
