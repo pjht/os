@@ -91,8 +91,11 @@ int fputc(int c, FILE* stream) {
 
 int fputs(const char* s, FILE* stream) {
   for (int i=0;s[i]!='\0';i++) {
-    fputc(s[i],stream);
+    if (fputc(s[i],stream)==EOF) {
+      return EOF;
+    };
   }
+  return 0;
 }
 
 void register_fs(const char* name) {
