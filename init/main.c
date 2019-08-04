@@ -180,6 +180,6 @@ int main(char* initrd, uint32_t initrd_sz) {
   fputs("FPUTS String",file);
   vga_write_string("FPUTS RETURNED\n");
   for(;;) {
-s
+    yield();
   }
 }
