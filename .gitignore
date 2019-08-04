@@ -9,5 +9,6 @@ disk.img
 *.a
 init/init
 vfs/vfs
+fsdrv/fsdrv
 initrd/*
 iso/boot/initrd.tar
