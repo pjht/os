@@ -149,9 +149,9 @@ void vfs_putc(vfs_message* vfs_msg,uint32_t from) {
 }
 
 void vfs_register_fs(vfs_message* vfs_msg, uint32_t from) {
-  char* name=malloc(sizeof(char)*(strlen(vfs_msg->path)+1));
+  char* name=malloc(sizeof(char)*(strlen(vfs_msg->mode)+1));
   name[0]='\0';
-  strcpy(name,&vfs_msg->path[0]);
+  strcpy(name,&vfs_msg->mode[0]);
   register_fs_intern(from,name);
   vfs_msg->flags=0;
 }

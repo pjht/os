@@ -100,7 +100,7 @@ int fputs(const char* s, FILE* stream) {
 }
 
 void register_fs(const char* name) {
-  vfs_message* msg_data=make_msg(VFS_REGISTER_FS,NULL,name,0,0);
+  vfs_message* msg_data=make_msg(VFS_REGISTER_FS,name,NULL,0,0);
   Message msg;
   msg.from=box;
   msg.to=VFS_MBOX;
