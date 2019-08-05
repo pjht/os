@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <tasking.h>
 #define VFS_MBOX 3
+#define VFS_PID 2
 
 
 static uint32_t box;
@@ -42,12 +43,12 @@ FILE* fopen(char* filename,char* mode) {
   msg.size=sizeof(vfs_message);
   mailbox_send_msg(&msg);
   free(msg.msg);
-  yield();
+  yieldToPID(VFS_PID);
   msg.msg=malloc(sizeof(vfs_message));
-  yield();
+  yieldToPID(VFS_PID);
   mailbox_get_msg(box,&msg,sizeof(vfs_message));
   while (msg.from==0) {
-    yield();
+    yieldToPID(VFS_PID);
     mailbox_get_msg(box,&msg,sizeof(vfs_message));
   }
   vfs_message* vfs_msg=(vfs_message*)msg.msg;
@@ -71,12 +72,12 @@ int fputc(int c, FILE* stream) {
   msg.size=sizeof(vfs_message);
   mailbox_send_msg(&msg);
   free(msg.msg);
-  yield();
+  yieldToPID(VFS_PID);
   msg.msg=malloc(sizeof(vfs_message));
-  yield();
+  yieldToPID(VFS_PID);
   mailbox_get_msg(box,&msg,sizeof(vfs_message));
   while (msg.from==0) {
-    yield();
+    yieldToPID(VFS_PID);
     mailbox_get_msg(box,&msg,sizeof(vfs_message));
   }
   vfs_message* vfs_msg=(vfs_message*)msg.msg;
@@ -107,12 +108,12 @@ void register_fs(const char* name) {
   msg.size=sizeof(vfs_message);
   mailbox_send_msg(&msg);
   free(msg.msg);
-  yield();
+  yieldToPID(VFS_PID);
   msg.msg=malloc(sizeof(vfs_message));
-  yield();
+  yieldToPID(VFS_PID);
   mailbox_get_msg(box,&msg,sizeof(vfs_message));
   while (msg.from==0) {
-    yield();
+    yieldToPID(VFS_PID);
     mailbox_get_msg(box,&msg,sizeof(vfs_message));
   }
   free(msg.msg);
