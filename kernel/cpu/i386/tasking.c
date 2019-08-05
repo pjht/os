@@ -134,6 +134,7 @@ void tasking_yield(registers_t registers) {
 void tasking_yieldToPID(uint32_t pid) {
   Task* task=tasks[pid];
   if (!task) {
+    serial_printf("PID %d does not exist.\n",pid);
     return;
   }
   serial_printf("Yielding to PID %d.\n",task->pid);
