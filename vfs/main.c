@@ -51,6 +51,7 @@ static int vfsstrcmp(const char* s1,const char* s2) {
 
 void init_vfs() {
   drv_names=malloc(sizeof(const char**)*32);
+  drvs=malloc(sizeof(uint32_t)*32);
   max_drvs=32;
   next_drv_indx=0;
   head_mapping=NULL;
