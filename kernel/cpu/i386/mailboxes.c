@@ -87,5 +87,5 @@ void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz)
       mailbox.rd=mailbox.size-1;
     }
   }
-  serial_printf("Box %d got a message from box %d.\n",box,mailbox.msg_store[mailbox.rd].from);
+  serial_printf("Box %d got a message from box %d.\n",box,recv_msg->from);
 }
