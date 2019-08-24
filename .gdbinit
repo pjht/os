@@ -2,8 +2,9 @@ set pagination off
 target remote localhost:1234
 symbol-file kernel/kernel.elf
 add-symbol-file vfs/vfs
-b tasking.c:123
-commands
+b kernel/cpu/i386/tasking.c:129
+b kernel/cpu/i386/tasking.c:140
+commands 1 2
 silent
   disable breakpoints
   symbol-file kernel/kernel.elf
