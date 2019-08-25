@@ -179,7 +179,4 @@ int main(char* initrd, uint32_t initrd_sz) {
   vga_write_string("CALLING FPUTS\n");
   fputs("FPUTS String",file);
   vga_write_string("FPUTS RETURNED\n");
-  for(;;) {
-    yield();
-  }
 }
