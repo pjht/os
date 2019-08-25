@@ -12,6 +12,7 @@
 #include <mailboxes.h>
 #include <string.h>
 #include <stdint.h>
+#include "serial.h"
 void irq_handler(registers_t r);
 static isr_t interrupt_handlers[256];
 
@@ -227,6 +228,8 @@ void isr_handler(registers_t r) {
         r.ebx=kernel_mailbox_new((uint16_t)r.ebx);
       } else if (r.eax==15) {
         tasking_yieldToPID(r.ebx);
+      } else if (r.eax==16) {
+        serial_write_string((char*)r.ebx);
       }
       break;
     }
