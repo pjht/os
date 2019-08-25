@@ -81,7 +81,7 @@ void* kmalloc(uint32_t size) {
 }
 
 void kfree(void* mem) {
-  uint32_t* info=(uint32_t*)((uint32_t)mem-12);
+  uint32_t* info=(uint32_t*)((uint32_t)mem-8);
   uint32_t num_4b_grps=info[0];
   uint32_t bmap_index=info[1];
   for (uint32_t i=0;i<num_4b_grps;i++) {

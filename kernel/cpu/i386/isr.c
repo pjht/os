@@ -230,6 +230,8 @@ void isr_handler(registers_t r) {
         tasking_yieldToPID(r.ebx);
       } else if (r.eax==16) {
         serial_write_string((char*)r.ebx);
+      } else if (r.eax==17) {
+        tasking_exit((uint8_t)r.ebx);
       }
       break;
     }

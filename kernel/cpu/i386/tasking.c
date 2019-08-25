@@ -145,6 +145,29 @@ void tasking_yieldToPID(uint32_t pid) {
   switch_to_task(task);
 }
 
+void tasking_exit(uint8_t code) {
+  serial_printf("PID %d is exiting with code %d.\n",currentTask->pid,code);
+  if (currentTask->prev) {
+    currentTask->prev->next=currentTask->next;
+  }
+  if (currentTask->next) {
+    currentTask->next->prev=currentTask->prev;
+  }
+  if (headTask==currentTask) {
+    if (!currentTask->next) {
+      serial_write_string("ERROR! Head task exited with no child tasks! Halting!\n");
+      vga_write_string("ERROR! Head task exited with no child tasks! Halting!\n");
+      halt();
+    }
+    headTask=currentTask->next;
+  }
+  Task* task=currentTask->next;
+  kfree(currentTask);
+  serial_printf("Exit yielding to PID %d.\n",task->pid);
+  load_smap(task->cr3);
+  switch_to_task(task);
+}
+
 uint32_t getPID() {
   return currentTask->pid;
 }
