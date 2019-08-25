@@ -106,7 +106,7 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
     memcpy(initrd2,initrd,initrd_sz);
     initrd2=put_data(cr3,initrd2,initrd_sz);
     createTaskCr3Param((void*)header.entry,cr3,(uint32_t)initrd2,initrd_sz);
-    exit(1);
+    exit(0);
     for(;;) {
       yield();
     }
