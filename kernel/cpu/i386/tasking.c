@@ -97,7 +97,10 @@ Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1
     }
     if (tailTask) {
       tailTask->next=task;
+      task->prev=tailTask;
       tailTask=task;
+    } else {
+      task->prev=NULL;
     }
     if (task->pid!=0) {
       serial_printf("Created task with PID %d.\n",task->pid);

@@ -12,6 +12,7 @@ typedef struct Task {
   char priv;
   int errno;
   uint32_t pid;
+  struct Task* prev;
   struct Task* next;
 } Task;
 
