@@ -30,7 +30,7 @@ debug: os.iso kernel/kernel.elf
 	@$(GDB)
 	#gdbgui -g i386-elf-gdb --project $(CWD)
 
-os.iso: kernel/kernel.elf init vfs fsdrv initrd/*
+os.iso: kernel/kernel.elf init vfs fsdrv initrd
 	@cp kernel/kernel.elf iso/boot
 	@cd initrd; tar -f ../iso/boot/initrd.tar -c *
 	@grub-mkrescue -o $@ iso >/dev/null 2>/dev/null
