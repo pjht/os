@@ -8,14 +8,14 @@
 #include <vfs.h>
 
 int main() {
-  register_fs("devfs");
-  // mount("devfs","","/dev");
   text_fb_info info;
   info.address=map_phys((void*)0xB8000,10);
   info.width=80;
   info.height=25;
   vga_init(info);
   uint32_t box=mailbox_new(16);
+  register_fs("devfs",box);
+  mount("","devfs","/dev");
   for (;;) {
     yield();
     Message msg;

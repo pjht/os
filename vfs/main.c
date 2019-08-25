@@ -3,6 +3,7 @@
 #include <mailboxes.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dbg.h>
 
 #define PROC_FD_LIMIT 1024
 
@@ -23,7 +24,7 @@ typedef struct {
 static const char** drv_names;
 static uint32_t* drvs;
 static uint32_t max_drvs;
-static uint32_t next_drv_indx;
+static uint32_t num_drvs;
 static vfs_mapping* head_mapping;
 static vfs_mapping* tail_mapping;
 vfs_file* fd_tables[32768];
@@ -53,21 +54,21 @@ void init_vfs() {
   drv_names=malloc(sizeof(const char**)*32);
   drvs=malloc(sizeof(uint32_t)*32);
   max_drvs=32;
-  next_drv_indx=0;
+  num_drvs=0;
   head_mapping=NULL;
   tail_mapping=NULL;
 }
 
 uint32_t register_fs_intern(uint32_t drv,const char* type) {
-  if (next_drv_indx==max_drvs) {
+  if (num_drvs==max_drvs) {
     drvs=realloc(drvs,sizeof(uint32_t)*(max_drvs+32));
     drv_names=realloc(drv_names,sizeof(char*)*(max_drvs+32));
     max_drvs+=32;
   }
-  drvs[next_drv_indx]=drv;
-  drv_names[next_drv_indx]=type;
-  next_drv_indx++;
-  return next_drv_indx-1;
+  drvs[num_drvs]=drv;
+  drv_names[num_drvs]=type;
+  num_drvs++;
+  return num_drvs-1;
 }
 
 void vfs_fopen(vfs_message* vfs_msg,uint32_t from) {
@@ -152,8 +153,57 @@ void vfs_register_fs(vfs_message* vfs_msg, uint32_t from) {
   char* name=malloc(sizeof(char)*(strlen(vfs_msg->mode)+1));
   name[0]='\0';
   strcpy(name,&vfs_msg->mode[0]);
-  register_fs_intern(from,name);
+  register_fs_intern(vfs_msg->fd,name);
   vfs_msg->flags=0;
+}
+
+void vfs_mount(vfs_message* vfs_msg, uint32_t from) {
+  char* path=malloc(sizeof(char)*(strlen(vfs_msg->path)+1));
+  path[0]='\0';
+  strcpy(path,&vfs_msg->path[0]);
+  char* type=malloc(sizeof(char)*(strlen(vfs_msg->mode)+1));
+  type[0]='\0';
+  strcpy(type,&vfs_msg->mode[0]);
+  char* disk_file=malloc(sizeof(char)*(vfs_msg->data));
+  Message msg;
+  msg.msg=disk_file;
+  mailbox_get_msg(box,&msg,vfs_msg->data);
+  while (msg.from==0 && msg.size==0) {
+    yield();
+    mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  }
+  if (msg.from==0) {
+    vfs_msg->flags=4;
+    return;
+  }
+  char found=0;
+  uint32_t i;
+  for (i=0;i<num_drvs;i++) {
+    if (strcmp(type,drv_names[i])==0) {
+      found=1;
+      break;
+    }
+  }
+  if (!found) {
+    vfs_msg->flags=4;
+    return;
+  }
+  if (head_mapping==NULL) {
+    vfs_mapping* mapping=malloc(sizeof(vfs_mapping));
+    mapping->mntpnt=malloc(sizeof(char)*(strlen(path)+1));
+    strcpy(mapping->mntpnt,path);
+    mapping->type=i;
+    mapping->next=NULL;
+    head_mapping=mapping;
+    tail_mapping=mapping;
+  } else {
+    vfs_mapping* mapping=malloc(sizeof(vfs_mapping));
+    mapping->mntpnt=malloc(sizeof(char)*(strlen(path)+1));
+    strcpy(mapping->mntpnt,path);
+    mapping->type=i;
+    mapping->next=NULL;
+    tail_mapping->next=mapping;
+  }
 }
 
 int main() {
@@ -178,7 +228,7 @@ int main() {
       vfs_msg->flags=1;
       break;
       case VFS_MOUNT:
-      vfs_msg->flags=1;
+      vfs_mount(vfs_msg,msg.from);
       break;
       case VFS_UMOUNT:
       vfs_msg->flags=1;
