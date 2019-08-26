@@ -4,7 +4,8 @@
 #include <cpu/ports.h>
 #include "paging.h"
 #include "../halt.h"
-#include "../..//vga_err.h"
+#include "../../vga_err.h"
+#include "../../kernel.h"
 #include "../tasking.h"
 #include "interrupt.h"
 #include "address_spaces.h"
@@ -232,6 +233,12 @@ void isr_handler(registers_t r) {
         serial_write_string((char*)r.ebx);
       } else if (r.eax==17) {
         tasking_exit((uint8_t)r.ebx);
+      } else if (r.eax==18) {
+        serial_printf("Initrd size is %d bytes\n",initrd_sz);
+        r.ebx=initrd_sz;
+      } else if (r.eax==19) {
+        serial_printf("Copying initrd\n");
+        memcpy((char*)r.ebx,initrd,initrd_sz);
       }
       break;
     }

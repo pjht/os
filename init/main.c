@@ -8,6 +8,7 @@
 #include <tasking.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <initrd.h>
 
 typedef struct {
   char filename[100];
@@ -157,18 +158,22 @@ void test_vfs(char* path,uint32_t box,uint32_t fs_box) {
   free(msg.msg);
 }
 
-int main(char* initrd, uint32_t initrd_sz) {
+int main() {
   text_fb_info info;
   info.address=map_phys((void*)0xB8000,10);
   info.width=80;
   info.height=25;
   vga_init(info);
   vga_write_string("INIT\n");
+  long size=initrd_sz();
+  char* initrd=malloc(size);
+  initrd_get(initrd);
   uint32_t datapos=find_loc("vfs",initrd);
   load_task(datapos,initrd);
   yield(); // Bochs fails here
   datapos=find_loc("fsdrv",initrd);
   load_task(datapos,initrd);
+  free(initrd);
   yieldToPID(3);
   FILE* file;
   do {
