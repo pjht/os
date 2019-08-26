@@ -1,13 +1,13 @@
 C_SOURCES = $(wildcard *.c)
 OBJ = $(C_SOURCES:.c=.o )
-CFLAGS = -I../sysroot/usr/include -Wall -g
+CFLAGS =  -Wall -g --sysroot=../sysroot -isystem=/usr/include -nostdlib
 CC = i386-elf-gcc
 
 init: $(OBJ) ../libc/*
-	@i386-elf-ld -o $@ $(OBJ) ../kernel/start.o ../libc/libc.a
+	@$(CC)  -z max-page-size=4096 -Xlinker -n -o $@ $(CFLAGS) $(OBJ) ../kernel/start.o ../libc/libc.a -lgcc
 
 %.o: %.c
-	@$(CC) $(CFLAGS)  -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	@rm -rf *.o init
