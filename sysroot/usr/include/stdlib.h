@@ -10,6 +10,6 @@
 void* malloc(size_t size);
 void* realloc(void *mem, size_t new_sz);
 void free(void* mem);
-void exit(uint8_t code);
+__attribute__((noreturn)) void exit(int code);
 
 #endif

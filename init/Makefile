@@ -1,6 +1,6 @@
 C_SOURCES = $(wildcard *.c)
 OBJ = $(C_SOURCES:.c=.o )
-CFLAGS = -I../sysroot/usr/include -Wall -g -ffreestanding
+CFLAGS = -I../sysroot/usr/include -Wall -g
 CC = i386-elf-gcc
 
 init: $(OBJ) ../libc/*

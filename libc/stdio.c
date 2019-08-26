@@ -61,6 +61,8 @@ FILE* fopen(char* filename,char* mode) {
   }
 }
 
+int putc(int c, FILE* stream) __attribute__ ((alias ("fputc")));
+
 int fputc(int c, FILE* stream) {
   vfs_message* msg_data=make_msg(VFS_PUTC,0,0,*stream,c);
   Message msg;
@@ -92,6 +94,18 @@ int fputs(const char* s, FILE* stream) {
     };
   }
   return 0;
+}
+
+size_t fwrite(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
+  char* buffer=(char*)buffer_ptr;
+  size_t bytes=size*count;
+  for (size_t i=0;i<bytes;i++) {
+    int c=fputc((uint8_t)buffer[i],stream);
+    if (c==EOF) {
+      return (size_t)(i/size);
+    }
+  }
+  return count;
 }
 
 void register_fs(const char* name,uint32_t mbox) {

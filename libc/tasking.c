@@ -35,9 +35,11 @@ void yieldToPID(uint32_t pid) {
   "::"b"(pid));
 }
 
-void exit(uint8_t code) {
+__attribute__((noreturn)) void exit(int code) {
+  code=code&0xff;
   asm volatile("  \
     mov $17, %%eax; \
     int $80; \
   "::"b"(code));
+  for(;;);
 }

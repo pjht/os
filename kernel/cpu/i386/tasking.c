@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include "../halt.h"
 #include "serial.h"
+#include "../../vga_err.h"
 #define STACK_PAGES 2
 
 extern void task_init();
