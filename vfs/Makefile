@@ -4,7 +4,7 @@ CFLAGS = -Wall -g --sysroot=../sysroot -isystem=/usr/include -nostdlib
 CC = i386-elf-gcc
 
 vfs: $(OBJ) ../libc/*
-		@$(CC)  -z max-page-size=4096 -Xlinker -n -o $@ $(CFLAGS) $(OBJ) ../kernel/start.o ../libc/libc.a -lgcc
+		@$(CC)  -z max-page-size=4096 -Xlinker -n -o $@ $(CFLAGS) $(OBJ) ../kernel/start.o ../sysroot/usr/lib/libc.a -lgcc
 
 %.o: %.c
 	@$(CC) $(CFLAGS)  -c $< -o $@

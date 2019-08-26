@@ -48,10 +48,10 @@ fsdrv: fsdrv/* kernel/start.o
 	@cp $@/$@ initrd/$@
 
 
-kernel/kernel.elf: $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) libc/libc.a
+kernel/kernel.elf: $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) sysroot/usr/lib/libc.a
 	@$(CC) -z max-page-size=4096 -Xlinker -n -T kernel/cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc
 
-libc/libc.a: $(LIBC_OBJ)
+sysroot/usr/lib/libc.a: $(LIBC_OBJ)
 	@$(AR) rcs $@ $^
 
 %.o: %.c
