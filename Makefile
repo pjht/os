@@ -31,9 +31,9 @@ debug: os.iso kernel/kernel.elf
 	#gdbgui -g i386-elf-gdb --project $(CWD)
 
 os.iso: kernel/kernel.elf init vfs fsdrv initrd
-	@cp kernel/kernel.elf iso/boot
-	@cd initrd; tar -f ../iso/boot/initrd.tar -c *
-	@grub-mkrescue -o $@ iso >/dev/null 2>/dev/null
+	@cp kernel/kernel.elf sysroot/boot
+	@cd initrd; tar -f ../sysroot/boot/initrd.tar -c *
+	@grub-mkrescue -o $@ sysroot >/dev/null 2>/dev/null
 
 init: init/* kernel/start.o
 	@cd $@ && make
@@ -64,4 +64,4 @@ libc/libc.a: $(LIBC_OBJ)
 	@$(AS) $< -o $@
 
 clean:
-	@rm -rf initrd/* kernel/*.o drivers/*/*.o drivers/*/*/*.o cpu/*/*.o fs/*.o libc/libc.a kernel/cstart.o cpu/memory.h os.iso */*.elf iso/boot/initrd.tar
+	@rm -rf initrd/* kernel/*.o drivers/*/*.o drivers/*/*/*.o cpu/*/*.o fs/*.o libc/libc.a kernel/cstart.o cpu/memory.h os.iso */*.elf sysroot/boot/initrd.tar

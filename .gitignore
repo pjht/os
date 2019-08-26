@@ -11,5 +11,5 @@ init/init
 vfs/vfs
 fsdrv/fsdrv
 initrd/*
-iso/boot/initrd.tar
+sysroot/boot/initrd.tar
 serout
