@@ -14,7 +14,7 @@ AR = $(shell cat psinfo/$(PLAT)/ar.txt)
 NASM = $(shell cat psinfo/$(PLAT)/nasm.txt)
 EMU = $(shell cat psinfo/$(PLAT)/emu.txt)
 GDB = $(shell cat psinfo/$(PLAT)/gdb.txt)
-CFLAGS =  --sysroot=../sysroot -isystem=/usr/include -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
+CFLAGS =  -Isysroot/usr/include -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
 QFLAGS =  -hda ext2.img -m 2G -boot d -cdrom os.iso -serial file:serout #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
 CWD = $(shell pwd)
 
