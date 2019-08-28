@@ -34,5 +34,7 @@ long ftell(FILE* stream);
 int fclose(FILE* file);
 int feof(FILE* stream);
 int ferror(FILE* stream);
+int fflush(FILE *stream); // GCC required
+void setbuf(FILE *restrict stream, char *restrict buf); // GCC required
 
 #endif
