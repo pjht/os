@@ -1,0 +1,20 @@
+diff --git a/libgcc/config.host b/libgcc/config.host
+index 0a6b66af0..e55623cf8 100644
+--- a/libgcc/config.host
++++ b/libgcc/config.host
+@@ -343,7 +343,6 @@ i[34567]86-*-cygwin* | x86_64-*-cygwin*)
+ esac
+ 
+ case ${host} in
+-aarch64*-*-elf | aarch64*-*-rtems*)
+ i[34567]86-*-myos*)
+ 	extra_parts="$extra_parts crti.o crtbegin.o crtend.o crtn.o"
+ 	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
+@@ -352,6 +351,7 @@ x86_64-*-myos*)
+ 	extra_parts="$extra_parts crti.o crtbegin.o crtend.o crtn.o"
+ 	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
+ 	;;
++aarch64*-*-elf | aarch64*-*-rtems*)
+ 	extra_parts="$extra_parts crtbegin.o crtend.o crti.o crtn.o"
+ 	extra_parts="$extra_parts crtfastmath.o"
+ 	tmake_file="${tmake_file} ${cpu_type}/t-aarch64"

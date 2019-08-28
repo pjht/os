@@ -1,0 +1,94 @@
+diff --git a/bfd/config.bfd b/bfd/config.bfd
+index 0e1ddb65..39fc4a7e 100644
+--- a/bfd/config.bfd
++++ b/bfd/config.bfd
+@@ -223,6 +223,18 @@ case "${targ}" in
+     ;;
+ 
+ # START OF targmatch.h
++  i[3-7]86-*-myos*)
++    targ_defvec=i386_elf32_vec
++    targ_selvecs=
++    targ64_selvecs=x86_64_elf64_vec
++    ;;
++#ifdef BFD64
++  x86_64-*-myos*)
++    targ_defvec=x86_64_elf64_vec
++    targ_selvecs=i386_elf32_vec
++    want64=true
++    ;;
++#endif
+ #ifdef BFD64
+   aarch64-*-darwin*)
+     targ_defvec=aarch64_mach_o_vec
+diff --git a/config.sub b/config.sub
+index 75bb6a31..8b9d9df3 100755
+--- a/config.sub
++++ b/config.sub
+@@ -1336,7 +1336,7 @@ case $os in
+ 	# The portable systems comes first.
+ 	# Each alternative MUST end in a * to match a version number.
+ 	# sysv* is not here because it comes later, after sysvr4.
+-	gnu* | bsd* | mach* | minix* | genix* | ultrix* | irix* \
++	gnu* | bsd* | mach* | minix* | genix* | ultrix* | irix* | myos* \
+ 	     | *vms* | esix* | aix* | cnk* | sunos | sunos[34]*\
+ 	     | hpux* | unos* | osf* | luna* | dgux* | auroraux* | solaris* \
+ 	     | sym* | kopensolaris* | plan9* \
+diff --git a/gas/configure.tgt b/gas/configure.tgt
+index 616d2113..454429ea 100644
+--- a/gas/configure.tgt
++++ b/gas/configure.tgt
+@@ -6,12 +6,12 @@
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation; either version 3 of the License, or
+ # (at your option) any later version.
+-# 
++#
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+-# 
++#
+ # You should have received a copy of the GNU General Public License
+ # along with this program; see the file COPYING3.  If not see
+ # <http://www.gnu.org/licenses/>.
+@@ -220,6 +220,7 @@ case ${generic_target} in
+   i386-*-fuchsia*)			fmt=elf ;;
+   i386-*-kaos*)				fmt=elf ;;
+   i386-*-bsd*)				fmt=aout em=386bsd ;;
++  i386-*-myos*)    fmt=elf ;;
+   i386-*-nacl*)				fmt=elf em=nacl
+     case ${cpu} in
+       x86_64*)				arch=x86_64:32 ;;
+@@ -327,7 +328,7 @@ case ${generic_target} in
+   moxie-*-uclinux)			fmt=elf em=linux ;;
+   moxie-*-moxiebox*)                    fmt=elf endian=little ;;
+   moxie-*-*)				fmt=elf ;;
+-    
++
+   mt-*-elf)				fmt=elf bfd_gas=yes ;;
+ 
+   msp430-*-*)				fmt=elf ;;
+@@ -415,7 +416,7 @@ case ${generic_target} in
+   wasm32-*-*)                           fmt=elf ;;
+ 
+   xstormy16-*-*)			fmt=elf ;;
+-  
++
+   xgate-*-*)    			fmt=elf ;;
+ 
+   xtensa*-*-*)				fmt=elf ;;
+diff --git a/ld/configure.tgt b/ld/configure.tgt
+index beba17ef..74550e1f 100644
+--- a/ld/configure.tgt
++++ b/ld/configure.tgt
+@@ -281,6 +281,8 @@ i[3-7]86-*-solaris*)	targ_emul=elf_i386_ldso
+ 			targ_extra_emuls="elf_i386"
+ 			targ_extra_libpath=$targ_extra_emuls
+ 			;;
++i[3-7]86-*-myos*) targ_emul=elf_i386 ;;
++x86_64-*-myos*)	targ_emul=elf_x86_64 ;;
+ i[3-7]86-*-netbsdelf* | \
+ i[3-7]86-*-netbsd*-gnu* | \
+ i[3-7]86-*-knetbsd*-gnu)
