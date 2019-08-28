@@ -36,7 +36,7 @@ os.iso: kernel/kernel.elf init vfs fsdrv initrd
 	@grub-mkrescue -o $@ sysroot >/dev/null 2>/dev/null
 
 crts: kernel/crt0.o
-	cp $^ sysroot/usr/lib
+	@cp $^ sysroot/usr/lib
 
 init: init/* crts
 	@cd $@ && make
