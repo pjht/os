@@ -1,10 +1,10 @@
 C_SOURCES = $(wildcard *.c)
 OBJ = $(C_SOURCES:.c=.o )
-CFLAGS = -Wall -g --sysroot=../sysroot -isystem=/usr/include -nostdlib
+CFLAGS = -Wall -g
 CC = i386-myos-gcc
 
 fsdrv: $(OBJ) ../libc/*
-		@$(CC)  -z max-page-size=4096 -Xlinker -n -o $@ $(CFLAGS) $(OBJ) ../kernel/start.o ../sysroot/usr/lib/libc.a -lgcc
+	@$(CC)  -o $@ $(CFLAGS) $(OBJ)
 
 %.o: %.c
 	@$(CC) $(CFLAGS)  -c $< -o $@

@@ -35,7 +35,10 @@ os.iso: kernel/kernel.elf init vfs fsdrv initrd
 	@cd initrd; tar -f ../sysroot/boot/initrd.tar -c *
 	@grub-mkrescue -o $@ sysroot >/dev/null 2>/dev/null
 
-init: init/* kernel/start.o
+crts: kernel/crt0.o
+	cp $^ sysroot/usr/lib
+
+init: init/* crts
 	@cd $@ && make
 	@cp $@/$@ initrd/$@
 
