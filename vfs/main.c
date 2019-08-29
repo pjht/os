@@ -135,7 +135,7 @@ void vfs_putc(vfs_message* vfs_msg,uint32_t from) {
   vfs_msg->pos=file_info.pos;
   Message msg;
   msg.from=box;
-  msg.to=file_info.mntpnt->type;
+  msg.to=drvs[file_info.mntpnt->type];
   msg.size=sizeof(vfs_message);
   msg.msg=vfs_msg;
   mailbox_send_msg(&msg);
@@ -191,7 +191,7 @@ void vfs_mount(vfs_message* vfs_msg, uint32_t from) {
     vfs_mapping* mapping=malloc(sizeof(vfs_mapping));
     mapping->mntpnt=malloc(sizeof(char)*(strlen(path)+1));
     strcpy(mapping->mntpnt,path);
-    mapping->type=drvs[i];
+    mapping->type=i;
     mapping->next=NULL;
     head_mapping=mapping;
     tail_mapping=mapping;
@@ -199,7 +199,7 @@ void vfs_mount(vfs_message* vfs_msg, uint32_t from) {
     vfs_mapping* mapping=malloc(sizeof(vfs_mapping));
     mapping->mntpnt=malloc(sizeof(char)*(strlen(path)+1));
     strcpy(mapping->mntpnt,path);
-    mapping->type=drvs[i];
+    mapping->type=i;
     mapping->next=NULL;
     tail_mapping->next=mapping;
   }
