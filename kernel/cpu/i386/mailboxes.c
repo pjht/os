@@ -28,6 +28,10 @@ void kernel_mailbox_free(uint32_t box) {
 }
 
 void kernel_mailbox_send_msg(Message* user_msg) {
+  if (user_msg->to==0) {
+    serial_printf("Box %d attempted to send to box 0!\n",user_msg->from);
+    return;
+  }
   Mailbox mailbox=mailboxes[user_msg->to];
   char* msg_data=kmalloc(user_msg->size);
   memcpy(msg_data,user_msg->msg,user_msg->size);
