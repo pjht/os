@@ -95,7 +95,7 @@ int fputs(const char* s, FILE* stream) {
   msg.msg=msg_data;
   msg.size=sizeof(vfs_message);
   mailbox_send_msg(&msg);
-  msg.msg=s;
+  msg.msg=(char*)s;
   msg.size=strlen(s);
   mailbox_send_msg(&msg);
   yieldToPID(VFS_PID);
