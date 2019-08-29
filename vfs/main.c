@@ -136,7 +136,6 @@ void vfs_putc(vfs_message* vfs_msg,uint32_t from) {
   Message msg;
   msg.from=box;
   msg.to=file_info.mntpnt->type;
-  msg.to=5;
   msg.size=sizeof(vfs_message);
   msg.msg=vfs_msg;
   mailbox_send_msg(&msg);
