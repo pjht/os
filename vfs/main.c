@@ -108,7 +108,7 @@ void vfs_fopen(vfs_message* vfs_msg,uint32_t from) {
       open_fds[from]=0;
     } else {
       if (open_fds[from]==PROC_FD_LIMIT) {
-        vfs_msg->flags=4;
+        vfs_msg->flags=2;
       }
     }
     uint16_t fd=open_fds[from];
@@ -124,7 +124,7 @@ void vfs_fopen(vfs_message* vfs_msg,uint32_t from) {
     vfs_msg->flags=0;
     return;
   }
-  vfs_msg->flags=1;
+  vfs_msg->flags=2;
 }
 
 void vfs_putc(vfs_message* vfs_msg,uint32_t from) {
@@ -172,7 +172,7 @@ void vfs_mount(vfs_message* vfs_msg, uint32_t from) {
     mailbox_get_msg(box,&msg,sizeof(vfs_message));
   }
   if (msg.from==0) {
-    vfs_msg->flags=4;
+    vfs_msg->flags=2;
     return;
   }
   char found=0;
@@ -184,7 +184,7 @@ void vfs_mount(vfs_message* vfs_msg, uint32_t from) {
     }
   }
   if (!found) {
-    vfs_msg->flags=4;
+    vfs_msg->flags=2;
     return;
   }
   if (head_mapping==NULL) {
@@ -220,23 +220,14 @@ int main() {
       case VFS_PUTC:
       vfs_putc(vfs_msg,msg.from);
       break;
-      case VFS_GETC:
-      vfs_msg->flags=1;
-      break;
-      case VFS_CLOSE:
-      vfs_msg->flags=1;
-      break;
       case VFS_MOUNT:
       vfs_mount(vfs_msg,msg.from);
-      break;
-      case VFS_UMOUNT:
-      vfs_msg->flags=1;
       break;
       case VFS_REGISTER_FS:
       vfs_register_fs(vfs_msg,msg.from);
       break;
       default:
-      vfs_msg->flags=2;
+      vfs_msg->flags=1;
       break;
     }
     msg.from=box;
