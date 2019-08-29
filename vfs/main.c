@@ -191,7 +191,7 @@ void vfs_mount(vfs_message* vfs_msg, uint32_t from) {
     vfs_mapping* mapping=malloc(sizeof(vfs_mapping));
     mapping->mntpnt=malloc(sizeof(char)*(strlen(path)+1));
     strcpy(mapping->mntpnt,path);
-    mapping->type=i;
+    mapping->type=drvs[i];
     mapping->next=NULL;
     head_mapping=mapping;
     tail_mapping=mapping;
@@ -199,7 +199,7 @@ void vfs_mount(vfs_message* vfs_msg, uint32_t from) {
     vfs_mapping* mapping=malloc(sizeof(vfs_mapping));
     mapping->mntpnt=malloc(sizeof(char)*(strlen(path)+1));
     strcpy(mapping->mntpnt,path);
-    mapping->type=i;
+    mapping->type=drvs[i];
     mapping->next=NULL;
     tail_mapping->next=mapping;
   }
