@@ -148,6 +148,43 @@ void vfs_putc(vfs_message* vfs_msg,uint32_t from) {
   vfs_msg->flags=0;
 }
 
+void vfs_puts(vfs_message* vfs_msg,uint32_t from) {
+  char* data=malloc(sizeof(char)*vfs_msg->data);
+  Message msg;
+  msg.msg=data;
+  mailbox_get_msg(box,&msg,vfs_msg->data);
+  while (msg.from==0 && msg.size==0) {
+    yield();
+    mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  }
+  if (msg.from==0) {
+    vfs_msg->flags=2;
+    return;
+  }
+  uint32_t fd=vfs_msg->fd;
+  vfs_file file_info=fd_tables[from][fd];
+  strcpy(&vfs_msg->path[0],file_info.path);
+  strcpy(&vfs_msg->mode[0],file_info.mode);
+  vfs_msg->pos=file_info.pos;
+  msg.from=box;
+  msg.to=drvs[file_info.mntpnt->type];
+  msg.size=sizeof(vfs_message);
+  msg.msg=vfs_msg;
+  mailbox_send_msg(&msg);
+  msg.size=vfs_msg->data;
+  msg.msg=data;
+  mailbox_send_msg(&msg);
+  free(data);
+  yield();
+  vfs_msg=get_message(&msg);
+  if (vfs_msg->flags!=0) {
+    return;
+  }
+  fd_tables[from][fd].pos++;
+  vfs_msg->flags=0;
+}
+
+
 void vfs_register_fs(vfs_message* vfs_msg, uint32_t from) {
   char* name=malloc(sizeof(char)*(strlen(vfs_msg->mode)+1));
   name[0]='\0';
@@ -219,6 +256,9 @@ int main() {
       break;
       case VFS_PUTC:
       vfs_putc(vfs_msg,msg.from);
+      break;
+      case VFS_PUTS:
+      vfs_puts(vfs_msg,msg.from);
       break;
       case VFS_MOUNT:
       vfs_mount(vfs_msg,msg.from);

@@ -25,13 +25,40 @@ int main() {
       yield();
     } else {
       vfs_message* vfs_msg=(vfs_message*)msg.msg;
-      char str[]={(char)vfs_msg->data,'\0'};
-      vga_write_string(&str[0]);
+      switch (vfs_msg->type) {
+        case VFS_OPEN:
+        vfs_msg->flags=0;
+        break;
+        case VFS_PUTC: {
+          char str[]={(char)vfs_msg->data,'\0'};
+          vga_write_string(&str[0]);
+          vfs_msg->flags=0;
+        break;
+        }
+        case VFS_PUTS: {
+        char* data=malloc(sizeof(char)*vfs_msg->data);
+        Message msg;
+        msg.msg=data;
+        mailbox_get_msg(box,&msg,vfs_msg->data);
+        while (msg.from==0 && msg.size==0) {
+          yield();
+          mailbox_get_msg(box,&msg,sizeof(vfs_message));
+        }
+        if (msg.from==0) {
+          serial_print("Could not recieve fputs data from the VFS\n");
+          vfs_msg->flags=2;
+          break;
+        }
+        vga_write_string(data);
+        vfs_msg->flags=0;
+        break;
+        }
+        default:
+        vfs_msg->flags=1;
+      }
       msg.to=msg.from;
       msg.from=box;
-      vfs_msg->flags=0;
       mailbox_send_msg(&msg);
-      yield();
     }
     free(msg.msg);
   }

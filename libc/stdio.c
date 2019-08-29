@@ -88,24 +88,63 @@ int fputc(int c, FILE* stream) {
 }
 
 int fputs(const char* s, FILE* stream) {
-  for (int i=0;s[i]!='\0';i++) {
-    if (fputc(s[i],stream)==EOF) {
-      return EOF;
-    };
+  vfs_message* msg_data=make_msg(VFS_PUTS,NULL,NULL,*stream,strlen(s));
+  Message msg;
+  msg.from=box;
+  msg.to=VFS_MBOX;
+  msg.msg=msg_data;
+  msg.size=sizeof(vfs_message);
+  mailbox_send_msg(&msg);
+  msg.msg=buffer;
+  msg.size=strlen(s);
+  mailbox_send_msg(&msg);
+  yieldToPID(VFS_PID);
+  msg.msg=msg_data;
+  mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  while (msg.from==0) {
+    yieldToPID(VFS_PID);
+    mailbox_get_msg(box,&msg,sizeof(vfs_message));
   }
-  return 0;
+  vfs_message* vfs_msg=(vfs_message*)msg.msg;
+  if (vfs_msg->flags) {
+    free(msg.msg);
+    return EOF;
+  } else {
+    free(msg.msg);
+    return 0;
+  }
+  return EOF;
 }
 
 size_t fwrite(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
   char* buffer=(char*)buffer_ptr;
   size_t bytes=size*count;
-  for (size_t i=0;i<bytes;i++) {
-    int c=fputc((uint8_t)buffer[i],stream);
-    if (c==EOF) {
-      return (size_t)(i/size);
-    }
+  vfs_message* msg_data=make_msg(VFS_PUTS,NULL,NULL,*stream,bytes);
+  Message msg;
+  msg.from=box;
+  msg.to=VFS_MBOX;
+  msg.msg=msg_data;
+  msg.size=sizeof(vfs_message);
+  mailbox_send_msg(&msg);
+  msg.msg=buffer;
+  msg.size=bytes;
+  mailbox_send_msg(&msg);
+  yieldToPID(VFS_PID);
+  msg.msg=msg_data;
+  mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  while (msg.from==0) {
+    yieldToPID(VFS_PID);
+    mailbox_get_msg(box,&msg,sizeof(vfs_message));
   }
-  return count;
+  vfs_message* vfs_msg=(vfs_message*)msg.msg;
+  if (vfs_msg->flags) {
+    free(msg.msg);
+    return 0;
+  } else {
+    free(msg.msg);
+    return count;
+  }
+  return 0;
 }
 
 void register_fs(const char* name,uint32_t mbox) {
