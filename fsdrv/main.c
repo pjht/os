@@ -29,12 +29,6 @@ int main() {
         case VFS_OPEN:
         vfs_msg->flags=0;
         break;
-        case VFS_PUTC: {
-          char str[]={(char)vfs_msg->data,'\0'};
-          vga_write_string(&str[0]);
-          vfs_msg->flags=0;
-        break;
-        }
         case VFS_PUTS: {
         char* data=malloc(sizeof(char)*vfs_msg->data);
         Message msg;

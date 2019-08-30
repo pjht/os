@@ -64,27 +64,13 @@ FILE* fopen(char* filename,char* mode) {
 int putc(int c, FILE* stream) __attribute__ ((alias ("fputc")));
 
 int fputc(int c, FILE* stream) {
-  vfs_message* msg_data=make_msg(VFS_PUTC,0,0,*stream,c);
-  Message msg;
-  msg.from=box;
-  msg.to=VFS_MBOX;
-  msg.msg=msg_data;
-  msg.size=sizeof(vfs_message);
-  mailbox_send_msg(&msg);
-  yieldToPID(VFS_PID);
-  mailbox_get_msg(box,&msg,sizeof(vfs_message));
-  while (msg.from==0) {
-    yieldToPID(VFS_PID);
-    mailbox_get_msg(box,&msg,sizeof(vfs_message));
-  }
-  vfs_message* vfs_msg=(vfs_message*)msg.msg;
-  if (vfs_msg->flags) {
-    free(msg.msg);
-    return EOF;
-  } else {
-    free(msg.msg);
+  char str[]={c,'\0'};
+  if (fputs(str,stream)==0) {
     return c;
+  } else {
+    return EOF;
   }
+  return EOF;
 }
 
 int fputs(const char* s, FILE* stream) {

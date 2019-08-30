@@ -127,27 +127,6 @@ void vfs_fopen(vfs_message* vfs_msg,uint32_t from) {
   vfs_msg->flags=2;
 }
 
-void vfs_putc(vfs_message* vfs_msg,uint32_t from) {
-  uint32_t fd=vfs_msg->fd;
-  vfs_file file_info=fd_tables[from][fd];
-  strcpy(&vfs_msg->path[0],file_info.path);
-  strcpy(&vfs_msg->mode[0],file_info.mode);
-  vfs_msg->pos=file_info.pos;
-  Message msg;
-  msg.from=box;
-  msg.to=drvs[file_info.mntpnt->type];
-  msg.size=sizeof(vfs_message);
-  msg.msg=vfs_msg;
-  mailbox_send_msg(&msg);
-  yield();
-  vfs_msg=get_message(&msg);
-  if (vfs_msg->flags!=0) {
-    return;
-  }
-  fd_tables[from][fd].pos++;
-  vfs_msg->flags=0;
-}
-
 void vfs_puts(vfs_message* vfs_msg,uint32_t from) {
   char* data=malloc(sizeof(char)*vfs_msg->data);
   Message msg;
@@ -253,9 +232,6 @@ int main() {
     switch (vfs_msg->type) {
       case VFS_OPEN:
       vfs_fopen(vfs_msg,msg.from);
-      break;
-      case VFS_PUTC:
-      vfs_putc(vfs_msg,msg.from);
       break;
       case VFS_PUTS:
       vfs_puts(vfs_msg,msg.from);

@@ -3,7 +3,6 @@
 
 typedef enum {
   VFS_OPEN,
-  VFS_PUTC,
   VFS_PUTS,
   VFS_GETC,
   VFS_CLOSE,
