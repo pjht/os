@@ -203,6 +203,21 @@ void vfs_mount(vfs_message* vfs_msg, uint32_t from) {
     vfs_msg->flags=2;
     return;
   }
+  msg.from=box;
+  msg.to=drvs[i];
+  msg.size=sizeof(vfs_message);
+  msg.msg=vfs_msg;
+  mailbox_send_msg(&msg);
+  msg.size=vfs_msg->data;
+  msg.msg=disk_file;
+  mailbox_send_msg(&msg);
+  yield();
+  msg.size=sizeof(vfs_message);
+  vfs_message* resp=get_message(&msg);
+  if (resp->flags!=0) {
+    vfs_msg->flags=resp->flags;
+    return;
+  }
   if (head_mapping==NULL) {
     vfs_mapping* mapping=malloc(sizeof(vfs_mapping));
     mapping->mntpnt=malloc(sizeof(char)*(strlen(path)+1));

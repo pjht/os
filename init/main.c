@@ -175,6 +175,11 @@ int main() {
   load_task(datapos,initrd);
   free(initrd);
   yieldToPID(3);
+  serial_print("MOUNT\n");
+  vga_write_string("CALLING MOUNT\n");
+  mount("","devfs","/dev");
+  serial_print("MOUNT SUCSESFULL\n");
+  vga_write_string("MOUNT SUCSESFULL\n");
   FILE* file;
   do {
     vga_write_string("CALLING FOPEN\n");
