@@ -163,6 +163,9 @@ void tasking_exit(uint8_t code) {
     headTask=currentTask->next;
   }
   Task* task=currentTask->next;
+  if (task==NULL) {
+    task=headTask;
+  }
   kfree(currentTask);
   serial_printf("Exit yielding to PID %d.\n",task->pid);
   load_smap(task->cr3);
