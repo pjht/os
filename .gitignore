@@ -9,7 +9,8 @@ disk.img
 *.a
 init/init
 vfs/vfs
-fsdrv/fsdrv
+devfs/devfs
 initrd/*
 sysroot/boot/initrd.tar
 serout
+vga_drv/vga_drv
