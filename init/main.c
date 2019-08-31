@@ -191,7 +191,13 @@ int main() {
     file=fopen("/dev/vga","w");
     vga_write_string("FOPEN RETURNED\n");
   } while(file==NULL);
+  do {
+    vga_write_string("CALLING FOPEN\n");
+    file=fopen("/dev/vga","w");
+    vga_write_string("FOPEN RETURNED\n");
+  } while(file==NULL);
   vga_write_string("CALLING FPUTS\n");
-  fputs("FPUTS String",file);
+  fputs("FPUTS String\n",file);
   vga_write_string("FPUTS RETURNED\n");
+  printf("Printf %d\n",size);
 }

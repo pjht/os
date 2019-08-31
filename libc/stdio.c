@@ -182,3 +182,92 @@ void mount(char* file,char* type,char* path) {
   }
   free(msg.msg);
 }
+
+int vfprintf(FILE* stream,const char* format,va_list arg) {
+  int c;
+	for(;*format!='\0';format++) {
+    if(*format!='%') {
+  		c=fputc(*format,stream);
+      if (c==EOF) {
+        return EOF;
+      }
+      continue;
+  	}
+    format++;
+		switch(*format) {
+			case 'c': {
+        int i=va_arg(arg,int);
+				c=fputc(i,stream);
+        if (c==EOF) {
+          return EOF;
+        }
+				break;
+      }
+			case 'd': {
+        int i=va_arg(arg,int); 		//Fetch Decimal/Integer argument
+				if(i<0) {
+					i=-i;
+					fputc('-',stream);
+				}
+        char str[11];
+        int_to_ascii(i,str);
+				c=fputs(str,stream);
+        if (c==EOF) {
+          return EOF;
+        }
+				break;
+      }
+			// case 'o': {
+      //   int i=va_arg(arg,unsigned int); //Fetch Octal representation
+			// 	puts(convert(i,8));
+			// 	break;
+      // }
+			case 's': {
+        char* s=va_arg(arg,char*);
+				c=fputs(s,stream);
+        if (c==EOF) {
+          return EOF;
+        }
+				break;
+      }
+			case 'x': {
+        uint32_t i=va_arg(arg,uint32_t);
+        char str[11];
+        str[0]='\0';
+        hex_to_ascii(i,str);
+				c=fputs(str,stream);
+        if (c==EOF) {
+          return EOF;
+        }
+				break;
+      }
+		}
+	}
+  return 1;
+}
+
+int fprintf(FILE* stream,const char* format,...) {
+  va_list arg;
+  int code;
+  va_start(arg,format);
+  code=vfprintf(stream,format,arg);
+  va_end(arg);
+  if (code) {
+    return strlen(format);
+  } else {
+    return EOF;
+  }
+}
+
+int printf(const char* format,...) {
+  va_list arg;
+  int code;
+  va_start(arg,format);
+  code=vfprintf(stdout,format,arg);
+  va_end(arg);
+  if (code) {
+    return strlen(format);
+  } else {
+    return EOF;
+  }
+}
