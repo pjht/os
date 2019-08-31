@@ -173,8 +173,11 @@ int main() {
   yield(); // Bochs fails here
   datapos=find_loc("devfs",initrd);
   load_task(datapos,initrd);
-  free(initrd);
   yieldToPID(3);
+  datapos=find_loc("vga_drv",initrd);
+  load_task(datapos,initrd);
+  free(initrd);
+  yieldToPID(4);
   serial_print("MOUNT\n");
   vga_write_string("CALLING MOUNT\n");
   mount("","devfs","/dev");

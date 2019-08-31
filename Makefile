@@ -30,7 +30,7 @@ debug: os.iso kernel/kernel.elf
 	@$(GDB)
 	#gdbgui -g i386-elf-gdb --project $(CWD)
 
-os.iso: kernel/kernel.elf init vfs devfs initrd
+os.iso: kernel/kernel.elf init vfs devfs initrd vga_drv
 	@cp kernel/kernel.elf sysroot/boot
 	@cd initrd; tar -f ../sysroot/boot/initrd.tar -c *
 	@grub-mkrescue -o $@ sysroot >/dev/null 2>/dev/null
@@ -50,6 +50,10 @@ devfs: devfs/* kernel/start.o
 	@cd $@ && make
 	@cp $@/$@ initrd/$@
 
+
+vga_drv: vga_drv/* kernel/start.o
+	@cd $@ && make
+	@cp $@/$@ initrd/$@
 
 kernel/kernel.elf: $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) sysroot/usr/lib/libc.a
 	@$(CC) -z max-page-size=4096 -Xlinker -n -T kernel/cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc
