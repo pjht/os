@@ -57,7 +57,6 @@ int main() {
           break;
         }
         vga_write_string(data);
-        vga_write_string("\n");
         vfs_msg->flags=0;
         }
         break;
