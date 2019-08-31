@@ -11,10 +11,13 @@
 #define SEEK_SET 3
 #define EOF -1
 
-#define stdin 0
-#define stdout 1
-#define stderr 2
+#define stdin __stdio_stdin
+#define stdout __stdio_stdout
+#define stderr __stdio_stderr
 
+extern FILE* __stdio_stdin;
+extern FILE* __stdio_stdout;
+extern FILE* __stdio_stderr;
 
 FILE* fopen(char* filename,char* mode);
 int fgetc(FILE* stream);

@@ -10,9 +10,19 @@
 
 
 static uint32_t box;
+FILE* __stdio_stdin;
+FILE* __stdio_stdout;
+FILE* __stdio_stderr;
+
 
 void __stdio_init() {
   box=mailbox_new(16);
+  __stdio_stdin=malloc(sizeof(FILE*));
+  *__stdio_stdin=0;
+  __stdio_stdout=malloc(sizeof(FILE*));
+  *__stdio_stdout=1;
+  __stdio_stderr=malloc(sizeof(FILE*));
+  *__stdio_stderr=2;
 }
 
 static vfs_message* make_msg(vfs_message_type type,const char* mode,const char* path, uint32_t fd, int data) {
