@@ -75,11 +75,12 @@ void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz)
   memcpy(recv_msg->msg,mailbox.msg_store[mailbox.rd].msg,mailbox.msg_store[mailbox.rd].size);
   kfree(mailbox.msg_store[mailbox.rd].msg);
   mailbox.msg_store[mailbox.rd].size=0;
+  uint32_t orig_rd=mailbox.rd;
   mailbox.rd++;
   if (mailbox.rd==mailbox.size) {
     mailbox.rd=0;
   }
-  if (mailbox.rd>mailbox.wr) {
+  if (mailbox.rd>mailbox.wr && !(orig_rd>mailbox.wr)) {
     mailbox.rd=mailbox.wr;
   }
   serial_printf("Box %d got a message from box %d.\n",box,recv_msg->from);
