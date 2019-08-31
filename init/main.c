@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <initrd.h>
+#include <dbg.h>
+#include <vfs.h>
 
 typedef struct {
   char filename[100];

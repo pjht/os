@@ -7,6 +7,7 @@
 #include <vfs.h>
 #include <ipc/devfs.h>
 #include <string.h>
+#include <dbg.h>
 
 uint32_t vfs_box;
 uint32_t devfs_box;

@@ -7,6 +7,7 @@
 #include <tasking.h>
 #include <memory.h>
 #include "vga.h"
+#include <dbg.h>
 
 #define DEVFS_BOX 6
 #define DEVFS_PID 3
