@@ -155,8 +155,9 @@ void vfs_puts(vfs_message* vfs_msg,uint32_t from) {
   mailbox_send_msg(&msg);
   free(data);
   yield();
-  vfs_msg=get_message(&msg);
-  if (vfs_msg->flags!=0) {
+  vfs_message* resp=get_message(&msg);
+  if (resp->flags!=0) {
+    vfs_msg->flags=resp->flags;
     return;
   }
   fd_tables[from][fd].pos++;
