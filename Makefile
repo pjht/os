@@ -30,7 +30,7 @@ debug: os.iso kernel/kernel.elf
 	@$(GDB)
 	#gdbgui -g i386-elf-gdb --project $(CWD)
 
-os.iso: kernel/kernel.elf init vfs fsdrv initrd
+os.iso: kernel/kernel.elf init vfs devfs initrd
 	@cp kernel/kernel.elf sysroot/boot
 	@cd initrd; tar -f ../sysroot/boot/initrd.tar -c *
 	@grub-mkrescue -o $@ sysroot >/dev/null 2>/dev/null
@@ -46,7 +46,7 @@ vfs: vfs/* kernel/start.o
 	@cd $@ && make
 	@cp $@/$@ initrd/$@
 
-fsdrv: fsdrv/* kernel/start.o
+devfs: devfs/* kernel/start.o
 	@cd $@ && make
 	@cp $@/$@ initrd/$@
 

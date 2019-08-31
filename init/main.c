@@ -171,7 +171,7 @@ int main() {
   uint32_t datapos=find_loc("vfs",initrd);
   load_task(datapos,initrd);
   yield(); // Bochs fails here
-  datapos=find_loc("fsdrv",initrd);
+  datapos=find_loc("devfs",initrd);
   load_task(datapos,initrd);
   free(initrd);
   yieldToPID(3);

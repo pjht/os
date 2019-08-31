@@ -15,7 +15,6 @@ int main() {
   vga_init(info);
   uint32_t box=mailbox_new(16);
   register_fs("devfs",box);
-  mount("","devfs","/dev");
   for (;;) {
     yield();
     Message msg;
@@ -46,6 +45,24 @@ int main() {
         vga_write_string(data);
         vfs_msg->flags=0;
         break;
+        }
+        case VFS_MOUNT: {
+          char* disk_file=malloc(sizeof(char)*vfs_msg->data);
+          Message msg;
+          msg.msg=disk_file;
+          mailbox_get_msg(box,&msg,vfs_msg->data);
+          while (msg.from==0 && msg.size==0) {
+            yield();
+            mailbox_get_msg(box,&msg,sizeof(vfs_message));
+          }
+          if (msg.from==0) {
+            serial_print("Could not recieve disk file path from the VFS\n");
+            vfs_msg->flags=2;
+            break;
+          }
+          free(disk_file);
+          vfs_msg->flags=0;
+          break;
         }
         default:
         vfs_msg->flags=1;
