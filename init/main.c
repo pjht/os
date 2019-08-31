@@ -180,13 +180,13 @@ int main() {
   yieldToPID(4);
   serial_print("MOUNT\n");
   vga_write_string("CALLING MOUNT\n");
-  mount("","devfs","/dev");
+  mount("","devfs","/dev/");
   serial_print("MOUNT SUCSESFULL\n");
   vga_write_string("MOUNT SUCSESFULL\n");
   FILE* file;
   do {
     vga_write_string("CALLING FOPEN\n");
-    file=fopen("/dev/sda","w");
+    file=fopen("/dev/vga","w");
     vga_write_string("FOPEN RETURNED\n");
   } while(file==NULL);
   vga_write_string("CALLING FPUTS\n");

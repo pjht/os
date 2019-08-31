@@ -19,6 +19,7 @@ typedef struct {
   char* mode;
   uint32_t pos;
   char error;
+  void* fs_data;
 } vfs_file;
 
 static const char** drv_names;
@@ -120,6 +121,7 @@ void vfs_fopen(vfs_message* vfs_msg,uint32_t from) {
     strcpy(fd_tables[from][fd].mode,&vfs_msg->mode[0]);
     fd_tables[from][fd].pos=0;
     fd_tables[from][fd].error=0;
+    fd_tables[from][fd].fs_data=resp_msg->fs_data;
     vfs_msg->fd=fd;
     vfs_msg->flags=0;
     return;
@@ -145,6 +147,7 @@ void vfs_puts(vfs_message* vfs_msg,uint32_t from) {
   strcpy(&vfs_msg->path[0],file_info.path);
   strcpy(&vfs_msg->mode[0],file_info.mode);
   vfs_msg->pos=file_info.pos;
+  vfs_msg->fs_data=fd_tables[from][fd].fs_data;
   msg.from=box;
   msg.to=drvs[file_info.mntpnt->type];
   msg.size=sizeof(vfs_message);

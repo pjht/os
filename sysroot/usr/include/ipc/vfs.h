@@ -20,6 +20,7 @@ typedef struct {
   uint32_t pos;
   char flags;
   int data;
+  void* fs_data;
 } vfs_message;
 
 #endif
