@@ -56,21 +56,11 @@ void kernel_mailbox_send_msg(Message* user_msg) {
 void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz) {
   Mailbox mailbox=mailboxes[box];
   if (mailbox.msg_store[mailbox.rd].size==0) {
-    mailbox.rd++;
-    if (mailbox.rd==mailbox.size) {
-      mailbox.rd=0;
-    }
-    if (mailbox.msg_store[mailbox.rd].size==0) {
-      mailbox.rd--;
-      if (mailbox.rd==(2^32)-1) {
-        mailbox.rd=mailbox.size-1;
-      }
-      recv_msg->size=0;
-      recv_msg->from=0;
-      serial_printf("Box %d attempted to get a message, but there were none.\n",box);
-      mailboxes[box]=mailbox;
-      return;
-    }
+    recv_msg->size=0;
+    recv_msg->from=0;
+    serial_printf("Box %d attempted to get a message, but there were none.\n",box);
+    mailboxes[box]=mailbox;
+    return;
   }
   recv_msg->from=mailbox.msg_store[mailbox.rd].from;
   recv_msg->to=mailbox.msg_store[mailbox.rd].to;
@@ -90,10 +80,7 @@ void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz)
     mailbox.rd=0;
   }
   if (mailbox.rd>mailbox.wr) {
-    mailbox.rd=mailbox.wr-1;
-    if (mailbox.rd==(2^32)-1) {
-      mailbox.rd=mailbox.size-1;
-    }
+    mailbox.rd=mailbox.wr;
   }
   serial_printf("Box %d got a message from box %d.\n",box,recv_msg->from);
   mailboxes[box]=mailbox;
