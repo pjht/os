@@ -1,5 +1,4 @@
 #include <string.h>
-#include "vga.h"
 #include <grub/text_fb_info.h>
 #include <ipc/vfs.h>
 #include <elf.h>
@@ -31,36 +30,6 @@ uint32_t getsize(const char *in) {
         size+=((in[j-1]-'0')*count);
     }
     return size;
-}
-
-void display_msg(vfs_message* vfs_msg) {
-  vga_write_string("Message of type ");
-  char str[256];
-  str[0]='\0';
-  int_to_ascii(vfs_msg->type,str);
-  vga_write_string(str);
-  vga_write_string("\n");
-  vga_write_string("ID ");
-  str[0]='\0';
-  int_to_ascii(vfs_msg->id,str);
-  vga_write_string(str);
-  vga_write_string("\n");
-  vga_write_string("Mode ");
-  vga_write_string(&vfs_msg->mode[0]);
-  vga_write_string("\n");
-  vga_write_string("FD ");
-  str[0]='\0';
-  int_to_ascii(vfs_msg->fd,str);
-  vga_write_string(str);
-  vga_write_string("\n");
-  vga_write_string("Path ");
-  vga_write_string(&vfs_msg->path[0]);
-  vga_write_string("\n");
-  vga_write_string("Flags ");
-  str[0]='\0';
-  hex_to_ascii(vfs_msg->flags,str);
-  vga_write_string(str);
-  vga_write_string("\n");
 }
 
 uint32_t find_loc(char* name,char* initrd) {
@@ -96,7 +65,6 @@ char load_task(uint32_t datapos,char* initrd) {
     pos++;
   }
   if (header.magic!=ELF_MAGIC) {
-    vga_write_string("[INFO] Invalid magic number\n");
     return 0;
   } else {
     void* cr3=new_address_space();
@@ -124,49 +92,7 @@ char load_task(uint32_t datapos,char* initrd) {
   return 1;
 }
 
-vfs_message* make_msg(vfs_message_type type, char* mode, char* path) {
-  static uint32_t id=0;
-  vfs_message* msg_data=malloc(sizeof(vfs_message));
-  msg_data->type=type;
-  msg_data->id=id;
-  id++;
-  strcpy(&msg_data->mode[0],mode);
-  strcpy(&msg_data->path[0],path);
-  return msg_data;
-}
-
-void test_vfs(char* path,uint32_t box,uint32_t fs_box) {
-  vga_write_string("Sending test message\n");
-  vfs_message* msg_data=make_msg(VFS_OPEN,"r",path);
-  Message msg;
-  msg.from=box;
-  msg.to=1;
-  msg.msg=msg_data;
-  msg.size=sizeof(vfs_message);
-  mailbox_send_msg(&msg);
-  free(msg.msg);
-  yield();
-  vga_write_string("Getting fs_box message\n");
-  yield();
-  vga_write_string("Getting message\n");
-  msg.msg=malloc(sizeof(vfs_message));
-  mailbox_get_msg(box,&msg,sizeof(vfs_message));
-  if (msg.from==0) {
-    vga_write_string("No message\n");
-  } else {
-    vfs_message* vfs_msg=(vfs_message*)msg.msg;
-    display_msg(vfs_msg);
-  }
-  free(msg.msg);
-}
-
 int main() {
-  text_fb_info info;
-  info.address=map_phys((void*)0xB8000,10);
-  info.width=80;
-  info.height=25;
-  vga_init(info);
-  vga_write_string("INIT\n");
   long size=initrd_sz();
   char* initrd=malloc(size);
   initrd_get(initrd);
@@ -180,24 +106,14 @@ int main() {
   load_task(datapos,initrd);
   free(initrd);
   yieldToPID(4);
-  serial_print("MOUNT\n");
-  vga_write_string("CALLING MOUNT\n");
   mount("","devfs","/dev/");
-  serial_print("MOUNT SUCSESFULL\n");
-  vga_write_string("MOUNT SUCSESFULL\n");
   FILE* file;
   do {
-    vga_write_string("CALLING FOPEN\n");
     file=fopen("/dev/vga","w");
-    vga_write_string("FOPEN RETURNED\n");
   } while(file==NULL);
   do {
-    vga_write_string("CALLING FOPEN\n");
     file=fopen("/dev/vga","w");
-    vga_write_string("FOPEN RETURNED\n");
   } while(file==NULL);
-  vga_write_string("CALLING FPUTS\n");
   fputs("FPUTS String\n",file);
-  vga_write_string("FPUTS RETURNED\n");
   printf("Printf %d\n",size);
 }
