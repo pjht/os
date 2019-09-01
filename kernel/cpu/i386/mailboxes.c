@@ -65,10 +65,11 @@ void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz)
   recv_msg->from=mailbox.msg_store[mailbox.rd].from;
   recv_msg->to=mailbox.msg_store[mailbox.rd].to;
   recv_msg->size=mailbox.msg_store[mailbox.rd].size;
-  if (buffer_sz>mailbox.msg_store[mailbox.rd].size) {
+  if (buffer_sz<mailbox.msg_store[mailbox.rd].size) {
     recv_msg->size=mailbox.msg_store[mailbox.rd].size;
     recv_msg->from=0;
     serial_printf("Box %d attempted to get the message from box %d, but the buffer was too small.\n",box,mailbox.msg_store[mailbox.rd].from);
+    serial_printf("The message size is %d, and the buffer size is %d.\n",mailbox.msg_store[mailbox.rd].size,buffer_sz);
     mailboxes[box]=mailbox;
     return;
   }
