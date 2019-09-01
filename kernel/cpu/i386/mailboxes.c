@@ -59,7 +59,7 @@ void kernel_mailbox_send_msg(Message* user_msg) {
 
 void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz) {
   Mailbox mailbox=mailboxes[box];
-  if (mailbox.msg_store[mailbox.rd].size==0) {
+  if (mailbox.msg_store[mailbox.rd].from==0) {
     recv_msg->size=0;
     recv_msg->from=0;
     serial_printf("Box %s attempted to get a message, but there were none.\n",mailboxes[box].name);
@@ -78,7 +78,7 @@ void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz)
   }
   memcpy(recv_msg->msg,mailbox.msg_store[mailbox.rd].msg,mailbox.msg_store[mailbox.rd].size);
   kfree(mailbox.msg_store[mailbox.rd].msg);
-  mailbox.msg_store[mailbox.rd].size=0;
+  mailbox.msg_store[mailbox.rd].from=0;
   uint32_t orig_rd=mailbox.rd;
   mailbox.rd++;
   if (mailbox.rd==mailbox.size) {
