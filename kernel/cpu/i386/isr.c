@@ -14,6 +14,8 @@
 #include <string.h>
 #include <stdint.h>
 #include "serial.h"
+#include <sys/types.h>
+
 void irq_handler(registers_t r);
 static isr_t interrupt_handlers[256];
 
@@ -239,6 +241,8 @@ void isr_handler(registers_t r) {
       } else if (r.eax==19) {
         serial_printf("Copying initrd\n");
         memcpy((char*)r.ebx,initrd,initrd_sz);
+      } else if (r.eax==20) {
+        r.ebx=(pid_t)getPID();
       }
       break;
     }
