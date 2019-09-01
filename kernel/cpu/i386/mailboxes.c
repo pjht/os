@@ -9,7 +9,7 @@
 Mailbox* mailboxes=(Mailbox*)0xF6400000;
 uint32_t next_box=1;
 
-uint32_t kernel_mailbox_new(uint16_t size) {
+uint32_t kernel_mailbox_new(uint16_t size,char* name) {
   if (next_box==262144) {
     serial_printf("Attempted to create a mailbox, but failed\n");
     return 0xFFFFFFFF;
@@ -18,7 +18,11 @@ uint32_t kernel_mailbox_new(uint16_t size) {
   mailboxes[next_box].wr=0;
   mailboxes[next_box].size=size;
   mailboxes[next_box].msg_store=kmalloc(sizeof(Message)*size);
-  serial_printf("PID %d created mailbox %d\n",getPID(),next_box);
+  if (strlen(name)>19) {
+    name[20]='\0';
+  }
+  strcpy(mailboxes[next_box].name,name);
+  serial_printf("PID %d created mailbox %s\n",getPID(),mailboxes[next_box].name);
   next_box++;
   return next_box-1;
 }
@@ -29,7 +33,7 @@ void kernel_mailbox_free(uint32_t box) {
 
 void kernel_mailbox_send_msg(Message* user_msg) {
   if (user_msg->to==0) {
-    serial_printf("Box %d attempted to send to box 0!\n",user_msg->from);
+    serial_printf("Box %s attempted to send to box 0!\n",mailboxes[user_msg->from].name);
     return;
   }
   Mailbox mailbox=mailboxes[user_msg->to];
@@ -50,7 +54,7 @@ void kernel_mailbox_send_msg(Message* user_msg) {
     }
   }
   mailboxes[user_msg->to]=mailbox;
-  serial_printf("Message sent from box %d to box %d\n",user_msg->from,user_msg->to);
+  serial_printf("Message sent from box %s to box %s\n",mailboxes[user_msg->from].name,mailboxes[user_msg->to].name);
 }
 
 void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz) {
@@ -58,7 +62,7 @@ void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz)
   if (mailbox.msg_store[mailbox.rd].size==0) {
     recv_msg->size=0;
     recv_msg->from=0;
-    serial_printf("Box %d attempted to get a message, but there were none.\n",box);
+    serial_printf("Box %s attempted to get a message, but there were none.\n",mailboxes[box].name);
     mailboxes[box]=mailbox;
     return;
   }
@@ -68,8 +72,7 @@ void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz)
   if (buffer_sz<mailbox.msg_store[mailbox.rd].size) {
     recv_msg->size=mailbox.msg_store[mailbox.rd].size;
     recv_msg->from=0;
-    serial_printf("Box %d attempted to get the message from box %d, but the buffer was too small.\n",box,mailbox.msg_store[mailbox.rd].from);
-    serial_printf("The message size is %d, and the buffer size is %d.\n",mailbox.msg_store[mailbox.rd].size,buffer_sz);
+    serial_printf("Box %s attempted to get the message from box %s, but the buffer was too small.\n",mailboxes[box].name,mailboxes[mailbox.msg_store[mailbox.rd].from].name);
     mailboxes[box]=mailbox;
     return;
   }
@@ -84,6 +87,6 @@ void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz)
   if (mailbox.rd>mailbox.wr && !(orig_rd>mailbox.wr)) {
     mailbox.rd=mailbox.wr;
   }
-  serial_printf("Box %d got a message from box %d.\n",box,recv_msg->from);
+  serial_printf("Box %s got a message from box %s.\n",mailboxes[box].name,mailboxes[recv_msg->from].name);
   mailboxes[box]=mailbox;
 }

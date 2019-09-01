@@ -282,7 +282,7 @@ void vfs_mount(vfs_message* vfs_msg, uint32_t from) {
 
 int main() {
   init_vfs();
-  box=mailbox_new(16);
+  box=mailbox_new(16,"vfs");
   yield();
   while (1) {
     Message msg;

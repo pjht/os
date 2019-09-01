@@ -1,12 +1,12 @@
 #include <stdint.h>
 #include <mailboxes.h>
 
-uint32_t mailbox_new(uint16_t size) {
+uint32_t mailbox_new(uint16_t size,char* name) {
   uint32_t box;
   asm volatile("  \
     mov $14, %%eax; \
     int $80; \
-  ":"=b"(box):"b"(size));
+  ":"=b"(box):"b"(size),"c"(name));
   return box;
 }
 

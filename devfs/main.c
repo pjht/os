@@ -116,8 +116,8 @@ void process_vfs_msg(vfs_message* vfs_msg) {
 
 
 int main() {
-  vfs_box=mailbox_new(16);
-  devfs_box=mailbox_new(16);
+  vfs_box=mailbox_new(16,"devfs_vfs");
+  devfs_box=mailbox_new(16,"devfs_devfs");
   register_fs("devfs",vfs_box);
   dev_names=malloc(sizeof(char*)*32);
   dev_mboxes=malloc(sizeof(uint32_t)*32);

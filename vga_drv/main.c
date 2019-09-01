@@ -13,7 +13,7 @@
 #define DEVFS_PID 3
 
 int main() {
-  uint32_t box=mailbox_new(16);
+  uint32_t box=mailbox_new(16,"vga");
   text_fb_info info;
   info.address=map_phys((void*)0xB8000,10);
   info.width=80;

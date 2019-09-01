@@ -15,9 +15,10 @@ typedef struct {
   uint32_t wr;
   uint16_t size;
   Message* msg_store;
+  char name[20];
 } Mailbox;
 
-uint32_t mailbox_new(uint16_t size);
+uint32_t mailbox_new(uint16_t size,char* name);
 void mailbox_send_msg(Message* msg);
 void mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz);
 

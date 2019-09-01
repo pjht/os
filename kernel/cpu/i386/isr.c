@@ -228,7 +228,7 @@ void isr_handler(registers_t r) {
       } else if (r.eax==13) {
         r.ebx=(uint32_t)address_spaces_put_data((void*)r.ebx,(void*)r.ecx,r.edx);
       } else if (r.eax==14) {
-        r.ebx=kernel_mailbox_new((uint16_t)r.ebx);
+        r.ebx=kernel_mailbox_new((uint16_t)r.ebx,(char*)r.ecx);
       } else if (r.eax==15) {
         tasking_yieldToPID(r.ebx);
       } else if (r.eax==16) {

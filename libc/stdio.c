@@ -6,6 +6,7 @@
 #include <tasking.h>
 #include <dbg.h>
 #include <limits.h>
+#include <unistd.h>
 #define VFS_MBOX 3
 #define VFS_PID 2
 
@@ -17,7 +18,12 @@ FILE* __stdio_stderr;
 
 
 void __stdio_init() {
-  box=mailbox_new(16);
+  char name[256];
+  strcpy(name,"stdio");
+  int name_end_index=strlen(name);
+  char* name_end=&name[name_end_index];
+  int_to_ascii(getpid(),name_end);
+  box=mailbox_new(16,name);
   __stdio_stdin=malloc(sizeof(FILE*));
   *__stdio_stdin=0;
   __stdio_stdout=malloc(sizeof(FILE*));
