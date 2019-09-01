@@ -31,13 +31,17 @@ int main() {
   msg.size=sizeof(devfs_message);
   msg.msg=msg_data;
   mailbox_send_msg(&msg);
+  free(msg_data);
   yieldToPID(DEVFS_PID);
   for (;;) {
     Message msg;
     msg.msg=malloc(sizeof(vfs_message));
     mailbox_get_msg(box,&msg,sizeof(vfs_message));
-    if (msg.from!=0) {
+    if (msg.from==0) {
+      free(msg.msg);
+    } else {
       vfs_message* vfs_msg=(vfs_message*)msg.msg;
+      char* gets_data=NULL;
       switch (vfs_msg->type) {
         case VFS_OPEN:
         vfs_msg->flags=0;
@@ -58,16 +62,31 @@ int main() {
         }
         vga_write_string(data);
         vfs_msg->flags=0;
-        }
         break;
+        }
+        case VFS_GETS: {
+        vfs_msg->flags=2;
+        break;
+        }
         default:
         vfs_msg->flags=1;
       }
       msg.to=msg.from;
       msg.from=box;
       mailbox_send_msg(&msg);
+      free(msg.msg);
+      if (gets_data && vfs_msg->flags==0) {
+        serial_print("GETS DATA VGA\n");
+        msg.msg=gets_data;
+        msg.size=vfs_msg->data;
+        mailbox_send_msg(&msg);
+        free(gets_data);
+      } else {
+        if (vfs_msg->type==VFS_GETS) {
+          serial_print("NO GETS DATA VGA\n");
+        }
+      }
     }
-    free(msg.msg);
     yield();
   }
 }

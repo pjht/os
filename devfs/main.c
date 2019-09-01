@@ -17,7 +17,10 @@ char** dev_names;
 uint32_t* dev_mboxes;
 int* dev_types;
 
-void process_vfs_msg(vfs_message* vfs_msg) {
+#define VFS_PID 2
+
+char* process_vfs_msg(vfs_message* vfs_msg) {
+  char* gets_data=NULL;
   switch (vfs_msg->type) {
     case VFS_OPEN: {
     int i;
@@ -91,6 +94,39 @@ void process_vfs_msg(vfs_message* vfs_msg) {
     vfs_msg->flags=recv_msg->flags;
     break;
     }
+    case VFS_GETS: {
+      Message msg;
+      msg.from=devfs_box;
+      msg.to=*((int*)vfs_msg->fs_data);
+      msg.size=sizeof(vfs_message);
+      msg.msg=vfs_msg;
+      mailbox_send_msg(&msg);
+      vfs_message* recv_msg=malloc(sizeof(vfs_message));
+      msg.msg=recv_msg;
+      mailbox_get_msg(devfs_box,&msg,sizeof(vfs_message));
+      while (msg.from==0 && msg.size==0) {
+        yield();
+        mailbox_get_msg(devfs_box,&msg,sizeof(vfs_message));
+      }
+      if (recv_msg->flags) {
+        vfs_msg->flags=recv_msg->flags;
+        break;
+      } else {
+        if (recv_msg->data>vfs_msg->data) {
+          vfs_msg->flags=2;
+        }
+        vfs_msg->data=recv_msg->data;
+      }
+      gets_data=malloc(sizeof(vfs_msg->data));
+      msg.msg=gets_data;
+      mailbox_get_msg(devfs_box,&msg,vfs_msg->data);
+      while (msg.from==0 && msg.size==0) {
+        yield();
+        mailbox_get_msg(devfs_box,&msg,sizeof(vfs_message));
+      }
+      vfs_msg->flags=0;
+      break;
+    }
     case VFS_MOUNT: {
       char* disk_file=malloc(sizeof(char)*vfs_msg->data);
       Message msg;
@@ -112,6 +148,7 @@ void process_vfs_msg(vfs_message* vfs_msg) {
     default:
     vfs_msg->flags=1;
   }
+  return gets_data;
 }
 
 
@@ -123,26 +160,30 @@ int main() {
   dev_mboxes=malloc(sizeof(uint32_t)*32);
   dev_types=malloc(sizeof(int)*32);
   for (;;) {
-    yield();
     Message msg;
     msg.msg=malloc(sizeof(vfs_message));
     mailbox_get_msg(vfs_box,&msg,sizeof(vfs_message));
     if (msg.from==0) {
-      yield();
+      free(msg.msg);
     } else {
       vfs_message* vfs_msg=(vfs_message*)msg.msg;
-      process_vfs_msg(vfs_msg);
+      char* gets_data=process_vfs_msg(vfs_msg);
       msg.to=msg.from;
       msg.from=vfs_box;
+      msg.size=sizeof(vfs_message);
       mailbox_send_msg(&msg);
+      free(msg.msg);
+      if (gets_data) {
+        msg.size=vfs_msg->data;
+        msg.msg=gets_data;
+        mailbox_send_msg(&msg);
+        free(gets_data);
+      }
+      yieldToPID(VFS_PID);
     }
-    free(msg.msg);
-    yield();
     msg.msg=malloc(sizeof(devfs_message));
     mailbox_get_msg(devfs_box,&msg,sizeof(devfs_message));
-    if (msg.from==0) {
-      yield();
-    } else {
+    if (msg.from!=0) {
       devfs_message* devfs_msg=(devfs_message*)msg.msg;
       if (num_devs==max_devs) {
         max_devs+=32;
@@ -157,5 +198,6 @@ int main() {
       num_devs++;
     }
     free(msg.msg);
+    yield();
   }
 }

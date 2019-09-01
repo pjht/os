@@ -115,5 +115,9 @@ int main() {
     file=fopen("/dev/vga","w");
   } while(file==NULL);
   fputs("FPUTS String\n",file);
-  printf("Printf %d\n",size);
+  char str[3]={0,0,0};
+  fgets(str,2,stdin);
+  char str2[3]={0,0,0};
+  fgets(str2,2,stdin);
+  printf("Printf %s,%s\n",str,str2);
 }
