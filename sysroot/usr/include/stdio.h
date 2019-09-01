@@ -21,8 +21,9 @@ extern FILE* __stdio_stderr;
 
 FILE* fopen(char* filename,char* mode);
 int fgetc(FILE* stream);
-int getc();
+int getc(FILE* stream);
 char* fgets(char* str,int count,FILE* stream);
+char* gets(char* str);
 size_t fread(void* buffer,size_t size,size_t count,FILE* stream);
 int fputc(int c,FILE* stream);
 int putc(int c,FILE *stream);
