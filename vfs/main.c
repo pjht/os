@@ -163,8 +163,48 @@ void vfs_puts(vfs_message* vfs_msg,uint32_t from) {
     vfs_msg->flags=resp->flags;
     return;
   }
-  fd_tables[from][fd].pos++;
+  fd_tables[from][fd].pos+=vfs_msg->data;
   vfs_msg->flags=0;
+}
+
+char* vfs_gets(vfs_message* vfs_msg,uint32_t from) {
+  uint32_t fd=vfs_msg->fd;
+  vfs_file file_info=fd_tables[from][fd];
+  strcpy(&vfs_msg->path[0],file_info.path);
+  strcpy(&vfs_msg->mode[0],file_info.mode);
+  vfs_msg->pos=file_info.pos;
+  vfs_msg->fs_data=fd_tables[from][fd].fs_data;
+  Message msg;
+  msg.from=box;
+  msg.to=drvs[file_info.mntpnt->type];
+  msg.size=sizeof(vfs_message);
+  msg.msg=vfs_msg;
+  mailbox_send_msg(&msg);
+  yield();
+  vfs_message* resp=get_message(&msg);
+  if (resp->flags!=0) {
+    vfs_msg->flags=resp->flags;
+    return NULL;
+  }
+  char* data=malloc(sizeof(char)*resp->data);
+  msg.msg=data;
+  mailbox_get_msg(box,&msg,resp->data);
+  while (msg.from==0 && msg.size==0) {
+    yield();
+    mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  }
+  if (msg.from==0) {
+    vfs_msg->flags=2;
+    return NULL;
+  }
+  if (resp->data>vfs_msg->data) {
+    vfs_msg->flags=2;
+    return NULL;
+  }
+  vfs_msg->data=resp->data;
+  fd_tables[from][fd].pos+=vfs_msg->data;
+  vfs_msg->flags=0;
+  return data;
 }
 
 
@@ -248,12 +288,16 @@ int main() {
     Message msg;
     vfs_message* vfs_msg=get_message(&msg);
     uint32_t sender=msg.from;
+    char* gets_data;
     switch (vfs_msg->type) {
       case VFS_OPEN:
       vfs_fopen(vfs_msg,msg.from);
       break;
       case VFS_PUTS:
       vfs_puts(vfs_msg,msg.from);
+      break;
+      case VFS_GETS:
+      gets_data=vfs_gets(vfs_msg,msg.from);
       break;
       case VFS_MOUNT:
       vfs_mount(vfs_msg,msg.from);
@@ -268,6 +312,11 @@ int main() {
     msg.from=box;
     msg.to=sender;
     mailbox_send_msg(&msg);
+    if (vfs_msg->type==VFS_GETS && gets_data!=NULL) {
+      msg.size=vfs_msg->data;
+      msg.msg=gets_data;
+      mailbox_send_msg(&msg);
+    }
     yield();
   }
   for (;;);
