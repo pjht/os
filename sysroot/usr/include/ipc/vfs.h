@@ -4,7 +4,7 @@
 typedef enum {
   VFS_OPEN,
   VFS_PUTS,
-  VFS_GETC,
+  VFS_GETS,
   VFS_CLOSE,
   VFS_REGISTER_FS,
   VFS_MOUNT,
