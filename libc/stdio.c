@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <tasking.h>
 #include <dbg.h>
+#include <limits.h>
 #define VFS_MBOX 3
 #define VFS_PID 2
 
@@ -83,6 +84,89 @@ int fputc(int c, FILE* stream) {
   return EOF;
 }
 
+int getc(FILE* stream) __attribute__ ((alias ("fgetc")));
+
+int fgetc(FILE* stream) {
+  char c[2];
+  if (fgets(&c[0],1,stream)==NULL) {
+    return EOF;
+  } else {
+    return c[0];
+  }
+  return EOF;
+}
+
+char* gets(char* s) {
+  return fgets(s,INT_MAX,stdin);
+}
+
+char* fgets(char* str,int count,FILE* stream) {
+  vfs_message* msg_data=make_msg(VFS_GETS,NULL,NULL,*stream,count);
+  Message msg;
+  msg.from=box;
+  msg.to=VFS_MBOX;
+  msg.msg=msg_data;
+  msg.size=sizeof(vfs_message);
+  mailbox_send_msg(&msg);
+  yieldToPID(VFS_PID);
+  mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  while (msg.from==0) {
+    yieldToPID(VFS_PID);
+    mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  }
+  vfs_message* vfs_msg=(vfs_message*)msg.msg;
+  if (vfs_msg->flags) {
+    free(vfs_msg);
+    return NULL;
+  } else {
+    msg.msg=str;
+    mailbox_get_msg(box,&msg,count);
+    while (msg.from==0) {
+      yieldToPID(VFS_PID);
+      mailbox_get_msg(box,&msg,count);
+    }
+    str[vfs_msg->data]='\0';
+    free(vfs_msg);
+    return str;
+  }
+  free(vfs_msg);
+  return NULL;
+}
+
+size_t fread(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
+  char* buffer=(char*)buffer_ptr;
+  size_t bytes=size*count;
+  vfs_message* msg_data=make_msg(VFS_GETS,NULL,NULL,*stream,bytes);
+  Message msg;
+  msg.from=box;
+  msg.to=VFS_MBOX;
+  msg.msg=msg_data;
+  msg.size=sizeof(vfs_message);
+  mailbox_send_msg(&msg);
+  yieldToPID(VFS_PID);
+  mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  while (msg.from==0) {
+    yieldToPID(VFS_PID);
+    mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  }
+  vfs_message* vfs_msg=(vfs_message*)msg.msg;
+  if (vfs_msg->flags) {
+    free(vfs_msg);
+    return 0;
+  } else {
+    msg.msg=buffer;
+    mailbox_get_msg(box,&msg,count);
+    while (msg.from==0) {
+      yieldToPID(VFS_PID);
+      mailbox_get_msg(box,&msg,count);
+    }
+    free(vfs_msg);
+    return count;
+  }
+  free(vfs_msg);
+  return 0;
+}
+
 int fputs(const char* s, FILE* stream) {
   vfs_message* msg_data=make_msg(VFS_PUTS,NULL,NULL,*stream,strlen(s));
   Message msg;
@@ -109,6 +193,7 @@ int fputs(const char* s, FILE* stream) {
     free(msg.msg);
     return 0;
   }
+  free(msg.msg);
   return EOF;
 }
 
@@ -140,6 +225,7 @@ size_t fwrite(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
     free(msg.msg);
     return count;
   }
+  free(msg.msg);
   return 0;
 }
 
