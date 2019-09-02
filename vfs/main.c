@@ -6,6 +6,7 @@
 #include <dbg.h>
 
 #define PROC_FD_LIMIT 1024
+#define ID_LIMIT 256
 
 typedef struct _vfs_mapping_struct {
   char* mntpnt;
@@ -22,6 +23,17 @@ typedef struct {
   void* fs_data;
 } vfs_file;
 
+typedef struct {
+  uint32_t fd;
+  int max_len;
+} gets_data;
+
+
+typedef struct {
+  char* path;
+  uint32_t type;
+} mount_data;
+
 static const char** drv_names;
 static uint32_t* drvs;
 static uint32_t max_drvs;
@@ -31,6 +43,7 @@ static vfs_mapping* tail_mapping;
 vfs_file* fd_tables[32768];
 uint16_t open_fds[32768];
 uint32_t box;
+void** in_progress_data[32768];
 vfs_message* get_message(Message* msg) {
   msg->msg=malloc(sizeof(vfs_message));
   mailbox_get_msg(box,msg,sizeof(vfs_message));
@@ -73,6 +86,9 @@ uint32_t register_fs_intern(uint32_t drv,const char* type) {
 }
 
 void vfs_fopen(vfs_message* vfs_msg,uint32_t from) {
+  if (fd_tables[from]!=NULL&&open_fds[from]==PROC_FD_LIMIT) {
+    vfs_msg->flags=2;
+  }
   vfs_mapping* mnt=head_mapping;
   vfs_mapping* mntpnt=NULL;
   uint32_t mntpnt_len=0;
@@ -85,7 +101,7 @@ void vfs_fopen(vfs_message* vfs_msg,uint32_t from) {
       }
     }
   }
-  if (mntpnt) { // was if (mntpnt)
+  if (mntpnt) {
     Message msg;
     char* path_buf=malloc(sizeof(char)*4096);
     strcpy(path_buf,&(vfs_msg->path[0]));
@@ -99,34 +115,35 @@ void vfs_fopen(vfs_message* vfs_msg,uint32_t from) {
     msg.size=sizeof(vfs_message);
     msg.msg=vfs_msg;
     mailbox_send_msg(&msg);
-    yield();
-    vfs_message* resp_msg=get_message(&msg);
-    if (resp_msg->flags!=0) {
-      return;
-    }
-    if (fd_tables[from]==NULL) {
-      fd_tables[from]=malloc(PROC_FD_LIMIT*sizeof(vfs_file));
-      open_fds[from]=0;
-    } else {
-      if (open_fds[from]==PROC_FD_LIMIT) {
-        vfs_msg->flags=2;
-      }
-    }
-    uint16_t fd=open_fds[from];
-    open_fds[from]++;
-    fd_tables[from][fd].mntpnt=mntpnt;
-    fd_tables[from][fd].path=malloc(sizeof(char)*(strlen(&vfs_msg->path[0])+1));
-    strcpy(fd_tables[from][fd].path,&vfs_msg->path[0]);
-    fd_tables[from][fd].mode=malloc(sizeof(char)*(strlen(&vfs_msg->mode[0])+1));
-    strcpy(fd_tables[from][fd].mode,&vfs_msg->mode[0]);
-    fd_tables[from][fd].pos=0;
-    fd_tables[from][fd].error=0;
-    fd_tables[from][fd].fs_data=resp_msg->fs_data;
-    vfs_msg->fd=fd;
-    vfs_msg->flags=0;
-    return;
+    in_progress_data[from][vfs_msg->id]=mntpnt;
+  } else {
+    vfs_msg->flags=2;
   }
-  vfs_msg->flags=2;
+  vfs_msg->flags=0;
+}
+void vfs_fopen_finish(vfs_message* vfs_msg,uint32_t from) {
+  vfs_mapping* mntpnt=in_progress_data[vfs_msg->orig_mbox][vfs_msg->id];
+  if (fd_tables[vfs_msg->orig_mbox]==NULL) {
+    fd_tables[vfs_msg->orig_mbox]=malloc(PROC_FD_LIMIT*sizeof(vfs_file));
+    open_fds[vfs_msg->orig_mbox]=0;
+  }
+  uint16_t fd=open_fds[vfs_msg->orig_mbox];
+  open_fds[vfs_msg->orig_mbox]++;
+  fd_tables[vfs_msg->orig_mbox][fd].mntpnt=mntpnt;
+  fd_tables[vfs_msg->orig_mbox][fd].path=malloc(sizeof(char)*(strlen(&vfs_msg->path[0])+1));
+  strcpy(fd_tables[vfs_msg->orig_mbox][fd].path,&vfs_msg->path[0]);
+  fd_tables[vfs_msg->orig_mbox][fd].mode=malloc(sizeof(char)*(strlen(&vfs_msg->mode[0])+1));
+  strcpy(fd_tables[vfs_msg->orig_mbox][fd].mode,&vfs_msg->mode[0]);
+  fd_tables[vfs_msg->orig_mbox][fd].pos=0;
+  fd_tables[vfs_msg->orig_mbox][fd].error=0;
+  fd_tables[vfs_msg->orig_mbox][fd].fs_data=vfs_msg->fs_data;
+  vfs_msg->fd=fd;
+  vfs_msg->flags=0;
+  free(mntpnt);
+}
+
+void vfs_fopen_abort(vfs_message* vfs_msg,uint32_t from) {
+  free(in_progress_data[from][vfs_msg->id]);
 }
 
 void vfs_puts(vfs_message* vfs_msg,uint32_t from) {
@@ -157,17 +174,23 @@ void vfs_puts(vfs_message* vfs_msg,uint32_t from) {
   msg.msg=data;
   mailbox_send_msg(&msg);
   free(data);
-  yield();
-  vfs_message* resp=get_message(&msg);
-  if (resp->flags!=0) {
-    vfs_msg->flags=resp->flags;
-    return;
-  }
-  fd_tables[from][fd].pos+=vfs_msg->data;
+  in_progress_data[from][vfs_msg->id]=malloc(sizeof(uint32_t));
+  *((uint32_t*)in_progress_data[from][vfs_msg->id])=fd;
   vfs_msg->flags=0;
 }
 
-char* vfs_gets(vfs_message* vfs_msg,uint32_t from) {
+void vfs_puts_finish(vfs_message* vfs_msg,uint32_t from) {
+  uint32_t fd=*((uint32_t*)in_progress_data[vfs_msg->orig_mbox][vfs_msg->id]);
+  free(in_progress_data[vfs_msg->orig_mbox][vfs_msg->id]);
+  fd_tables[vfs_msg->orig_mbox][fd].pos+=vfs_msg->data;
+  vfs_msg->flags=0;
+}
+
+void vfs_puts_abort(vfs_message* vfs_msg,uint32_t from) {
+  free(in_progress_data[vfs_msg->orig_mbox][vfs_msg->id]);
+}
+
+void vfs_gets(vfs_message* vfs_msg,uint32_t from) {
   uint32_t fd=vfs_msg->fd;
   vfs_file file_info=fd_tables[from][fd];
   strcpy(&vfs_msg->path[0],file_info.path);
@@ -180,15 +203,18 @@ char* vfs_gets(vfs_message* vfs_msg,uint32_t from) {
   msg.size=sizeof(vfs_message);
   msg.msg=vfs_msg;
   mailbox_send_msg(&msg);
-  yield();
-  vfs_message* resp=get_message(&msg);
-  if (resp->flags!=0) {
-    vfs_msg->flags=resp->flags;
-    return NULL;
-  }
-  char* data=malloc(sizeof(char)*resp->data);
-  msg.msg=data;
-  mailbox_get_msg(box,&msg,resp->data);
+  gets_data* data=malloc(sizeof(gets_data));
+  in_progress_data[from][vfs_msg->id]=data;
+  data->fd=fd;
+  data->max_len=vfs_msg->data;
+  vfs_msg->flags=0;
+}
+
+char* vfs_gets_finish(vfs_message* vfs_msg,uint32_t from) {
+  char* buf=malloc(sizeof(char)*vfs_msg->data);
+  Message msg;
+  msg.msg=buf;
+  mailbox_get_msg(box,&msg,vfs_msg->data);
   while (msg.from==0 && msg.size==0) {
     yield();
     mailbox_get_msg(box,&msg,sizeof(vfs_message));
@@ -197,14 +223,21 @@ char* vfs_gets(vfs_message* vfs_msg,uint32_t from) {
     vfs_msg->flags=2;
     return NULL;
   }
-  if (resp->data>vfs_msg->data) {
+  gets_data* data=(gets_data*)in_progress_data[vfs_msg->orig_mbox][vfs_msg->id];
+  if (vfs_msg->data>data->max_len) {
     vfs_msg->flags=2;
     return NULL;
   }
-  vfs_msg->data=resp->data;
+  vfs_msg->data=data->max_len;
+  uint32_t fd=data->fd;
+  free(in_progress_data[vfs_msg->orig_mbox][vfs_msg->id]);
   fd_tables[from][fd].pos+=vfs_msg->data;
   vfs_msg->flags=0;
-  return data;
+  return buf;
+}
+
+void vfs_gets_abort(vfs_message* vfs_msg,uint32_t from) {
+  free(in_progress_data[vfs_msg->orig_mbox][vfs_msg->id]);
 }
 
 
@@ -232,6 +265,9 @@ void vfs_mount(vfs_message* vfs_msg, uint32_t from) {
     mailbox_get_msg(box,&msg,sizeof(vfs_message));
   }
   if (msg.from==0) {
+    free(path);
+    free(type);
+    free(disk_file);
     vfs_msg->flags=2;
     return;
   }
@@ -244,6 +280,9 @@ void vfs_mount(vfs_message* vfs_msg, uint32_t from) {
     }
   }
   if (!found) {
+    free(path);
+    free(type);
+    free(disk_file);
     vfs_msg->flags=2;
     return;
   }
@@ -255,30 +294,44 @@ void vfs_mount(vfs_message* vfs_msg, uint32_t from) {
   msg.size=vfs_msg->data;
   msg.msg=disk_file;
   mailbox_send_msg(&msg);
-  yield();
-  msg.size=sizeof(vfs_message);
-  vfs_message* resp=get_message(&msg);
-  if (resp->flags!=0) {
-    vfs_msg->flags=resp->flags;
-    return;
-  }
+  mount_data* data=malloc(sizeof(mount_data));
+  in_progress_data[from][vfs_msg->id]=data;
+  data->path=path;
+  data->type=i;
+  free(type);
+  free(disk_file);
+  vfs_msg->flags=0;
+}
+
+void vfs_mount_finish(vfs_message* vfs_msg,uint32_t from) {
+  mount_data* data=in_progress_data[vfs_msg->orig_mbox][vfs_msg->id];
   if (head_mapping==NULL) {
     vfs_mapping* mapping=malloc(sizeof(vfs_mapping));
-    mapping->mntpnt=malloc(sizeof(char)*(strlen(path)+1));
-    strcpy(mapping->mntpnt,path);
-    mapping->type=i;
+    mapping->mntpnt=malloc(sizeof(char)*(strlen(data->path)+1));
+    strcpy(mapping->mntpnt,data->path);
+    mapping->type=data->type;
     mapping->next=NULL;
     head_mapping=mapping;
     tail_mapping=mapping;
   } else {
     vfs_mapping* mapping=malloc(sizeof(vfs_mapping));
-    mapping->mntpnt=malloc(sizeof(char)*(strlen(path)+1));
-    strcpy(mapping->mntpnt,path);
-    mapping->type=i;
+    mapping->mntpnt=malloc(sizeof(char)*(strlen(data->path)+1));
+    strcpy(mapping->mntpnt,data->path);
+    mapping->type=data->type;
     mapping->next=NULL;
     tail_mapping->next=mapping;
   }
+  free(data->path);
+  free(data);
+  vfs_msg->flags=0;
 }
+
+void vfs_mount_abort(vfs_message* vfs_msg,uint32_t from)  {
+  mount_data* data=in_progress_data[vfs_msg->orig_mbox][vfs_msg->id];
+  free(data->path);
+  free(data);
+}
+
 
 int main() {
   init_vfs();
@@ -288,35 +341,90 @@ int main() {
     Message msg;
     vfs_message* vfs_msg=get_message(&msg);
     uint32_t sender=msg.from;
-    char* gets_data;
-    switch (vfs_msg->type) {
-      case VFS_OPEN:
-      vfs_fopen(vfs_msg,msg.from);
-      break;
-      case VFS_PUTS:
-      vfs_puts(vfs_msg,msg.from);
-      break;
-      case VFS_GETS:
-      gets_data=vfs_gets(vfs_msg,msg.from);
-      break;
-      case VFS_MOUNT:
-      vfs_mount(vfs_msg,msg.from);
-      break;
-      case VFS_REGISTER_FS:
-      vfs_register_fs(vfs_msg,msg.from);
-      break;
-      default:
-      vfs_msg->flags=1;
-      break;
-    }
-    msg.from=box;
-    msg.to=sender;
-    mailbox_send_msg(&msg);
-    if (vfs_msg->type==VFS_GETS && gets_data!=NULL) {
-      msg.size=vfs_msg->data;
-      msg.msg=gets_data;
+    char* data=NULL;
+    if (vfs_msg->in_progress) {
+      if (vfs_msg->flags) {
+        serial_print("ABORT\n");
+        switch (vfs_msg->type) {
+          case VFS_OPEN:
+          vfs_fopen_abort(vfs_msg,msg.from);
+          break;
+          case VFS_PUTS:
+          vfs_puts_abort(vfs_msg,msg.from);
+          break;
+          case VFS_GETS:
+          vfs_gets_abort(vfs_msg,msg.from);
+          break;
+          case VFS_MOUNT:
+          vfs_mount_abort(vfs_msg,msg.from);
+          break;
+          break;
+          default:
+          vfs_msg->flags=1;
+          break;
+        }
+      } else {
+        serial_print("FINISH\n");
+        switch (vfs_msg->type) {
+          case VFS_OPEN:
+          vfs_fopen_finish(vfs_msg,msg.from);
+          break;
+          case VFS_PUTS:
+          vfs_puts_finish(vfs_msg,msg.from);
+          break;
+          case VFS_GETS:
+          data=vfs_gets_finish(vfs_msg,msg.from);
+          break;
+          case VFS_MOUNT:
+          vfs_mount_finish(vfs_msg,msg.from);
+          break;
+          default:
+          vfs_msg->flags=1;
+          break;
+        }
+      }
+      msg.from=box;
+      msg.to=vfs_msg->orig_mbox;
       mailbox_send_msg(&msg);
+      if (vfs_msg->type==VFS_GETS && data!=NULL) {
+        msg.size=vfs_msg->data;
+        msg.msg=data;
+        mailbox_send_msg(&msg);
+      }
+    } else {
+      vfs_msg->in_progress=1;
+      if (in_progress_data[msg.from]==NULL) {
+        in_progress_data[msg.from]=malloc(sizeof(void*)*ID_LIMIT);
+      }
+      serial_print("NEW\n");
+      switch (vfs_msg->type) {
+        case VFS_OPEN:
+        vfs_fopen(vfs_msg,msg.from);
+        break;
+        case VFS_PUTS:
+        vfs_puts(vfs_msg,msg.from);
+        break;
+        case VFS_GETS:
+        vfs_gets(vfs_msg,msg.from);
+        break;
+        case VFS_MOUNT:
+        vfs_mount(vfs_msg,msg.from);
+        break;
+        case VFS_REGISTER_FS:
+        vfs_register_fs(vfs_msg,msg.from);
+        serial_print("REGISTER_FS DONE\n");
+        break;
+        default:
+        vfs_msg->flags=1;
+        break;
+      }
+      if (vfs_msg->flags || vfs_msg->type==VFS_REGISTER_FS) {
+        msg.from=box;
+        msg.to=sender;
+        mailbox_send_msg(&msg);
+      }
     }
+    free(vfs_msg);
     yield();
   }
   for (;;);

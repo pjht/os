@@ -33,13 +33,13 @@ void __stdio_init() {
 }
 
 static vfs_message* make_msg(vfs_message_type type,const char* mode,const char* path, uint32_t fd, int data) {
-  static uint32_t id=0;
   vfs_message* msg_data=malloc(sizeof(vfs_message));
   msg_data->type=type;
-  msg_data->id=id;
+  msg_data->id=0;
   msg_data->fd=fd;
   msg_data->data=data;
-  id++;
+  msg_data->in_progress=0;
+  msg_data->orig_mbox=box;
   if (mode!=NULL) {
     strcpy(&msg_data->mode[0],mode);
   }
