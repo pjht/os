@@ -3,6 +3,7 @@
 #include "ports.h"
 #include <string.h>
 #include <stddef.h>
+#include "cansid.h"
 #define xy_to_indx(x,y) ((x+(y*width))*2)
 static char* screen;
 static int width;
@@ -13,16 +14,20 @@ static vga_colors fg_color;
 static vga_colors bg_color;
 static char* scroll_buf[0xfa0];
 
+static struct cansid_state state;
 
-static void set_char(int x,int y,char c) {
-  screen[xy_to_indx(x,y)]=c;
-  screen[xy_to_indx(x,y)+1]=(bg_color<<4)|fg_color;
+static void set_char(int x,int y,struct color_char ch) {
+  screen[xy_to_indx(x,y)]=ch.ascii;
+  screen[xy_to_indx(x,y)+1]=ch.style;
 }
 
 void vga_clear() {
   for (int y=0;y<height;y++) {
     for (int x=0;x<width;x++) {
-      set_char(x,y,' ');
+      struct color_char ch;
+      ch.ascii=' ';
+      ch.style=0;
+      set_char(x,y,ch);
     }
   }
 }
@@ -40,6 +45,7 @@ void vga_init(text_fb_info framebuffer_info) {
   y=0;
   fg_color=VGA_WHITE;
   bg_color=VGA_BLACK;
+  state=cansid_init();
   screen=framebuffer_info.address;
   width=framebuffer_info.width;
   height=framebuffer_info.height;
@@ -58,8 +64,11 @@ void vga_write_string(const char* string) {
       x=0;
       y++;
     } else {
-      set_char(x,y,c);
-      x++;
+      struct color_char ch=cansid_process(&state,c);
+      if (ch.ascii) {
+        set_char(x,y,ch);
+        x++;
+      }
     }
     if (x==width) {
       x=0;
@@ -79,7 +88,9 @@ void vga_write_string(const char* string) {
 void vga_backspace() {
   if (x!=0) {
       x--;
-      set_char(x,y,' ');
-      set_cursor(x,y);
+      struct color_char ch;
+      ch.ascii=' ';
+      ch.style=0;
+      set_char(x,y,ch);
   }
 }
