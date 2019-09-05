@@ -57,12 +57,6 @@ void vga_write_string(const char* string) {
     if (c=='\n') {
       x=0;
       y++;
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wunused-value"
-      for (int i=0;i<67108864;i++) {
-        1+1;
-      }
-      #pragma GCC diagnostic pop
     } else {
       set_char(x,y,c);
       x++;
