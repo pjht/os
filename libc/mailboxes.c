@@ -23,3 +23,13 @@ void mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz)  {
     int $80; \
   "::"b"(box),"c"(recv_msg),"d"(buffer_sz));
 }
+
+
+uint32_t mailbox_find_by_name(char* name) {
+  uint32_t box;
+  asm volatile("  \
+    mov $21, %%eax; \
+    int $80; \
+  ":"=b"(box):"b"(name));
+  return box;
+}

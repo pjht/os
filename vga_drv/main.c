@@ -9,11 +9,12 @@
 #include "vga.h"
 #include <dbg.h>
 
-#define DEVFS_BOX 6
+uint32_t devfs_box;
 #define DEVFS_PID 3
 
 int main() {
   uint32_t box=mailbox_new(16,"vga");
+  devfs_box=mailbox_find_by_name("devfs_devfs");
   text_fb_info info;
   info.address=map_phys((void*)0xB8000,10);
   info.width=80;
@@ -27,7 +28,7 @@ int main() {
   strcpy(&msg_data->name[0],"vga");
   Message msg;
   msg.from=box;
-  msg.to=DEVFS_BOX;
+  msg.to=devfs_box;
   msg.size=sizeof(devfs_message);
   msg.msg=msg_data;
   mailbox_send_msg(&msg);

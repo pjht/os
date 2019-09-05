@@ -7,11 +7,11 @@
 #include <dbg.h>
 #include <limits.h>
 #include <unistd.h>
-#define VFS_MBOX 3
 #define VFS_PID 2
 
 
 static uint32_t box;
+static uint32_t vfs_box;
 FILE* __stdio_stdin;
 FILE* __stdio_stdout;
 FILE* __stdio_stderr;
@@ -30,6 +30,10 @@ void __stdio_init() {
   *__stdio_stdout=1;
   __stdio_stderr=malloc(sizeof(FILE*));
   *__stdio_stderr=2;
+  vfs_box=mailbox_find_by_name("vfs");
+  if (vfs_box==0) {
+    serial_print("Cannot find VFS box\n");
+  }
 }
 
 static vfs_message* make_msg(vfs_message_type type,const char* mode,const char* path, uint32_t fd, int data) {
@@ -50,13 +54,17 @@ static vfs_message* make_msg(vfs_message_type type,const char* mode,const char* 
 }
 
 FILE* fopen(char* filename,char* mode) {
+  if (vfs_box==0) {
+    serial_print("The VFS box has not been found\n");
+    return NULL;
+  }
   if (strlen(filename)>4096 || strlen(mode)>10) {
     return NULL;
   }
   vfs_message* msg_data=make_msg(VFS_OPEN,mode,filename,0,0);
   Message msg;
   msg.from=box;
-  msg.to=VFS_MBOX;
+  msg.to=vfs_box;
   msg.msg=msg_data;
   msg.size=sizeof(vfs_message);
   mailbox_send_msg(&msg);
@@ -81,6 +89,10 @@ FILE* fopen(char* filename,char* mode) {
 int putc(int c, FILE* stream) __attribute__ ((alias ("fputc")));
 
 int fputc(int c, FILE* stream) {
+  if (vfs_box==0) {
+    serial_print("The VFS box has not been found\n");
+    return EOF;
+  }
   char str[]={c,'\0'};
   if (fputs(str,stream)==0) {
     return c;
@@ -93,6 +105,10 @@ int fputc(int c, FILE* stream) {
 int getc(FILE* stream) __attribute__ ((alias ("fgetc")));
 
 int fgetc(FILE* stream) {
+  if (vfs_box==0) {
+    serial_print("The VFS box has not been found\n");
+    return EOF;
+  }
   char c[2];
   if (fgets(&c[0],1,stream)==NULL) {
     return EOF;
@@ -107,10 +123,14 @@ char* gets(char* s) {
 }
 
 char* fgets(char* str,int count,FILE* stream) {
+  if (vfs_box==0) {
+    serial_print("The VFS box has not been found\n");
+    return NULL;
+  }
   vfs_message* msg_data=make_msg(VFS_GETS,NULL,NULL,*stream,count);
   Message msg;
   msg.from=box;
-  msg.to=VFS_MBOX;
+  msg.to=vfs_box;
   msg.msg=msg_data;
   msg.size=sizeof(vfs_message);
   mailbox_send_msg(&msg);
@@ -140,12 +160,16 @@ char* fgets(char* str,int count,FILE* stream) {
 }
 
 size_t fread(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
+  if (vfs_box==0) {
+    serial_print("The VFS box has not been found\n");
+    return 0;
+  }
   char* buffer=(char*)buffer_ptr;
   size_t bytes=size*count;
   vfs_message* msg_data=make_msg(VFS_GETS,NULL,NULL,*stream,bytes);
   Message msg;
   msg.from=box;
-  msg.to=VFS_MBOX;
+  msg.to=vfs_box;
   msg.msg=msg_data;
   msg.size=sizeof(vfs_message);
   mailbox_send_msg(&msg);
@@ -174,10 +198,14 @@ size_t fread(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
 }
 
 int fputs(const char* s, FILE* stream) {
+  if (vfs_box==0) {
+    serial_print("The VFS box has not been found\n");
+    return EOF;
+  }
   vfs_message* msg_data=make_msg(VFS_PUTS,NULL,NULL,*stream,strlen(s));
   Message msg;
   msg.from=box;
-  msg.to=VFS_MBOX;
+  msg.to=vfs_box;
   msg.msg=msg_data;
   msg.size=sizeof(vfs_message);
   mailbox_send_msg(&msg);
@@ -204,12 +232,16 @@ int fputs(const char* s, FILE* stream) {
 }
 
 size_t fwrite(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
+  if (vfs_box==0) {
+    serial_print("The VFS box has not been found\n");
+    return 0;
+  }
   char* buffer=(char*)buffer_ptr;
   size_t bytes=size*count;
   vfs_message* msg_data=make_msg(VFS_PUTS,NULL,NULL,*stream,bytes);
   Message msg;
   msg.from=box;
-  msg.to=VFS_MBOX;
+  msg.to=vfs_box;
   msg.msg=msg_data;
   msg.size=sizeof(vfs_message);
   mailbox_send_msg(&msg);
@@ -236,10 +268,14 @@ size_t fwrite(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
 }
 
 void register_fs(const char* name,uint32_t mbox) {
+  if (vfs_box==0) {
+    serial_print("The VFS box has not been found\n");
+    return;
+  }
   vfs_message* msg_data=make_msg(VFS_REGISTER_FS,name,NULL,mbox,0);
   Message msg;
   msg.from=box;
-  msg.to=VFS_MBOX;
+  msg.to=vfs_box;
   msg.msg=msg_data;
   msg.size=sizeof(vfs_message);
   mailbox_send_msg(&msg);
@@ -255,10 +291,14 @@ void register_fs(const char* name,uint32_t mbox) {
 }
 
 void mount(char* file,char* type,char* path) {
+  if (vfs_box==0) {
+    serial_print("The VFS box has not been found\n");
+    return;
+  }
   vfs_message* msg_data=make_msg(VFS_MOUNT,type,path,0,strlen(file)+1);
   Message msg;
   msg.from=box;
-  msg.to=VFS_MBOX;
+  msg.to=vfs_box;
   msg.msg=msg_data;
   msg.size=sizeof(vfs_message);
   mailbox_send_msg(&msg);
@@ -276,6 +316,10 @@ void mount(char* file,char* type,char* path) {
 }
 
 int vfprintf(FILE* stream,const char* format,va_list arg) {
+  if (vfs_box==0) {
+    serial_print("The VFS box has not been found\n");
+    return EOF;
+  }
   int c;
 	for(;*format!='\0';format++) {
     if(*format!='%') {
@@ -362,4 +406,8 @@ int printf(const char* format,...) {
   } else {
     return EOF;
   }
+}
+
+void rescan_vfs() {
+  vfs_box=mailbox_find_by_name("vfs");
 }

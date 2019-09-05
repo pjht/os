@@ -243,6 +243,8 @@ void isr_handler(registers_t r) {
         memcpy((char*)r.ebx,initrd,initrd_sz);
       } else if (r.eax==20) {
         r.ebx=(pid_t)getPID();
+      } else if (r.eax==21) {
+        r.ebx=kernel_mailbox_find_by_name((char*)r.ebx);
       }
       break;
     }

@@ -90,3 +90,12 @@ void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz)
   serial_printf("Box %s got a message from box %s.\n",mailboxes[box].name,mailboxes[recv_msg->from].name);
   mailboxes[box]=mailbox;
 }
+
+uint32_t kernel_mailbox_find_by_name(char* name) {
+  for (uint32_t i=1;i<next_box;i++) {
+    if (strcmp(mailboxes[i].name,name)==0) {
+      return i;
+    }
+  }
+  return 0;
+}
