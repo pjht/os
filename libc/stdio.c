@@ -197,6 +197,10 @@ size_t fread(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
   return 0;
 }
 
+int puts(const char *s) {
+  return fputs(s,stdout);
+}
+
 int fputs(const char* s, FILE* stream) {
   if (vfs_box==0) {
     serial_print("The VFS box has not been found\n");
