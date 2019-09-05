@@ -10,7 +10,8 @@
 #include <dbg.h>
 
 uint32_t vfs_box;
-uint32_t devfs_box;
+uint32_t devfs_reg_box;
+uint32_t devfs_drv_box;
 int num_devs;
 int max_devs;
 char** dev_names;
@@ -19,142 +20,194 @@ int* dev_types;
 
 #define VFS_PID 2
 
-char* process_vfs_msg(vfs_message* vfs_msg) {
-  char* gets_data=NULL;
-  switch (vfs_msg->type) {
-    case VFS_OPEN: {
-    int i;
-    char found=0;
-    for (i=0;i<num_devs;i++) {
-      if (strcmp(dev_names[i],&vfs_msg->path[0])==0) {
-        found=1;
-        break;
-      }
-    }
-    if (!found) {
-      vfs_msg->flags=2;
+char devfs_open(vfs_message* vfs_msg) {
+  int i;
+  char found=0;
+  for (i=0;i<num_devs;i++) {
+    if (strcmp(dev_names[i],&vfs_msg->path[0])==0) {
+      found=1;
       break;
     }
-    if (dev_types[i]==1) {
-      Message msg;
-      msg.from=devfs_box;
-      msg.to=dev_mboxes[i];
-      msg.size=sizeof(vfs_message);
-      msg.msg=vfs_msg;
-      mailbox_send_msg(&msg);
-      yield();
-      vfs_message* recv_msg=malloc(sizeof(vfs_message));
-      msg.msg=recv_msg;
-      mailbox_get_msg(devfs_box,&msg,sizeof(vfs_message));
-      while (msg.from==0 && msg.size==0) {
-        yield();
-        mailbox_get_msg(devfs_box,&msg,sizeof(vfs_message));
-      }
-      vfs_msg->flags=recv_msg->flags;
-    } else {
-      vfs_msg->flags=0;
-    }
-    if (vfs_msg->flags==0) {
-      uint32_t* data=malloc(sizeof(uint32_t));
-      *data=dev_mboxes[i];
-      vfs_msg->fs_data=data;
-    }
-    break;
-    }
-    case VFS_PUTS: {
-    char* data=malloc(sizeof(char)*vfs_msg->data);
+  }
+  if (!found) {
+    vfs_msg->flags=2;
+    return 1;
+  }
+  if (dev_types[i]==1) {
+    uint32_t* data=malloc(sizeof(uint32_t));
+    *data=dev_mboxes[i];
+    vfs_msg->fs_data=data;
     Message msg;
-    msg.msg=data;
-    mailbox_get_msg(vfs_box,&msg,vfs_msg->data);
-    while (msg.from==0 && msg.size==0) {
-      yield();
-      mailbox_get_msg(vfs_box,&msg,sizeof(vfs_message));
-    }
-    if (msg.from==0) {
-      serial_print("Could not recieve fputs data from the VFS\n");
-      vfs_msg->flags=2;
-      break;
-    }
-    msg.from=devfs_box;
-    msg.to=*((int*)vfs_msg->fs_data);
+    msg.from=devfs_drv_box;
+    msg.to=dev_mboxes[i];
     msg.size=sizeof(vfs_message);
     msg.msg=vfs_msg;
     mailbox_send_msg(&msg);
-    msg.size=vfs_msg->data;
-    msg.msg=data;
-    mailbox_send_msg(&msg);
+  } else {
+    vfs_msg->flags=0;
+    uint32_t* data=malloc(sizeof(uint32_t));
+    *data=dev_mboxes[i];
+    vfs_msg->fs_data=data;
+    return 1;
+  }
+  vfs_msg->flags=2;
+  return 1;
+}
+
+char devfs_puts(vfs_message* vfs_msg) {
+  char* data=malloc(sizeof(char)*vfs_msg->data);
+  Message msg;
+  msg.msg=data;
+  mailbox_get_msg(vfs_box,&msg,vfs_msg->data);
+  while (msg.from==0 && msg.size==0) {
     yield();
-    vfs_message* recv_msg=malloc(sizeof(vfs_message));
-    msg.msg=recv_msg;
-    mailbox_get_msg(devfs_box,&msg,sizeof(vfs_message));
-    while (msg.from==0 && msg.size==0) {
-      yield();
-      mailbox_get_msg(devfs_box,&msg,sizeof(vfs_message));
-    }
-    vfs_msg->flags=recv_msg->flags;
-    break;
-    }
-    case VFS_GETS: {
+    mailbox_get_msg(vfs_box,&msg,sizeof(vfs_message));
+  }
+  if (msg.from==0) {
+    serial_print("Could not recieve fputs data from the VFS\n");
+    vfs_msg->flags=2;
+    return 1;
+  }
+  msg.from=devfs_drv_box;
+  msg.to=*((uint32_t*)vfs_msg->fs_data);
+  msg.size=sizeof(vfs_message);
+  msg.msg=vfs_msg;
+  mailbox_send_msg(&msg);
+  msg.size=vfs_msg->data;
+  msg.msg=data;
+  mailbox_send_msg(&msg);
+  return 0;
+}
+
+char devfs_gets(vfs_message* vfs_msg) {
+  Message msg;
+  msg.from=devfs_drv_box;
+  msg.to=*((uint32_t*)vfs_msg->fs_data);
+  msg.size=sizeof(vfs_message);
+  msg.msg=vfs_msg;
+  mailbox_send_msg(&msg);
+  vfs_msg->flags=0;
+  return 0;
+}
+
+char* devfs_gets_finish(vfs_message* vfs_msg) {
+  if (vfs_msg->flags) {
+    return NULL;
+  }
+  char* gets_data=malloc(sizeof(vfs_msg->data));
+  Message msg;
+  msg.msg=gets_data;
+  mailbox_get_msg(devfs_drv_box,&msg,vfs_msg->data);
+  while (msg.from==0 && msg.size==0) {
+    yield();
+    mailbox_get_msg(devfs_drv_box,&msg,sizeof(vfs_message));
+  }
+  vfs_msg->flags=0;
+  return gets_data;
+}
+
+char devfs_mount(vfs_message* vfs_msg) {
+  char* disk_file=malloc(sizeof(char)*vfs_msg->data);
+  Message msg;
+  msg.msg=disk_file;
+  mailbox_get_msg(vfs_box,&msg,vfs_msg->data);
+  while (msg.from==0 && msg.size==0) {
+    yield();
+    mailbox_get_msg(vfs_box,&msg,sizeof(vfs_message));
+  }
+  if (msg.from==0) {
+    serial_print("Could not recieve disk file path from the VFS\n");
+    vfs_msg->flags=2;
+    return 1;
+  }
+  free(disk_file);
+  vfs_msg->flags=0;
+  return 1;
+}
+
+void process_vfs_msg(vfs_message* vfs_msg, uint32_t from) {
+  if (vfs_msg->in_progress&2) {
+    if (vfs_msg->flags) {
+      if (vfs_msg->type==VFS_OPEN) {
+        free((void*)vfs_msg->data);
+      }
       Message msg;
-      msg.from=devfs_box;
-      msg.to=*((int*)vfs_msg->fs_data);
+      msg.to=vfs_msg->orig_mbox;
+      msg.from=vfs_box;
       msg.size=sizeof(vfs_message);
       msg.msg=vfs_msg;
       mailbox_send_msg(&msg);
-      vfs_message* recv_msg=malloc(sizeof(vfs_message));
-      msg.msg=recv_msg;
-      mailbox_get_msg(devfs_box,&msg,sizeof(vfs_message));
-      while (msg.from==0 && msg.size==0) {
-        yield();
-        mailbox_get_msg(devfs_box,&msg,sizeof(vfs_message));
-      }
-      if (recv_msg->flags) {
-        vfs_msg->flags=recv_msg->flags;
+    } else {
+      char* gets_data=NULL;
+      switch (vfs_msg->type) {
+        case VFS_OPEN:
+        vfs_msg->flags=0;
         break;
-      } else {
-        if (recv_msg->data>vfs_msg->data) {
-          vfs_msg->flags=2;
-        }
-        vfs_msg->data=recv_msg->data;
+        case VFS_PUTS:
+        vfs_msg->flags=0;
+        break;
+        case VFS_GETS:
+        gets_data=devfs_gets_finish(vfs_msg);
+        break;
+        case VFS_MOUNT:
+        vfs_msg->flags=0;
+        break;
+        default:
+        vfs_msg->flags=1;
       }
-      gets_data=malloc(sizeof(vfs_msg->data));
-      msg.msg=gets_data;
-      mailbox_get_msg(devfs_box,&msg,vfs_msg->data);
-      while (msg.from==0 && msg.size==0) {
-        yield();
-        mailbox_get_msg(devfs_box,&msg,sizeof(vfs_message));
-      }
-      vfs_msg->flags=0;
-      break;
-    }
-    case VFS_MOUNT: {
-      char* disk_file=malloc(sizeof(char)*vfs_msg->data);
       Message msg;
-      msg.msg=disk_file;
-      mailbox_get_msg(vfs_box,&msg,vfs_msg->data);
-      while (msg.from==0 && msg.size==0) {
-        yield();
-        mailbox_get_msg(vfs_box,&msg,sizeof(vfs_message));
+      msg.to=vfs_msg->orig_mbox;
+      msg.from=vfs_box;
+      msg.size=sizeof(vfs_message);
+      msg.msg=vfs_msg;
+      mailbox_send_msg(&msg);
+      if (gets_data) {
+        msg.size=vfs_msg->data;
+        msg.msg=gets_data;
+        mailbox_send_msg(&msg);
       }
-      if (msg.from==0) {
-        serial_print("Could not recieve disk file path from the VFS\n");
-        vfs_msg->flags=2;
-        break;
-      }
-      free(disk_file);
-      vfs_msg->flags=0;
-      break;
     }
-    default:
-    vfs_msg->flags=1;
+  } else {
+    char send_msg;
+    vfs_msg->in_progress=vfs_msg->in_progress|2;
+    switch (vfs_msg->type) {
+      case VFS_OPEN:
+      send_msg=devfs_open(vfs_msg);
+      break;
+      case VFS_PUTS:
+      send_msg=devfs_puts(vfs_msg);
+      break;
+      case VFS_GETS:
+      send_msg=devfs_gets(vfs_msg);
+      break;
+      case VFS_MOUNT:
+      serial_print("Mount\n");
+      send_msg=devfs_mount(vfs_msg);
+      break;
+      default:
+      vfs_msg->flags=1;
+    }
+    if (send_msg) {
+      serial_print("Send message prep\n");
+      Message msg;
+      msg.to=from;
+      msg.from=vfs_box;
+      msg.size=sizeof(vfs_message);
+      msg.msg=vfs_msg;
+      serial_print("Send message\n");
+      mailbox_send_msg(&msg);
+      serial_print("Done\n");
+    }
   }
-  return gets_data;
+  free(vfs_msg);
+  yieldToPID(VFS_PID);
 }
 
 
 int main() {
   vfs_box=mailbox_new(16,"devfs_vfs");
-  devfs_box=mailbox_new(16,"devfs_devfs");
+  devfs_reg_box=mailbox_new(16,"devfs_register");
+  devfs_drv_box=mailbox_new(16,"devfs_driver");
   register_fs("devfs",vfs_box);
   dev_names=malloc(sizeof(char*)*32);
   dev_mboxes=malloc(sizeof(uint32_t)*32);
@@ -167,22 +220,17 @@ int main() {
       free(msg.msg);
     } else {
       vfs_message* vfs_msg=(vfs_message*)msg.msg;
-      char* gets_data=process_vfs_msg(vfs_msg);
-      msg.to=msg.from;
-      msg.from=vfs_box;
-      msg.size=sizeof(vfs_message);
-      mailbox_send_msg(&msg);
+      process_vfs_msg(vfs_msg,msg.from);
+    }
+    mailbox_get_msg(devfs_drv_box,&msg,sizeof(vfs_message));
+    if (msg.from==0) {
       free(msg.msg);
-      if (gets_data) {
-        msg.size=vfs_msg->data;
-        msg.msg=gets_data;
-        mailbox_send_msg(&msg);
-        free(gets_data);
-      }
-      yieldToPID(VFS_PID);
+    } else {
+      vfs_message* vfs_msg=(vfs_message*)msg.msg;
+      process_vfs_msg(vfs_msg,msg.from);
     }
     msg.msg=malloc(sizeof(devfs_message));
-    mailbox_get_msg(devfs_box,&msg,sizeof(devfs_message));
+    mailbox_get_msg(devfs_reg_box,&msg,sizeof(devfs_message));
     if (msg.from!=0) {
       devfs_message* devfs_msg=(devfs_message*)msg.msg;
       if (num_devs==max_devs) {

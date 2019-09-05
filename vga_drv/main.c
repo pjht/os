@@ -14,7 +14,7 @@ uint32_t devfs_box;
 
 int main() {
   uint32_t box=mailbox_new(16,"vga");
-  devfs_box=mailbox_find_by_name("devfs_devfs");
+  devfs_box=mailbox_find_by_name("devfs_driver");
   text_fb_info info;
   info.address=map_phys((void*)0xB8000,10);
   info.width=80;
@@ -28,7 +28,7 @@ int main() {
   strcpy(&msg_data->name[0],"vga");
   Message msg;
   msg.from=box;
-  msg.to=devfs_box;
+  msg.to=mailbox_find_by_name("devfs_register");
   msg.size=sizeof(devfs_message);
   msg.msg=msg_data;
   mailbox_send_msg(&msg);
@@ -87,6 +87,7 @@ int main() {
           serial_print("NO GETS DATA VGA\n");
         }
       }
+      yieldToPID(DEVFS_PID);
     }
     yield();
   }
