@@ -10,15 +10,8 @@ typedef enum {
   VGA_PURPLE=5,
   VGA_BROWN=6,
   VGA_GRAY=7,
-  VGA_DARK_GRAY=8,
-  VGA_LIGHT_BLUE=9,
-  VGA_LIGHT_GREEN=10,
-  VGA_LIGHT_CYAN=11,
-  VGA_LIGHT_RED=12,
-  VGA_LIGHT_PURPLE=13,
-  VGA_YELLOW=14,
   VGA_WHITE=15
-} vga_colors;
+} vga_color;
 
 
 void vga_init();
