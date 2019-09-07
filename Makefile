@@ -38,20 +38,20 @@ os.iso: kernel/kernel.elf init vfs devfs initrd vga_drv
 crts: kernel/crt0.o
 	@cp $^ sysroot/usr/lib
 
-init: init/* crts
+init: crts libc
 	@cd $@ && make
 	@cp $@/$@ initrd/$@
 
-vfs: vfs/* kernel/start.o
+vfs: crts libc
 	@cd $@ && make
 	@cp $@/$@ initrd/$@
 
-devfs: devfs/* kernel/start.o
+devfs: crts libc
 	@cd $@ && make
 	@cp $@/$@ initrd/$@
 
 
-vga_drv: vga_drv/* kernel/start.o
+vga_drv: crts libc
 	@cd $@ && make
 	@cp $@/$@ initrd/$@
 
