@@ -198,7 +198,14 @@ size_t fread(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
 }
 
 int puts(const char *s) {
-  return fputs(s,stdout);
+  char* str=malloc(sizeof(char)*(strlen(s)+2));
+  strcpy(str,s);
+  str[strlen(s)]='\n';
+  str[strlen(s)+1]='\0';
+  serial_print(str);
+  int code=fputs(str,stdout);
+  free(str);
+  return code;
 }
 
 int fputs(const char* s, FILE* stream) {
