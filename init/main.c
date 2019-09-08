@@ -105,7 +105,6 @@ int main() {
   yieldToPID(3);
   datapos=find_loc("vga_drv",initrd);
   load_task(datapos,initrd);
-  free(initrd);
   yieldToPID(4);
   mount("","devfs","/dev/");
   FILE* file;
@@ -115,6 +114,10 @@ int main() {
   do {
     file=fopen("/dev/vga","w");
   } while(file==NULL);
+  datapos=find_loc("pci",initrd);
+  load_task(datapos,initrd);
+  free(initrd);
+  yieldToPID(4);
   fputs("FPUTS String\n",file);
   char str[3]={0,0,0};
   fgets(str,2,stdin);

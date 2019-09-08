@@ -30,7 +30,7 @@ debug: os.iso kernel/kernel.elf
 	@$(GDB)
 	#gdbgui -g i386-elf-gdb --project $(CWD)
 
-os.iso: kernel/kernel.elf init vfs devfs initrd vga_drv
+os.iso: kernel/kernel.elf init vfs devfs initrd vga_drv pci
 	@cp kernel/kernel.elf sysroot/boot
 	@cd initrd; tar -f ../sysroot/boot/initrd.tar -c *
 	@grub-mkrescue -o $@ sysroot >/dev/null 2>/dev/null
@@ -50,6 +50,9 @@ devfs: crts libc
 	@cd $@ && make
 	@cp $@/$@ initrd/$@
 
+pci: crts libc
+	@cd $@ && make
+	@cp $@/$@ initrd/$@
 
 vga_drv: crts libc
 	@cd $@ && make
@@ -58,6 +61,8 @@ vga_drv: crts libc
 kernel/kernel.elf: $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) sysroot/usr/lib/libc.a
 	@$(CC) -z max-page-size=4096 -Xlinker -n -T kernel/cpu/$(PLAT)/linker.ld -o $@ $(CFLAGS) -nostdlib $^ -lgcc
 
+libc: sysroot/usr/lib/libc.a
+
 sysroot/usr/lib/libc.a: $(LIBC_OBJ)
 	@$(AR) rcs $@ $^
 
@@ -65,7 +70,7 @@ sysroot/usr/lib/libc.a: $(LIBC_OBJ)
 	@$(CC) $(CFLAGS)  -c $< -o $@
 
 %.o: %.asm
-	@$(NASM) $< -o $@
+	$(NASM) $< -o $@
 
 %.o: %.s
 	@$(AS) $< -o $@
