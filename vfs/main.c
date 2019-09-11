@@ -231,7 +231,7 @@ char* vfs_gets_finish(vfs_message* vfs_msg,uint32_t from) {
   vfs_msg->data=data->max_len;
   uint32_t fd=data->fd;
   free(in_progress_data[vfs_msg->orig_mbox][vfs_msg->id]);
-  fd_tables[from][fd].pos+=vfs_msg->data;
+  fd_tables[vfs_msg->orig_mbox][fd].pos+=vfs_msg->data;
   vfs_msg->flags=0;
   return buf;
 }
