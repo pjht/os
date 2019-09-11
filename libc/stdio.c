@@ -185,10 +185,10 @@ size_t fread(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
     return 0;
   } else {
     msg.msg=buffer;
-    mailbox_get_msg(box,&msg,count);
+    mailbox_get_msg(box,&msg,bytes);
     while (msg.from==0) {
       yieldToPID(VFS_PID);
-      mailbox_get_msg(box,&msg,count);
+      mailbox_get_msg(box,&msg,bytes);
     }
     free(vfs_msg);
     return count;
