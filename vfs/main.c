@@ -139,11 +139,9 @@ void vfs_fopen_finish(vfs_message* vfs_msg,uint32_t from) {
   fd_tables[vfs_msg->orig_mbox][fd].fs_data=vfs_msg->fs_data;
   vfs_msg->fd=fd;
   vfs_msg->flags=0;
-  free(mntpnt);
 }
 
 void vfs_fopen_abort(vfs_message* vfs_msg,uint32_t from) {
-  free(in_progress_data[from][vfs_msg->id]);
 }
 
 void vfs_puts(vfs_message* vfs_msg,uint32_t from) {
