@@ -10,6 +10,7 @@
 #include <dbg.h>
 
 uint32_t vfs_box;
+uint32_t devfs_vfs_box;
 uint32_t devfs_reg_box;
 uint32_t devfs_drv_box;
 int num_devs;
@@ -58,10 +59,10 @@ char devfs_puts(vfs_message* vfs_msg) {
   char* data=malloc(sizeof(char)*vfs_msg->data);
   Message msg;
   msg.msg=data;
-  mailbox_get_msg(vfs_box,&msg,vfs_msg->data);
+  mailbox_get_msg(devfs_vfs_box,&msg,vfs_msg->data);
   while (msg.from==0 && msg.size==0) {
     yield();
-    mailbox_get_msg(vfs_box,&msg,sizeof(vfs_message));
+    mailbox_get_msg(devfs_vfs_box,&msg,sizeof(vfs_message));
   }
   if (msg.from==0) {
     serial_print("Could not recieve fputs data from the VFS\n");
@@ -110,10 +111,10 @@ char devfs_mount(vfs_message* vfs_msg) {
   char* disk_file=malloc(sizeof(char)*vfs_msg->data);
   Message msg;
   msg.msg=disk_file;
-  mailbox_get_msg(vfs_box,&msg,vfs_msg->data);
+  mailbox_get_msg(devfs_vfs_box,&msg,vfs_msg->data);
   while (msg.from==0 && msg.size==0) {
     yield();
-    mailbox_get_msg(vfs_box,&msg,sizeof(vfs_message));
+    mailbox_get_msg(devfs_vfs_box,&msg,sizeof(vfs_message));
   }
   if (msg.from==0) {
     serial_print("Could not recieve disk file path from the VFS\n");
@@ -132,8 +133,8 @@ void process_vfs_msg(vfs_message* vfs_msg, uint32_t from) {
         free((void*)vfs_msg->data);
       }
       Message msg;
-      msg.to=vfs_msg->orig_mbox;
-      msg.from=vfs_box;
+      msg.to=vfs_box;
+      msg.from=devfs_vfs_box;
       msg.size=sizeof(vfs_message);
       msg.msg=vfs_msg;
       mailbox_send_msg(&msg);
@@ -156,8 +157,8 @@ void process_vfs_msg(vfs_message* vfs_msg, uint32_t from) {
         vfs_msg->flags=1;
       }
       Message msg;
-      msg.to=vfs_msg->orig_mbox;
-      msg.from=vfs_box;
+      msg.to=vfs_box;
+      msg.from=devfs_vfs_box;
       msg.size=sizeof(vfs_message);
       msg.msg=vfs_msg;
       mailbox_send_msg(&msg);
@@ -190,8 +191,8 @@ void process_vfs_msg(vfs_message* vfs_msg, uint32_t from) {
     if (send_msg) {
       serial_print("Send message prep\n");
       Message msg;
-      msg.to=from;
-      msg.from=vfs_box;
+      msg.to=vfs_box;
+      msg.from=devfs_vfs_box;
       msg.size=sizeof(vfs_message);
       msg.msg=vfs_msg;
       serial_print("Send message\n");
@@ -205,17 +206,18 @@ void process_vfs_msg(vfs_message* vfs_msg, uint32_t from) {
 
 
 int main() {
-  vfs_box=mailbox_new(16,"devfs_vfs");
+  vfs_box=mailbox_find_by_name("vfs");
+  devfs_vfs_box=mailbox_new(16,"devfs_vfs");
   devfs_reg_box=mailbox_new(16,"devfs_register");
   devfs_drv_box=mailbox_new(16,"devfs_driver");
-  register_fs("devfs",vfs_box);
+  register_fs("devfs",devfs_vfs_box);
   dev_names=malloc(sizeof(char*)*32);
   dev_mboxes=malloc(sizeof(uint32_t)*32);
   dev_types=malloc(sizeof(int)*32);
   for (;;) {
     Message msg;
     msg.msg=malloc(sizeof(vfs_message));
-    mailbox_get_msg(vfs_box,&msg,sizeof(vfs_message));
+    mailbox_get_msg(devfs_vfs_box,&msg,sizeof(vfs_message));
     if (msg.from==0) {
       free(msg.msg);
     } else {
