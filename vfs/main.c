@@ -332,6 +332,23 @@ void vfs_mount_abort(vfs_message* vfs_msg,uint32_t from)  {
   free(data);
 }
 
+void vfs_seek(vfs_message* vfs_msg,uint32_t from) {
+  char str[256];
+  int_to_ascii(fd_tables[vfs_msg->orig_mbox][vfs_msg->fd].pos,str);
+  serial_print("Prev pos:");
+  serial_print(str);
+  serial_print("\n");
+  int_to_ascii(vfs_msg->pos,str);
+  serial_print("New in vfs msg:");
+  serial_print(str);
+  serial_print("\n");
+  fd_tables[vfs_msg->orig_mbox][vfs_msg->fd].pos=vfs_msg->pos;
+  int_to_ascii(fd_tables[vfs_msg->orig_mbox][vfs_msg->fd].pos,str);
+  serial_print("New in fd table:");
+  serial_print(str);
+  serial_print("\n");
+  vfs_msg->flags=0;
+}
 
 int main() {
   init_vfs();
@@ -414,11 +431,14 @@ int main() {
         vfs_register_fs(vfs_msg,msg.from);
         serial_print("REGISTER_FS DONE\n");
         break;
+        case VFS_SEEK:
+        vfs_seek(vfs_msg,msg.from);
+        break;
         default:
         vfs_msg->flags=1;
         break;
       }
-      if (vfs_msg->flags || vfs_msg->type==VFS_REGISTER_FS) {
+      if (vfs_msg->flags || vfs_msg->type==VFS_REGISTER_FS || vfs_msg->type==VFS_SEEK) {
         msg.from=box;
         msg.to=sender;
         mailbox_send_msg(&msg);

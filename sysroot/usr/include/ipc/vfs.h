@@ -8,7 +8,8 @@ typedef enum {
   VFS_CLOSE,
   VFS_REGISTER_FS,
   VFS_MOUNT,
-  VFS_UMOUNT
+  VFS_UMOUNT,
+  VFS_SEEK
 } vfs_message_type;
 
 typedef struct {

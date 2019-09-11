@@ -419,6 +419,35 @@ int printf(const char* format,...) {
   }
 }
 
+int fseek(FILE* stream,long offset,int origin) {
+  if (vfs_box==0) {
+    serial_print("The VFS box has not been found\n");
+    return -1;
+  }
+  vfs_message* msg_data=make_msg(VFS_SEEK,NULL,NULL,*stream,origin);
+  msg_data->pos=offset;
+  Message msg;
+  msg.from=box;
+  msg.to=vfs_box;
+  msg.msg=msg_data;
+  msg.size=sizeof(vfs_message);
+  mailbox_send_msg(&msg);
+  yieldToPID(VFS_PID);
+  mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  while (msg.from==0) {
+    yieldToPID(VFS_PID);
+    mailbox_get_msg(box,&msg,sizeof(vfs_message));
+  }
+  vfs_message* vfs_msg=(vfs_message*)msg.msg;
+  if (vfs_msg->flags) {
+    free(vfs_msg);
+    return -1;
+  } else {
+    free(vfs_msg);
+    return 0;
+  }
+}
+
 void rescan_vfs() {
   vfs_box=mailbox_find_by_name("vfs");
 }
