@@ -219,8 +219,7 @@ void isr_handler(registers_t r) {
           r.ebx=0;
           return;
         }
-        uint32_t page_idx=find_free_pages(r.ecx);
-        void* virt_addr=(void*)(page_idx<<12);
+        void* virt_addr=find_free_pages(r.ecx);
         map_pages(virt_addr,(void*)r.ebx,r.ecx,1,1);
         r.ebx=(uint32_t)virt_addr;
       } else if (r.eax==12) {
