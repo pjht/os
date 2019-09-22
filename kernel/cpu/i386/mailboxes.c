@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <mailboxes.h>
 #include "serial.h"
+#include "paging.h"
+#include "pmem.h"
 #include "../tasking.h"
 
 Mailbox* mailboxes=(Mailbox*)0xF6400000;
@@ -37,9 +39,19 @@ void kernel_mailbox_send_msg(Message* user_msg) {
     return;
   }
   Mailbox mailbox=mailboxes[user_msg->to];
-  char* msg_data=kmalloc(user_msg->size);
-  memcpy(msg_data,user_msg->msg,user_msg->size);
-  mailbox.msg_store[mailbox.wr].msg=msg_data;
+  uint32_t num_pages=(user_msg->size/4096)+1;
+  void* phys_addr=pmem_alloc(num_pages);
+  void* virt_addr=find_free_pages(num_pages);
+  // char* msg_data=kmalloc(user_msg->size);
+  map_pages(virt_addr,phys_addr,num_pages,0,1);
+  // if (msg_data==NULL) {
+  //   serial_print("Cannot allocate kernel msg data!\n");
+  //   vga_write_string("Cannot allocate kernel msg data!\n");
+  //   for(;;);
+  // }
+  memcpy(virt_addr,user_msg->msg,user_msg->size);
+  unmap_pages(virt_addr,num_pages);
+  mailbox.msg_store[mailbox.wr].msg=phys_addr;
   mailbox.msg_store[mailbox.wr].from=user_msg->from;
   mailbox.msg_store[mailbox.wr].to=user_msg->to;
   mailbox.msg_store[mailbox.wr].size=user_msg->size;
@@ -73,11 +85,17 @@ void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz)
     recv_msg->size=mailbox.msg_store[mailbox.rd].size;
     recv_msg->from=0;
     serial_printf("Box %s attempted to get the message from box %s, but the buffer was too small.\n",mailboxes[box].name,mailboxes[mailbox.msg_store[mailbox.rd].from].name);
+    serial_printf("Expected message at most %d big, but got message sized %d.\n",buffer_sz,mailbox.msg_store[mailbox.rd].size);
     mailboxes[box]=mailbox;
     return;
   }
-  memcpy(recv_msg->msg,mailbox.msg_store[mailbox.rd].msg,mailbox.msg_store[mailbox.rd].size);
-  kfree(mailbox.msg_store[mailbox.rd].msg);
+  Message msg=mailbox.msg_store[mailbox.rd];
+  uint32_t num_pages=(msg.size/4096)+1;
+  void* virt_addr=find_free_pages(num_pages);
+  map_pages(virt_addr,msg.msg,num_pages,0,1);
+  memcpy(recv_msg->msg,virt_addr,mailbox.msg_store[mailbox.rd].size);
+  unmap_pages(virt_addr,num_pages);
+  // kfree(mailbox.msg_store[mailbox.rd].msg);
   mailbox.msg_store[mailbox.rd].from=0;
   uint32_t orig_rd=mailbox.rd;
   mailbox.rd++;
