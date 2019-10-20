@@ -59,6 +59,11 @@ char load_task(uint32_t datapos,char* initrd) {
   int pos=0;
   elf_header header;
   pos=datapos;
+  char str[256];
+  int_to_ascii(pos,str);
+  serial_print("POS:");
+  serial_print(str);
+  serial_print("\n");
   char* hdr_ptr=(char*)&header;
   for (size_t i=0;i<sizeof(elf_header);i++) {
     hdr_ptr[i]=initrd[pos];
@@ -92,6 +97,35 @@ char load_task(uint32_t datapos,char* initrd) {
   return 1;
 }
 
+char load_task_devfs(uint32_t datapos) {
+  serial_print("load_task_devfs\n");
+  FILE* initrd=fopen("/dev/initrd","r");
+  elf_header header;
+  fseek(initrd,datapos,SEEK_SET);
+  fread(&header,sizeof(elf_header),1,initrd);
+  if (header.magic!=ELF_MAGIC) {
+    serial_print("Bad magic number\n");
+    return 0;
+  } else {
+    void* cr3=new_address_space();
+    for (int i=0;i<header.pheader_ent_nm;i++) {
+      elf_pheader pheader;
+      fseek(initrd,(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos,SEEK_SET);
+      fread(&pheader,sizeof(elf_pheader),1,initrd);
+      char* ptr=alloc_memory(((pheader.memsz)/4096)+1);
+      memset(ptr,0,pheader.memsz);
+      if (pheader.filesz>0) {
+        fseek(initrd,pheader.offset+datapos,SEEK_SET);
+        fread(ptr,sizeof(char),pheader.memsz,initrd);
+      }
+      copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
+    }
+    createTaskCr3((void*)header.entry,cr3);
+  }
+  return 1;
+}
+
+
 int main() {
   long size=initrd_sz();
   char* initrd=malloc(size);
@@ -103,10 +137,15 @@ int main() {
   datapos=find_loc("devfs",initrd);
   load_task(datapos,initrd);
   yieldToPID(3);
-  datapos=find_loc("vga_drv",initrd);
+  datapos=find_loc("initrd_drv",initrd);
   load_task(datapos,initrd);
   yieldToPID(4);
   mount("","devfs","/dev/");
+  datapos=find_loc("vga_drv",initrd);
+  serial_print("Making vga task\n");
+  load_task_devfs(datapos);
+  serial_print("Made vga task\n");
+  yieldToPID(5);
   FILE* file;
   do {
     file=fopen("/dev/vga","w");

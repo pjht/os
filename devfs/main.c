@@ -77,6 +77,7 @@ char devfs_puts(vfs_message* vfs_msg) {
   msg.size=vfs_msg->data;
   msg.msg=data;
   mailbox_send_msg(&msg);
+  free(data);
   return 0;
 }
 
@@ -92,18 +93,36 @@ char devfs_gets(vfs_message* vfs_msg) {
 }
 
 char* devfs_gets_finish(vfs_message* vfs_msg) {
+  char str[256];
+  int_to_ascii(vfs_msg->data,str);
+  serial_print("gets_finish: Driver wants ");
+  serial_print(str);
+  serial_print(" bytes of gets data\n");
   if (vfs_msg->flags) {
     return NULL;
   }
   char* gets_data=malloc(sizeof(vfs_msg->data));
   Message msg;
   msg.msg=gets_data;
-  mailbox_get_msg(devfs_drv_box,&msg,vfs_msg->data);
-  while (msg.from==0 && msg.size==0) {
-    yield();
-    mailbox_get_msg(devfs_drv_box,&msg,sizeof(vfs_message));
-  }
+  int_to_ascii(vfs_msg->data,str);
+  serial_print("gets_finish: Driver now wants ");
+  serial_print(str);
+  serial_print(" bytes of gets data\n");
+  mailbox_get_msg(devfs_drv_box,&msg,(uint32_t)vfs_msg->data);
+  // while (msg.from==0 && msg.size==0) {
+  //   serial_print("Yielding to wait for data msg\n");
+  //   yield();
+  //   mailbox_get_msg(devfs_drv_box,&msg,(uint32_t)vfs_msg->data);
+  // }
+  int_to_ascii(vfs_msg->data,str);
+  serial_print("gets_finish: Again, driver now wants ");
+  serial_print(str);
+  serial_print(" bytes of gets data\n");
   vfs_msg->flags=0;
+  int_to_ascii(vfs_msg->data,str);
+  serial_print("gets_finish: Sending ");
+  serial_print(str);
+  serial_print(" bytes of gets data\n");
   return gets_data;
 }
 
@@ -127,8 +146,18 @@ char devfs_mount(vfs_message* vfs_msg) {
 }
 
 void process_vfs_msg(vfs_message* vfs_msg, uint32_t from) {
-  if (vfs_msg->in_progress&2) {
+  char str[256];
+  int_to_ascii(vfs_msg->data,str);
+  serial_print("vfs_msg->data=");
+  serial_print(str);
+  serial_print("\n");
+  if (from!=vfs_box) {
     if (vfs_msg->flags) {
+      serial_print("vfs_msg->flags=");
+      char str[256];
+      int_to_ascii(vfs_msg->flags,str);
+      serial_print(str);
+      serial_print("\n");
       if (vfs_msg->type==VFS_OPEN) {
         free((void*)vfs_msg->data);
       }
@@ -148,7 +177,13 @@ void process_vfs_msg(vfs_message* vfs_msg, uint32_t from) {
         vfs_msg->flags=0;
         break;
         case VFS_GETS:
+        int_to_ascii(vfs_msg->data,str);
+        serial_print("process_vfs_msg: Driver sending ");
+        serial_print(str);
+        serial_print(" bytes of gets data\n");
+        serial_print("GETS_FINISH\n");
         gets_data=devfs_gets_finish(vfs_msg);
+        serial_print("GETS_FINISH DONE\n");
         break;
         case VFS_MOUNT:
         vfs_msg->flags=0;
@@ -163,27 +198,42 @@ void process_vfs_msg(vfs_message* vfs_msg, uint32_t from) {
       msg.msg=vfs_msg;
       mailbox_send_msg(&msg);
       if (gets_data) {
+        serial_print("Gets data\n");
+        char str[256];
+        int_to_ascii(vfs_msg->data,str);
+        serial_print("Sending ");
+        serial_print(str);
+        serial_print(" bytes of gets data\n");
         msg.size=vfs_msg->data;
         msg.msg=gets_data;
         mailbox_send_msg(&msg);
+        free(gets_data);
+      } else {
+        serial_print("No gets data\n");
       }
     }
   } else {
     char send_msg;
-    vfs_msg->in_progress=vfs_msg->in_progress|2;
     switch (vfs_msg->type) {
       case VFS_OPEN:
+      serial_print("OPEN\n");
       send_msg=devfs_open(vfs_msg);
+      serial_print("OPEN DONE\n");
       break;
       case VFS_PUTS:
+      serial_print("PUTS\n");
       send_msg=devfs_puts(vfs_msg);
+      serial_print("PUTS DONE\n");
       break;
       case VFS_GETS:
+      serial_print("GETS\n");
       send_msg=devfs_gets(vfs_msg);
+      serial_print("GETS DONE\n");
       break;
       case VFS_MOUNT:
-      serial_print("Mount\n");
+      serial_print("MOUNT\n");
       send_msg=devfs_mount(vfs_msg);
+      serial_print("MOUNT DONE\n");
       break;
       default:
       vfs_msg->flags=1;
@@ -223,6 +273,7 @@ int main() {
     } else {
       vfs_message* vfs_msg=(vfs_message*)msg.msg;
       process_vfs_msg(vfs_msg,msg.from);
+      free(msg.msg);
     }
     mailbox_get_msg(devfs_drv_box,&msg,sizeof(vfs_message));
     if (msg.from==0) {
@@ -230,10 +281,13 @@ int main() {
     } else {
       vfs_message* vfs_msg=(vfs_message*)msg.msg;
       process_vfs_msg(vfs_msg,msg.from);
+      free(msg.msg);
     }
     msg.msg=malloc(sizeof(devfs_message));
     mailbox_get_msg(devfs_reg_box,&msg,sizeof(devfs_message));
-    if (msg.from!=0) {
+    if (msg.from==0) {
+      free(msg.msg);
+    } else {
       devfs_message* devfs_msg=(devfs_message*)msg.msg;
       if (num_devs==max_devs) {
         max_devs+=32;
@@ -246,8 +300,8 @@ int main() {
       dev_mboxes[num_devs]=devfs_msg->mbox;
       dev_types[num_devs]=devfs_msg->dev_type;
       num_devs++;
+      free(msg.msg);
     }
-    free(msg.msg);
     yield();
   }
 }

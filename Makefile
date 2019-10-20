@@ -30,7 +30,7 @@ debug: os.iso kernel/kernel.elf
 	@$(GDB)
 	#gdbgui -g i386-elf-gdb --project $(CWD)
 
-os.iso: kernel/kernel.elf init vfs devfs initrd vga_drv pci
+os.iso: kernel/kernel.elf init vfs devfs initrd vga_drv initrd_drv pci
 	@cp kernel/kernel.elf sysroot/boot
 	@cd initrd; tar -f ../sysroot/boot/initrd.tar -c *
 	@grub-mkrescue -o $@ sysroot >/dev/null 2>/dev/null
@@ -55,6 +55,10 @@ pci: crts libc
 	@cp $@/$@ initrd/$@
 
 vga_drv: crts libc
+	@cd $@ && make
+	@cp $@/$@ initrd/$@
+
+initrd_drv: crts libc
 	@cd $@ && make
 	@cp $@/$@ initrd/$@
 

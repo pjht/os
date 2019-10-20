@@ -40,17 +40,15 @@ void kernel_mailbox_send_msg(Message* user_msg) {
   }
   Mailbox mailbox=mailboxes[user_msg->to];
   uint32_t num_pages=(user_msg->size/4096)+1;
+  serial_printf("Storing data in pmem\n");
   void* phys_addr=pmem_alloc(num_pages);
   void* virt_addr=find_free_pages(num_pages);
-  // char* msg_data=kmalloc(user_msg->size);
   map_pages(virt_addr,phys_addr,num_pages,0,1);
-  // if (msg_data==NULL) {
-  //   serial_print("Cannot allocate kernel msg data!\n");
-  //   vga_write_string("Cannot allocate kernel msg data!\n");
-  //   for(;;);
-  // }
+  serial_printf("Mapped into vmem\n");
+  serial_printf("memcpy(%x,%x,%d)\n",virt_addr,user_msg->msg,user_msg->size);
   memcpy(virt_addr,user_msg->msg,user_msg->size);
   unmap_pages(virt_addr,num_pages);
+  serial_printf("Stored data in pmem\n");
   mailbox.msg_store[mailbox.wr].msg=phys_addr;
   mailbox.msg_store[mailbox.wr].from=user_msg->from;
   mailbox.msg_store[mailbox.wr].to=user_msg->to;
@@ -89,12 +87,16 @@ void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz)
     mailboxes[box]=mailbox;
     return;
   }
+  if (buffer_sz>mailbox.msg_store[mailbox.rd].size) {
+    serial_printf("Warning: buffer sized for message %d big, but got message sized %d.\n",buffer_sz,mailbox.msg_store[mailbox.rd].size);
+  }
   Message msg=mailbox.msg_store[mailbox.rd];
   uint32_t num_pages=(msg.size/4096)+1;
   void* virt_addr=find_free_pages(num_pages);
   map_pages(virt_addr,msg.msg,num_pages,0,1);
   memcpy(recv_msg->msg,virt_addr,mailbox.msg_store[mailbox.rd].size);
   unmap_pages(virt_addr,num_pages);
+  pmem_free(((uint32_t)msg.msg)>>12,num_pages);
   // kfree(mailbox.msg_store[mailbox.rd].msg);
   mailbox.msg_store[mailbox.rd].from=0;
   uint32_t orig_rd=mailbox.rd;

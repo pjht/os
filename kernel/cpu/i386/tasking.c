@@ -72,7 +72,10 @@ Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1
       kstacks[top_idx-5]=0;
       kstacks[top_idx-4]=0;
       kstacks[top_idx-3]=(uint32_t)task_init;
-      uint32_t* user_stack=(uint32_t*)(((uint32_t)alloc_pages(1))+0x1000);
+      uint32_t* user_stack=(uint32_t*)(((uint32_t)alloc_pages(2))+0x2000);
+      int buffer_pg_num=(((uint32_t)user_stack)-0x2000)>>12;
+      make_protector(buffer_pg_num);
+      // uint32_t* user_stack=(uint32_t*)(((uint32_t)alloc_pages(1))+0x1000);
       user_stack-=2;
       user_stack[0]=param1;
       user_stack[1]=param2;

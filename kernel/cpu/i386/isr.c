@@ -132,8 +132,12 @@ __attribute__((unused)) static char *exception_messages[] = {
 };
 
 void isr_handler(registers_t r) {
+  if (r.int_no!=80 && r.int_no!=14) {
+    vga_write_string(exception_messages[r.int_no]);
+  }
   switch (r.int_no) {
     case 14: {
+      serial_write_string("PAGE FAULT\n");
       uint32_t addr;
       asm("movl %%cr2,%0": "=r"(addr));
       vga_write_string("In PID ");
