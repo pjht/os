@@ -14,3 +14,4 @@ initrd/*
 sysroot/boot/initrd.tar
 serout
 vga_drv/vga_drv
+.vagrant
