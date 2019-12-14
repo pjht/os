@@ -16,7 +16,7 @@
 #include "serial.h"
 #include <sys/types.h>
 
-void irq_handler(registers_t r);
+void irq_handler(registers_t* r);
 static isr_t interrupt_handlers[256];
 
 extern Task* currentTask;
@@ -131,11 +131,11 @@ __attribute__((unused)) static char *exception_messages[] = {
     "Reserved"
 };
 
-void isr_handler(registers_t r) {
-  if (r.int_no!=80 && r.int_no!=14) {
-    vga_write_string(exception_messages[r.int_no]);
+void isr_handler(registers_t* r) {
+  if (r->int_no!=80 && r->int_no!=14) {
+    vga_write_string(exception_messages[r->int_no]);
   }
-  switch (r.int_no) {
+  switch (r->int_no) {
     case 14: {
       serial_write_string("PAGE FAULT\n");
       uint32_t addr;
@@ -146,23 +146,23 @@ void isr_handler(registers_t r) {
       vga_write_string(str);
       vga_write_string(" and address ");
       str[0]='\0';
-      hex_to_ascii(r.eip,str);
+      hex_to_ascii(r->eip,str);
       vga_write_string(str);
-      if (r.err_code==0) {
+      if (r->err_code==0) {
         vga_write_string(", kernel process tried to read a non-present page entry at address ");
-      } else if (r.err_code==1) {
+      } else if (r->err_code==1) {
         vga_write_string(", kernel process tried to read a page and caused a protection fault at address ");
-      } else if (r.err_code==2) {
+      } else if (r->err_code==2) {
         vga_write_string(", kernel process tried to write to a non-present page entry at address ");
-      } else if (r.err_code==3) {
+      } else if (r->err_code==3) {
         vga_write_string(", kernel process tried to write a page and caused a protection fault at address ");
-      } else if (r.err_code==4) {
+      } else if (r->err_code==4) {
         vga_write_string(", user process tried to read a non-present page entry at address ");
-      } else if (r.err_code==5) {
+      } else if (r->err_code==5) {
         vga_write_string(", user process tried to read a page and caused a protection fault at address ");
-      } else if (r.err_code==6) {
+      } else if (r->err_code==6) {
         vga_write_string(", user process tried to write to a non-present page entry at address ");
-      } else if (r.err_code==7) {
+      } else if (r->err_code==7) {
         vga_write_string(", user process tried to write a page and caused a protection fault at address ");
       }
       str[0]='\0';
@@ -171,10 +171,10 @@ void isr_handler(registers_t r) {
       vga_write_string(".");
       vga_write_string(" Stack is at ");
       str[0]='\0';
-      hex_to_ascii(r.useresp,str);
+      hex_to_ascii(r->useresp,str);
       vga_write_string(str);
       vga_write_string(".\n");
-      // if ((r.err_code&1)==0) {
+      // if ((r->err_code&1)==0) {
       //   // int dir_entry=(addr&0xFFC00000)>>22;
       //   // int table_entry=(addr&0x3FF000)>12;
       //   // if (dir_entry_present(dir_entry)) {
@@ -194,60 +194,60 @@ void isr_handler(registers_t r) {
       halt();
       break;
     case 80:
-      if (r.eax==1) {
+      if (r->eax==1) {
         tss_stack_reset();
         tasking_yield(r);
-        // r.ds=0x23;
-        // r.ss=0x23;
-        // r.cs=0x1B;
-      } else if (r.eax==2) {
-        tasking_createTask((void*)r.ebx);
-      } else if (r.eax==3) {
-        r.ebx=(uint32_t)alloc_pages(r.ebx);
-      } else if (r.eax==4) {
-        alloc_pages_virt(r.ebx,(void*)r.ecx);
-      } else if (r.eax==5) {
-        r.ebx=(uint32_t)tasking_get_errno_address();
-      } else if (r.eax==6) {
-        kernel_mailbox_get_msg(r.ebx,(Message*)r.ecx,r.edx);
-      } else if (r.eax==7) {
-        kernel_mailbox_send_msg((Message*)r.ebx);
-      } else if (r.eax==8) {
-        r.ebx=(uint32_t)paging_new_address_space();
-      } else if (r.eax==9) {
-        tasking_createTaskCr3KmodeParam((void*)r.ebx,(void*)r.ecx,0,0,0,0,0);
-      } else if (r.eax==10) {
-        address_spaces_copy_data((void*)r.ebx,(void*)r.ecx,r.edx,(void*)r.esi);
-      } else if (r.eax==11) {
+        // r->ds=0x23;
+        // r->ss=0x23;
+        // r->cs=0x1B;
+      } else if (r->eax==2) {
+        tasking_createTask((void*)r->ebx);
+      } else if (r->eax==3) {
+        r->ebx=(uint32_t)alloc_pages(r->ebx);
+      } else if (r->eax==4) {
+        alloc_pages_virt(r->ebx,(void*)r->ecx);
+      } else if (r->eax==5) {
+        r->ebx=(uint32_t)tasking_get_errno_address();
+      } else if (r->eax==6) {
+        kernel_mailbox_get_msg(r->ebx,(Message*)r->ecx,r->edx);
+      } else if (r->eax==7) {
+        kernel_mailbox_send_msg((Message*)r->ebx);
+      } else if (r->eax==8) {
+        r->ebx=(uint32_t)paging_new_address_space();
+      } else if (r->eax==9) {
+        tasking_createTaskCr3KmodeParam((void*)r->ebx,(void*)r->ecx,0,0,0,0,0);
+      } else if (r->eax==10) {
+        address_spaces_copy_data((void*)r->ebx,(void*)r->ecx,r->edx,(void*)r->esi);
+      } else if (r->eax==11) {
         if (!currentTask->priv) {
-          r.ebx=0;
+          r->ebx=0;
           return;
         }
-        void* virt_addr=find_free_pages(r.ecx);
-        map_pages(virt_addr,(void*)r.ebx,r.ecx,1,1);
-        r.ebx=(uint32_t)virt_addr;
-      } else if (r.eax==12) {
-        tasking_createTaskCr3KmodeParam((void*)r.ebx,(void*)r.ecx,0,1,r.edx,1,r.esi);
-      } else if (r.eax==13) {
-        r.ebx=(uint32_t)address_spaces_put_data((void*)r.ebx,(void*)r.ecx,r.edx);
-      } else if (r.eax==14) {
-        r.ebx=kernel_mailbox_new((uint16_t)r.ebx,(char*)r.ecx);
-      } else if (r.eax==15) {
-        tasking_yieldToPID(r.ebx);
-      } else if (r.eax==16) {
-        serial_write_string((char*)r.ebx);
-      } else if (r.eax==17) {
-        tasking_exit((uint8_t)r.ebx);
-      } else if (r.eax==18) {
+        void* virt_addr=find_free_pages(r->ecx);
+        map_pages(virt_addr,(void*)r->ebx,r->ecx,1,1);
+        r->ebx=(uint32_t)virt_addr;
+      } else if (r->eax==12) {
+        tasking_createTaskCr3KmodeParam((void*)r->ebx,(void*)r->ecx,0,1,r->edx,1,r->esi);
+      } else if (r->eax==13) {
+        r->ebx=(uint32_t)address_spaces_put_data((void*)r->ebx,(void*)r->ecx,r->edx);
+      } else if (r->eax==14) {
+        r->ebx=kernel_mailbox_new((uint16_t)r->ebx,(char*)r->ecx);
+      } else if (r->eax==15) {
+        tasking_yieldToPID(r->ebx);
+      } else if (r->eax==16) {
+        serial_write_string((char*)r->ebx);
+      } else if (r->eax==17) {
+        tasking_exit((uint8_t)r->ebx);
+      } else if (r->eax==18) {
         serial_printf("Initrd size is %d bytes\n",initrd_sz);
-        r.ebx=initrd_sz;
-      } else if (r.eax==19) {
+        r->ebx=initrd_sz;
+      } else if (r->eax==19) {
         serial_printf("Copying initrd\n");
-        memcpy((char*)r.ebx,initrd,initrd_sz);
-      } else if (r.eax==20) {
-        r.ebx=(pid_t)getPID();
-      } else if (r.eax==21) {
-        r.ebx=kernel_mailbox_find_by_name((char*)r.ebx);
+        memcpy((char*)r->ebx,initrd,initrd_sz);
+      } else if (r->eax==20) {
+        r->ebx=(pid_t)getPID();
+      } else if (r->eax==21) {
+        r->ebx=kernel_mailbox_find_by_name((char*)r->ebx);
       }
       break;
     }
@@ -259,14 +259,14 @@ void isr_register_handler(uint8_t n,isr_t handler) {
     interrupt_handlers[n] = handler;
 }
 
-void irq_handler(registers_t r) {
+void irq_handler(registers_t* r) {
     /* After every interrupt we need to send an EOI to the PICs
      * or they will not send another interrupt again */
-    if (r.int_no >= 40) port_byte_out(0xA0,0x20); /* slave */
+    if (r->int_no >= 40) port_byte_out(0xA0,0x20); /* slave */
     port_byte_out(0x20,0x20); /* master */
     /* Handle the interrupt in a more modular way */
-    if (interrupt_handlers[r.int_no] != 0) {
-        isr_t handler = interrupt_handlers[r.int_no];
+    if (interrupt_handlers[r->int_no] != 0) {
+        isr_t handler = interrupt_handlers[r->int_no];
         handler(r);
     }
 }
