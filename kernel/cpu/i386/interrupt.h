@@ -1,4 +1,4 @@
-#ifndef INERRUPT_H
+#ifndef INTERRUPT_H
 #define INTERRUPT_H
 
 /* ISRs reserved for CPU exceptions */
