@@ -203,6 +203,7 @@ void isr_handler(registers_t* r) {
       } else if (r->eax==2) {
         tasking_createTask((void*)r->ebx);
       } else if (r->eax==3) {
+        serial_printf("PID %d is allocating %d pages\n",getPID(),r->ebx);
         r->ebx=(uint32_t)alloc_pages(r->ebx);
       } else if (r->eax==4) {
         alloc_pages_virt(r->ebx,(void*)r->ecx);
@@ -217,6 +218,7 @@ void isr_handler(registers_t* r) {
       } else if (r->eax==9) {
         tasking_createTaskCr3KmodeParam((void*)r->ebx,(void*)r->ecx,0,0,0,0,0);
       } else if (r->eax==10) {
+        serial_printf("address_spaces_copy_data(0x%x,0x%x,0x%x,0x%x);\n",(void*)r->ebx,(void*)r->ecx,r->edx,(void*)r->esi);
         address_spaces_copy_data((void*)r->ebx,(void*)r->ecx,r->edx,(void*)r->esi);
       } else if (r->eax==11) {
         if (!currentTask->priv) {

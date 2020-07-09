@@ -95,6 +95,7 @@ void* find_free_pages(int num_pages) {
   }
   if (remaining_blks!=0) {
     vga_write_string("[PANIC] Out of memory");
+    halt();
   }
   return (void*)(bmap_index<<12);
 }

@@ -112,11 +112,16 @@ char load_task_devfs(uint32_t datapos) {
       elf_pheader pheader;
       fseek(initrd,(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos,SEEK_SET);
       fread(&pheader,sizeof(elf_pheader),1,initrd);
+      serial_print("pheader.memsz=");
+      char str[256];
+      hex_to_ascii(pheader.memsz,str);
+      serial_print(str);
+      serial_print("\n");
       char* ptr=alloc_memory(((pheader.memsz)/4096)+1);
       memset(ptr,0,pheader.memsz);
       if (pheader.filesz>0) {
         fseek(initrd,pheader.offset+datapos,SEEK_SET);
-        fread(ptr,sizeof(char),pheader.memsz,initrd);
+        fread(ptr,sizeof(char),pheader.filesz,initrd);
       }
       copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
     }
@@ -153,14 +158,14 @@ int main() {
   do {
     file=fopen("/dev/vga","w");
   } while(file==NULL);
-  datapos=find_loc("pci",initrd);
-  load_task(datapos,initrd);
-  free(initrd);
-  yieldToPID(4);
+  // datapos=find_loc("pci",initrd);
+  // load_task(datapos,initrd);
+  // free(initrd);
+  // yieldToPID(4);
   fputs("FPUTS String\n",file);
-  char str[3]={0,0,0};
-  fgets(str,2,stdin);
-  char str2[3]={0,0,0};
-  fgets(str2,2,stdin);
-  printf("Printf %s,%s\n",str,str2);
+  // char str[3]={0,0,0};
+  // fgets(str,2,stdin);
+  // char str2[3]={0,0,0};
+  // fgets(str2,2,stdin);
+  // printf("Printf %s,%s\n",str,str2);
 }

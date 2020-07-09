@@ -98,31 +98,62 @@ char* devfs_gets_finish(vfs_message* vfs_msg) {
   serial_print("gets_finish: Driver wants ");
   serial_print(str);
   serial_print(" bytes of gets data\n");
+  int_to_ascii(vfs_msg->type,str);
+  serial_print("gets_finish: Driver has message type ");
+  serial_print(str);
+  serial_print("\n");
   if (vfs_msg->flags) {
     return NULL;
   }
-  char* gets_data=malloc(sizeof(vfs_msg->data));
+  uint8_t* gets_data=malloc(sizeof(uint8_t)*vfs_msg->data);
   Message msg;
   msg.msg=gets_data;
   int_to_ascii(vfs_msg->data,str);
   serial_print("gets_finish: Driver now wants ");
   serial_print(str);
   serial_print(" bytes of gets data\n");
+  msg.msg=gets_data;
+  int_to_ascii(vfs_msg->type,str);
+  serial_print("gets_finish: Driver now has message type ");
+  serial_print(str);
+  serial_print("\n");
+
+  // int_to_ascii(devfs_drv_box,str);
+  // serial_print("mailbox_get_msg(");
+  // serial_print(str);
+  // serial_print(",");
+  // hex_to_ascii(msg,str);
+  // serial_print(str);
+  // serial_print(",");
+  // int_to_ascii((uint32_t)vfs_msg->data,str);
+  // serial_print(str);
+  // serial_print(");\n");
+  vfs_message temp_msg;
+  memcpy(&temp_msg, vfs_msg, sizeof(vfs_message));
   mailbox_get_msg(devfs_drv_box,&msg,(uint32_t)vfs_msg->data);
   // while (msg.from==0 && msg.size==0) {
   //   serial_print("Yielding to wait for data msg\n");
   //   yield();
   //   mailbox_get_msg(devfs_drv_box,&msg,(uint32_t)vfs_msg->data);
   // }
+  memcpy(vfs_msg, &temp_msg, sizeof(vfs_message));
   int_to_ascii(vfs_msg->data,str);
   serial_print("gets_finish: Again, driver now wants ");
   serial_print(str);
   serial_print(" bytes of gets data\n");
+  int_to_ascii(vfs_msg->type,str);
+  serial_print("gets_finish: Again, driver now has message type ");
+  serial_print(str);
+  serial_print("\n");
   vfs_msg->flags=0;
   int_to_ascii(vfs_msg->data,str);
   serial_print("gets_finish: Sending ");
   serial_print(str);
   serial_print(" bytes of gets data\n");
+  int_to_ascii(vfs_msg->type,str);
+  serial_print("gets_finish: Sending message type ");
+  serial_print(str);
+  serial_print("\n");
   return gets_data;
 }
 
@@ -169,6 +200,11 @@ void process_vfs_msg(vfs_message* vfs_msg, uint32_t from) {
       mailbox_send_msg(&msg);
     } else {
       char* gets_data=NULL;
+      serial_print("GOT FINISH TYPE ");
+      char str[256];
+      int_to_ascii(vfs_msg->type,str);
+      serial_print(str);
+      serial_print("\n");
       switch (vfs_msg->type) {
         case VFS_OPEN:
         vfs_msg->flags=0;
@@ -196,6 +232,10 @@ void process_vfs_msg(vfs_message* vfs_msg, uint32_t from) {
       msg.from=devfs_vfs_box;
       msg.size=sizeof(vfs_message);
       msg.msg=vfs_msg;
+      serial_print("SENDING FINISH TYPE ");
+      int_to_ascii(vfs_msg->type,str);
+      serial_print(str);
+      serial_print("\n");
       mailbox_send_msg(&msg);
       if (gets_data) {
         serial_print("Gets data\n");

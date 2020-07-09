@@ -107,7 +107,7 @@ void* malloc(size_t size) {
   }
   if (blk_indx==-1) {
     // reserve_block((uint32_t)ceilf((double)size/BLK_SZ));
-    reserve_block(256);
+    reserve_block(1024);
     return malloc(size);
   }
   for (uint32_t i=0;i<num_4b_grps;i++) {

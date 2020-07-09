@@ -379,21 +379,30 @@ int main() {
           break;
         }
       } else {
-        serial_print("FINISH\n");
+        serial_print("FINISH TYPE ");
+        char str[256];
+        int_to_ascii(vfs_msg->type,str);
+        serial_print(str);
+        serial_print("\n");
         switch (vfs_msg->type) {
           case VFS_OPEN:
+          serial_print("call fopen finish\n");
           vfs_fopen_finish(vfs_msg,msg.from);
           break;
           case VFS_PUTS:
+          serial_print("call puts finish\n");
           vfs_puts_finish(vfs_msg,msg.from);
           break;
           case VFS_GETS:
+          serial_print("call gets finish\n");
           data=vfs_gets_finish(vfs_msg,msg.from);
           break;
           case VFS_MOUNT:
+          serial_print("call mount finish\n");
           vfs_mount_finish(vfs_msg,msg.from);
           break;
           default:
+          serial_print("invalid finish\n");
           vfs_msg->flags=1;
           break;
         }

@@ -1,4 +1,4 @@
-#include "mailboxes.h"
+  #include "mailboxes.h"
 #include "kmalloc.h"
 #include <string.h>
 #include <stdint.h>
@@ -45,7 +45,6 @@ void kernel_mailbox_send_msg(Message* user_msg) {
   void* virt_addr=find_free_pages(num_pages);
   map_pages(virt_addr,phys_addr,num_pages,0,1);
   serial_printf("Mapped into vmem\n");
-  serial_printf("memcpy(%x,%x,%d)\n",virt_addr,user_msg->msg,user_msg->size);
   memcpy(virt_addr,user_msg->msg,user_msg->size);
   unmap_pages(virt_addr,num_pages);
   serial_printf("Stored data in pmem\n");
@@ -95,8 +94,8 @@ void kernel_mailbox_get_msg(uint32_t box, Message* recv_msg, uint32_t buffer_sz)
   void* virt_addr=find_free_pages(num_pages);
   map_pages(virt_addr,msg.msg,num_pages,0,1);
   memcpy(recv_msg->msg,virt_addr,mailbox.msg_store[mailbox.rd].size);
-  unmap_pages(virt_addr,num_pages);
-  pmem_free(((uint32_t)msg.msg)>>12,num_pages);
+  // unmap_pages(virt_addr,num_pages);
+  // pmem_free(((uint32_t)msg.msg)>>12,num_pages);
   // kfree(mailbox.msg_store[mailbox.rd].msg);
   mailbox.msg_store[mailbox.rd].from=0;
   uint32_t orig_rd=mailbox.rd;

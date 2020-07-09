@@ -13,6 +13,7 @@ uint32_t devfs_box;
 #define DEVFS_PID 3
 
 int main() {
+  serial_print("IN VGA DRV");
   uint32_t box=mailbox_new(16,"vga");
   devfs_box=mailbox_find_by_name("devfs_driver");
   text_fb_info info;
