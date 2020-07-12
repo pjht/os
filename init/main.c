@@ -132,37 +132,43 @@ char load_task_devfs(uint32_t datapos) {
 
 
 int main() {
-  long size=initrd_sz();
-  char* initrd=malloc(size);
-  initrd_get(initrd);
-  uint32_t datapos=find_loc("vfs",initrd);
-  load_task(datapos,initrd);
-  yield(); // Bochs fails here
-  rescan_vfs();
-  datapos=find_loc("devfs",initrd);
-  load_task(datapos,initrd);
-  yieldToPID(3);
-  datapos=find_loc("initrd_drv",initrd);
-  load_task(datapos,initrd);
-  yieldToPID(4);
-  mount("","devfs","/dev/");
-  datapos=find_loc("vga_drv",initrd);
-  serial_print("Making vga task\n");
-  load_task_devfs(datapos);
-  serial_print("Made vga task\n");
-  yieldToPID(5);
-  FILE* file;
-  do {
-    file=fopen("/dev/vga","w");
-  } while(file==NULL);
-  do {
-    file=fopen("/dev/vga","w");
-  } while(file==NULL);
+  serial_print("IN INIT\n");
+  blockTask(TASK_BLOCKED);
+  for (int i=0;i<4;i++) {
+    yield();
+  }
+  // long size=initrd_sz();
+  // char* initrd=malloc(size);
+  // initrd_get(initrd);
+  // exit(0);
+  // uint32_t datapos=find_loc("vfs",initrd);
+  // load_task(datapos,initrd);
+  // yield(); // Bochs fails here
+  // rescan_vfs();
+  // datapos=find_loc("devfs",initrd);
+  // load_task(datapos,initrd);
+  // yieldToPID(3);
+  // datapos=find_loc("initrd_drv",initrd);
+  // load_task(datapos,initrd);
+  // yieldToPID(4);
+  // mount("","devfs","/dev/");
+  // datapos=find_loc("vga_drv",initrd);
+  // serial_print("Making vga task\n");
+  // load_task_devfs(datapos);
+  // serial_print("Made vga task\n");
+  // yieldToPID(5);
+  // FILE* file;
+  // do {
+  //   file=fopen("/dev/vga","w");
+  // } while(file==NULL);
+  // do {
+  //   file=fopen("/dev/vga","w");
+  // } while(file==NULL);
   // datapos=find_loc("pci",initrd);
   // load_task(datapos,initrd);
   // free(initrd);
   // yieldToPID(4);
-  fputs("FPUTS String\n",file);
+  // fputs("FPUTS String\n",file);
   // char str[3]={0,0,0};
   // fgets(str,2,stdin);
   // char str2[3]={0,0,0};

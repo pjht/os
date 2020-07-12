@@ -3,7 +3,14 @@
 
 #include <stdint.h>
 
-
+#ifndef TASKING_H
+typedef enum TaskState {
+  TASK_RUNNING,
+  TASK_READY,
+  TASK_EXITED,
+  TASK_BLOCKED
+} TaskState;
+#endif
 typedef struct Task {
   uint32_t kernel_esp;
   uint32_t kernel_esp_top;
@@ -14,8 +21,7 @@ typedef struct Task {
   uint32_t pid;
   struct Task* prev;
   struct Task* next;
+  TaskState state;
 } Task;
-
-int* tasking_get_errno_address();
 
 #endif

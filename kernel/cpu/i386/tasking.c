@@ -13,29 +13,32 @@
 #include "../halt.h"
 #include "serial.h"
 #include "../../vga_err.h"
+#include <sys/types.h>
 #define STACK_PAGES 2
 
 extern void task_init();
 static uint32_t* kstacks=(uint32_t*)0xF6800000;
 
 
-uint32_t next_pid;
-
-Task* currentTask;
-static Task* headTask;
-static Task* tailTask;
+uint32_t next_pid=0;
+uint32_t running_blocked_tasks=0;
+Task* currentTask=NULL;
+static Task* readyToRunHead=NULL;
+static Task* readyToRunTail=NULL;
+static Task* exitedTasksHead=NULL;
+static Task* exitedTasksTail=NULL;
 static Task* tasks[32768];
 Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1_exists,uint32_t param1_arg,char param2_exists,uint32_t param2_arg);
 
 void tasking_init(void* esp) {
-  currentTask=NULL;
-  next_pid=0;
-  headTask=tasking_createTaskCr3KmodeParam(NULL,paging_new_address_space(),1,0,0,0,0);
-  currentTask=headTask;
-  tailTask=headTask;
+  tasking_createTaskCr3KmodeParam(NULL,paging_new_address_space(),1,0,0,0,0);
 }
 
 Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1_exists,uint32_t param1_arg,char param2_exists,uint32_t param2_arg) {
+    if (next_pid>1024*32) {
+      serial_printf("Failed to create a task, as 32k tasks have been created already.\n");
+      halt(); //Cannot ever create more than 32k tasks, as I don't currently reuse PIDs.
+    }
     Task* task=kmalloc(sizeof(Task));
     map_kstack(next_pid);
     uint32_t param1;
@@ -85,7 +88,6 @@ Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1
     load_address_space(old_cr3);
     task->next=NULL;
     task->pid=next_pid;
-    tasks[next_pid]=task;
     task->priv=0;
     task->errno=0;
     if (currentTask) {
@@ -94,18 +96,24 @@ Task* tasking_createTaskCr3KmodeParam(void* eip,void* cr3,char kmode,char param1
     if (task->pid==1) {
       task->priv=1;
     }
-    next_pid++;
-    if (next_pid>1024*32) {
-      serial_printf("Failed to create a task, as 32k tasks have been created already.\n");
-      halt(); //Cannot ever create more than 32k tasks, as I don't currently reuse PIDs.
-    }
-    if (tailTask) {
-      tailTask->next=task;
-      task->prev=tailTask;
-      tailTask=task;
+    task->prev=NULL;
+    task->next=NULL;
+    if (readyToRunTail) {
+      task->state=TASK_READY;
+      readyToRunTail->next=task;
+      task->prev=readyToRunTail;
+      readyToRunTail=task;
+    } else if (currentTask) {
+      task->state=TASK_READY;
+      readyToRunHead=task;
+      readyToRunTail=task;
     } else {
-      task->prev=NULL;
+      task->state=TASK_RUNNING;
+      currentTask=task;
     }
+    tasks[next_pid]=task;
+    next_pid++;
+    running_blocked_tasks++;
     if (task->pid!=0) {
       serial_printf("Created task with PID %d.\n",task->pid);
     }
@@ -116,7 +124,7 @@ int* tasking_get_errno_address() {
   return &(currentTask->errno);
 }
 char isPrivleged(uint32_t pid) {
-  for (Task* task=headTask;task!=NULL;task=task->next) {
+  for (Task* task=readyToRunHead;task!=NULL;task=task->next) {
     if (task->pid==pid) {
       return task->priv;
     }
@@ -128,14 +136,68 @@ Task* tasking_createTask(void* eip) {
   return tasking_createTaskCr3KmodeParam(eip,paging_new_address_space(),0,0,0,0,0);
 }
 
-void tasking_yield(registers_t registers) {
-  Task* task=currentTask->next;
-  if (!task) {
-    task=headTask;
+void switch_to_task(Task* task) {
+  if (task!=readyToRunHead) {
+    // Unlink it from the doubly-linked list of ready-to-run tasks
+    task->prev->next=task->next;
+    if (task->next) {
+      task->next->prev=task->prev;
+    }
+  } else {
+    // Unlink the task from the list by advancing the ready to run pointer to the next task
+    readyToRunHead=task->next;
+    // If the task did not have a next task, also clear the ready to run tail pointer
+    if (readyToRunHead==NULL) {
+      readyToRunTail=NULL;
+    }
+  }
+  task->prev=NULL;
+  task->next=NULL;
+  task->state=TASK_RUNNING;
+  if (currentTask->state==TASK_RUNNING) {
+    currentTask->state=TASK_READY;
+    // Link the task onto the list of ready to run tasks
+    if (readyToRunTail) {
+      currentTask->prev=readyToRunTail;
+      readyToRunTail->next=currentTask;
+      readyToRunTail=currentTask;
+    } else {
+      readyToRunHead=currentTask;
+      readyToRunTail=currentTask;
+    }
   }
   serial_printf("Yielding to PID %d.\n",task->pid);
   load_smap(task->cr3);
-  switch_to_task(task);
+  switch_to_task_asm(task);
+}
+
+void tasking_yield() {
+  serial_printf("Yield called from pid %d\n",currentTask->pid);
+  if (!readyToRunHead) {
+    if (currentTask->state!=TASK_RUNNING) {
+      //This indicates either all tasks are bloked or the os has shutdown. Check which one it is
+      if (running_blocked_tasks==0) {
+        serial_printf("All tasks exited, halting\n");
+        halt(); //never returns, so we dont need an else
+      }
+      serial_printf("All tasks blocked, waiting for interrupt to unblock task\n");
+      // All tasks blocked
+      // Stop running the current task by setting currentTask to null, though put it in a local variable to keep track of it.
+      Task* task=currentTask;
+      currentTask=NULL;
+      // Wait for an IRQ whose handler unblocks a task
+      do {
+        asm volatile("sti");
+        asm volatile("hlt");
+        asm volatile("cli");
+      } while (readyToRunHead==NULL);
+      currentTask=task;
+    } else {
+      serial_printf("Yield failed, no other ready tasks\n");
+      return;
+    }
+  }
+  switch_to_task(readyToRunHead);
 }
 
 void tasking_yieldToPID(uint32_t pid) {
@@ -144,37 +206,46 @@ void tasking_yieldToPID(uint32_t pid) {
     serial_printf("PID %d does not exist.\n",pid);
     return;
   }
-  serial_printf("Yielding to PID %d.\n",task->pid);
-  load_smap(task->cr3);
   switch_to_task(task);
 }
 
 void tasking_exit(uint8_t code) {
   serial_printf("PID %d is exiting with code %d.\n",currentTask->pid,code);
-  if (currentTask->prev) {
-    currentTask->prev->next=currentTask->next;
+  currentTask->state=TASK_EXITED;
+  if (exitedTasksHead) {
+    exitedTasksTail->next=currentTask;
+    currentTask->prev=exitedTasksHead;
+    exitedTasksTail=currentTask;
+  } else {
+    exitedTasksHead=currentTask;
+    exitedTasksTail=currentTask;
   }
-  if (currentTask->next) {
-    currentTask->next->prev=currentTask->prev;
-  }
-  if (headTask==currentTask) {
-    if (!currentTask->next) {
-      serial_write_string("ERROR! Head task exited with no child tasks! Halting!\n");
-      vga_write_string("ERROR! Head task exited with no child tasks! Halting!\n");
-      halt();
-    }
-    headTask=currentTask->next;
-  }
-  Task* task=currentTask->next;
-  if (task==NULL) {
-    task=headTask;
-  }
-  kfree(currentTask);
-  serial_printf("Exit yielding to PID %d.\n",task->pid);
-  load_smap(task->cr3);
-  switch_to_task(task);
+  running_blocked_tasks--;
+  tasking_yield();
 }
 
 uint32_t getPID() {
   return currentTask->pid;
+}
+
+void tasking_block(TaskState newstate) {
+    if (newstate==TASK_RUNNING || newstate==TASK_READY || newstate==TASK_EXITED) {
+      serial_printf("Attempted to block task using a new state of running/ready/exited. This is an error.\n");
+      return;
+    }
+    serial_printf("Blocking PID %d with state %d\n",currentTask->pid,currentTask->state);
+    currentTask->state = newstate;
+    tasking_yield();
+}
+
+void tasking_unblock(pid_t pid) {
+  serial_printf("Unblocking PID %d (task pid %d)\n",pid,tasks[pid]->pid);
+    tasks[pid]->state=TASK_READY;
+    if(readyToRunHead) {
+      readyToRunTail->next=tasks[pid];
+      readyToRunTail=tasks[pid];
+    } else {
+      readyToRunHead=tasks[pid];
+      readyToRunTail=tasks[pid];
+    }
 }

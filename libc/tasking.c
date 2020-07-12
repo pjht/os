@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include <tasking.h>
+#include <sys/types.h>
 
 void yield() {
   asm volatile("  \
@@ -42,4 +44,19 @@ __attribute__((noreturn)) void exit(int code) {
     int $80; \
   "::"b"(code));
   for(;;);
+}
+
+
+void blockTask(TaskState state) {
+  asm volatile("  \
+    mov $22, %%eax; \
+    int $80; \
+  "::"b"(state));
+}
+
+void unblockTask(pid_t pid) {
+  asm volatile("  \
+    mov $23, %%eax; \
+    int $80; \
+  "::"b"(pid));
 }

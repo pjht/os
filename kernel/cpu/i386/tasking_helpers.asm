@@ -1,10 +1,10 @@
 section .text
-global switch_to_task
+global switch_to_task_asm
 extern currentTask
 extern tss
 ;WARNING: Caller is expected to disable IRQs before calling, and enable IRQs again after function returns
 
-switch_to_task:
+switch_to_task_asm:
 
     ;Save previous task's state
 

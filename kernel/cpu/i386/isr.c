@@ -250,7 +250,11 @@ void isr_handler(registers_t* r) {
         r->ebx=(pid_t)getPID();
       } else if (r->eax==21) {
         r->ebx=kernel_mailbox_find_by_name((char*)r->ebx);
-      }
+      } else if (r->eax==22) {
+        tasking_block(r->ebx);
+      } else if (r->eax==23) {
+        tasking_unblock(r->ebx);
+      } 
       break;
     }
   }
