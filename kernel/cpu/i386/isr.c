@@ -193,20 +193,11 @@ void isr_handler(registers_t* r) {
       break;
     case 80:
       switch (r->eax) {
-      case SYSCALL_CREATEPROC_NEW_ADDR_SPACE:
-        tasking_createTask((void*)r->ebx);
-        break;
-      case SYSCALL_CREATEPROC_GIVEN_ADDR_SPACE:
-        tasking_createTaskCr3KmodeParam((void*)r->ebx,(void*)r->ecx,0,0,0,0,0);
-        break;
-      case SYSCALL_CREATEPROC_GIVEN_ADDR_SPACE_W_ARGS:
-        tasking_createTaskCr3KmodeParam((void*)r->ebx,(void*)r->ecx,0,1,r->edx,1,r->esi);
+      case SYSCALL_CREATEPROC:
+        tasking_createTaskCr3KmodeParam((void*)r->ebx,(void*)r->ecx,0,r->edx,r->esi,r->edx,r->edi);
         break;
       case SYSCALL_YIELD:
-        tasking_yield(r);
-        break;
-      case SYSCALL_YIELD_TO_PID:
-        tasking_yieldToPID(r->ebx);
+        tasking_yield(r->ebx);
         break;
       case SYSCALL_BLOCK:
         tasking_block(r->ebx);
@@ -224,11 +215,11 @@ void isr_handler(registers_t* r) {
         r->ebx=(pid_t)getPID();
         break;
       case SYSCALL_ALLOC_MEM:
-        serial_printf("PID %d is allocating %d pages\n",getPID(),r->ebx);
-        r->ebx=(uint32_t)alloc_pages(r->ebx);
-        break;
-      case SYSCALL_ALLOC_MEM_VIRT:
-        alloc_pages_virt(r->ebx,(void*)r->ecx);
+        if ((void*)r->ecx==NULL) {
+          r->ebx=(uint32_t)alloc_pages(r->ebx);
+        } else {
+          alloc_pages_virt(r->ebx,(void*)r->ecx);
+        }
         break;
       case SYSCALL_PRIV_MAP_PAGES:
         if (!currentTask->priv) {
@@ -244,10 +235,11 @@ void isr_handler(registers_t* r) {
         break;
       case SYSCALL_ADDR_SPACES_COPY_DATA:
         serial_printf("address_spaces_copy_data(0x%x,0x%x,0x%x,0x%x);\n",(void*)r->ebx,(void*)r->ecx,r->edx,(void*)r->esi);
-        address_spaces_copy_data((void*)r->ebx,(void*)r->ecx,r->edx,(void*)r->esi);
-        break;
-      case SYSCALL_ADDR_SPACES_PUT_DATA:
-        r->ebx=(uint32_t)address_spaces_put_data((void*)r->ebx,(void*)r->ecx,r->edx);
+        if ((void*)r->esi!=NULL) {
+          address_spaces_copy_data((void*)r->ebx,(void*)r->ecx,r->edx,(void*)r->esi);
+        } else {
+          r->ebx=(uint32_t)address_spaces_put_data((void*)r->ebx,(void*)r->ecx,r->edx);
+        }
         break;
       case SYSCALL_SERIAL_PRINT:
         serial_write_string((char*)r->ebx);

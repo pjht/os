@@ -171,44 +171,47 @@ void switch_to_task(Task* task) {
   switch_to_task_asm(task);
 }
 
-void tasking_yield() {
-  serial_printf("Yield called from pid %d\n",currentTask->pid);
-  if (!readyToRunHead) {
-    if (currentTask->state!=TASK_RUNNING) {
-      //This indicates either all tasks are bloked or the os has shutdown. Check which one it is
-      if (running_blocked_tasks==0) {
-        serial_printf("All tasks exited, halting\n");
-        halt(); //never returns, so we dont need an else
+void tasking_yield(pid_t pid) {
+  if (pid==0) {
+    if (!readyToRunHead) {
+      if (currentTask->state!=TASK_RUNNING) {
+        //This indicates either all tasks are bloked or the os has shutdown. Check which one it is
+        if (running_blocked_tasks==0) {
+          serial_printf("All tasks exited, halting\n");
+          halt(); //never returns, so we dont need an else
+        }
+        serial_printf("All tasks blocked, waiting for interrupt to unblock task\n");
+        // All tasks blocked
+        // Stop running the current task by setting currentTask to null, though put it in a local variable to keep track of it.
+        Task* task=currentTask;
+        currentTask=NULL;
+        // Wait for an IRQ whose handler unblocks a task
+        do {
+          asm volatile("sti");
+          asm volatile("hlt");
+          asm volatile("cli");
+        } while (readyToRunHead==NULL);
+        currentTask=task;
+      } else {
+        serial_printf("Yield failed, no other ready tasks\n");
+        return;
       }
-      serial_printf("All tasks blocked, waiting for interrupt to unblock task\n");
-      // All tasks blocked
-      // Stop running the current task by setting currentTask to null, though put it in a local variable to keep track of it.
-      Task* task=currentTask;
-      currentTask=NULL;
-      // Wait for an IRQ whose handler unblocks a task
-      do {
-        asm volatile("sti");
-        asm volatile("hlt");
-        asm volatile("cli");
-      } while (readyToRunHead==NULL);
-      currentTask=task;
-    } else {
-      serial_printf("Yield failed, no other ready tasks\n");
+    }
+    switch_to_task(readyToRunHead);
+  } else {
+    serial_printf("Attempting to yield to PID %d",pid);
+    Task* task=tasks[pid];
+    if (!task) {
+      serial_printf("PID %d does not exist.\n",pid);
       return;
     }
+    if (task->state!=TASK_READY) {
+      serial_printf("PID %d is blocked");
+      return;
+    }
+    switch_to_task(task);
   }
-  switch_to_task(readyToRunHead);
 }
-
-void tasking_yieldToPID(uint32_t pid) {
-  Task* task=tasks[pid];
-  if (!task) {
-    serial_printf("PID %d does not exist.\n",pid);
-    return;
-  }
-  switch_to_task(task);
-}
-
 void tasking_exit(uint8_t code) {
   serial_printf("PID %d is exiting with code %d.\n",currentTask->pid,code);
   currentTask->state=TASK_EXITED;
@@ -221,7 +224,7 @@ void tasking_exit(uint8_t code) {
     exitedTasksTail=currentTask;
   }
   running_blocked_tasks--;
-  tasking_yield();
+  tasking_yield(0);
 }
 
 uint32_t getPID() {
@@ -235,11 +238,11 @@ void tasking_block(TaskState newstate) {
     }
     serial_printf("Blocking PID %d with state %d\n",currentTask->pid,currentTask->state);
     currentTask->state = newstate;
-    tasking_yield();
+    tasking_yield(0);
 }
 
 void tasking_unblock(pid_t pid) {
-  serial_printf("Unblocking PID %d (task pid %d)\n",pid,tasks[pid]->pid);
+  serial_printf("Unblocking PID %d\n",pid);
     tasks[pid]->state=TASK_READY;
     if(readyToRunHead) {
       readyToRunTail->next=tasks[pid];

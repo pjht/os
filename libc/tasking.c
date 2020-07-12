@@ -8,28 +8,28 @@
 
 void yield() {
   asm volatile("  \
-    mov $" QU(SYSCALL_YIELD) ", %eax; \
+    mov $" QU(SYSCALL_YIELD) ", %%eax; \
     int $80; \
-  ");
+  "::"b"(0));
 }
 
 void createTaskCr3(void* task,void* cr3) {
   asm volatile("  \
-    mov $" QU(SYSCALL_CREATEPROC_GIVEN_ADDR_SPACE) ", %%eax; \
+    mov $" QU(SYSCALL_CREATEPROC) ", %%eax; \
     int $80; \
-  "::"b"(task),"c"(cr3));
+  "::"b"(task),"d"(0),"c"(cr3));
 }
 
 void createTaskCr3Param(void* task,void* cr3,uint32_t param1,uint32_t param2) {
   asm volatile("  \
-    mov $" QU(SYSCALL_CREATEPROC_GIVEN_ADDR_SPACE_W_ARGS) ", %%eax; \
+    mov $" QU(SYSCALL_CREATEPROC) ", %%eax; \
     int $80; \
-  "::"b"(task),"c"(cr3),"d"(param1),"S"(param2));
+  "::"b"(task),"c"(cr3),"d"(1),"S"(param1),"D"(param2));
 }
 
 void yieldToPID(uint32_t pid) {
   asm volatile("  \
-    mov $" QU(SYSCALL_YIELD_TO_PID) ", %%eax; \
+    mov $" QU(SYSCALL_YIELD) ", %%eax; \
     int $80; \
   "::"b"(pid));
 }

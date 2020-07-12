@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <sys/syscalls.h>
+#include <stdlib.h>
 
 #define QUAUX(X) #X
 #define QU(X) QUAUX(X)
@@ -9,13 +10,13 @@ void* alloc_memory(uint32_t num_pages) {
   asm volatile("  \
     mov $" QU(SYSCALL_ALLOC_MEM) ", %%eax; \
     int $80; \
-  ":"=b"(address):"b"(num_pages));
+  ":"=b"(address):"b"(num_pages),"c"(NULL));
   return address;
 }
 
 void alloc_memory_virt(uint32_t num_pages,void* addr) {
   asm volatile("  \
-    mov $" QU(SYSCALL_ALLOC_MEM_VIRT) ", %%eax; \
+    mov $" QU(SYSCALL_ALLOC_MEM) ", %%eax; \
     int $80; \
   "::"b"(num_pages),"c"(addr));
 }
@@ -39,9 +40,9 @@ void copy_data(void* cr3, void* data,uint32_t size,void* virt_addr) {
 void* put_data(void* cr3, void* data,uint32_t size) {
   void* virt_addr;
   asm volatile("  \
-    mov $" QU(SYSCALL_ADDR_SPACES_PUT_DATA) ", %%eax; \
+    mov $" QU(SYSCALL_ADDR_SPACES_COPY_DATA) ", %%eax; \
     int $80; \
-  ":"=b"(virt_addr):"b"(cr3),"c"(data),"d"(size));
+  ":"=b"(virt_addr):"b"(cr3),"c"(data),"d"(size),"S"(NULL));
   return virt_addr;
 }
 
