@@ -9,13 +9,11 @@
 #include "../tasking.h"
 #include "interrupt.h"
 #include "address_spaces.h"
-#include "mailboxes.h"
-#include <mailboxes.h>
 #include <string.h>
 #include <stdint.h>
 #include "serial.h"
 #include <sys/types.h>
-
+#include <sys/syscalls.h>
 void irq_handler(registers_t* r);
 static isr_t interrupt_handlers[256];
 
@@ -194,33 +192,34 @@ void isr_handler(registers_t* r) {
       halt();
       break;
     case 80:
-      if (r->eax==1) {
-        tss_stack_reset();
+      switch (r->eax) {
+      case SYSCALL_YIELD:
         tasking_yield(r);
-        // r->ds=0x23;
-        // r->ss=0x23;
-        // r->cs=0x1B;
-      } else if (r->eax==2) {
+        break;
+      case SYSCALL_CREATEPROC_NEW_ADDR_SPACE:
         tasking_createTask((void*)r->ebx);
-      } else if (r->eax==3) {
+        break;
+      case SYSCALL_ALLOC_MEM:
         serial_printf("PID %d is allocating %d pages\n",getPID(),r->ebx);
         r->ebx=(uint32_t)alloc_pages(r->ebx);
-      } else if (r->eax==4) {
+        break;
+      case SYSCALL_ALLOC_MEM_VIRT:
         alloc_pages_virt(r->ebx,(void*)r->ecx);
-      } else if (r->eax==5) {
+        break;
+      case SYSCALL_GET_ERRNO_ADDR:
         r->ebx=(uint32_t)tasking_get_errno_address();
-      } else if (r->eax==6) {
-        kernel_mailbox_get_msg(r->ebx,(Message*)r->ecx,r->edx);
-      } else if (r->eax==7) {
-        kernel_mailbox_send_msg((Message*)r->ebx);
-      } else if (r->eax==8) {
+        break;
+      case SYSCALL_NEW_ADDR_SPACE:
         r->ebx=(uint32_t)paging_new_address_space();
-      } else if (r->eax==9) {
+        break;
+      case SYSCALL_CREATEPROC_GIVEN_ADDR_SPACE:
         tasking_createTaskCr3KmodeParam((void*)r->ebx,(void*)r->ecx,0,0,0,0,0);
-      } else if (r->eax==10) {
+        break;
+      case SYSCALL_ADDR_SPACES_COPY_DATA:
         serial_printf("address_spaces_copy_data(0x%x,0x%x,0x%x,0x%x);\n",(void*)r->ebx,(void*)r->ecx,r->edx,(void*)r->esi);
         address_spaces_copy_data((void*)r->ebx,(void*)r->ecx,r->edx,(void*)r->esi);
-      } else if (r->eax==11) {
+        break;
+      case SYSCALL_PRIV_MAP_PAGES:
         if (!currentTask->priv) {
           r->ebx=0;
           return;
@@ -228,32 +227,41 @@ void isr_handler(registers_t* r) {
         void* virt_addr=find_free_pages(r->ecx);
         map_pages(virt_addr,(void*)r->ebx,r->ecx,1,1);
         r->ebx=(uint32_t)virt_addr;
-      } else if (r->eax==12) {
+        break;
+      case SYSCALL_CREATEPROC_GIVEN_ADDR_SPACE_W_ARGS:
         tasking_createTaskCr3KmodeParam((void*)r->ebx,(void*)r->ecx,0,1,r->edx,1,r->esi);
-      } else if (r->eax==13) {
+        break;
+      case SYSCALL_ADDR_SPACES_PUT_DATA:
         r->ebx=(uint32_t)address_spaces_put_data((void*)r->ebx,(void*)r->ecx,r->edx);
-      } else if (r->eax==14) {
-        r->ebx=kernel_mailbox_new((uint16_t)r->ebx,(char*)r->ecx);
-      } else if (r->eax==15) {
+        break;
+      case SYSCALL_YIELD_TO_PID:
         tasking_yieldToPID(r->ebx);
-      } else if (r->eax==16) {
+        break;
+      case SYSCALL_SERIAL_PRINT:
         serial_write_string((char*)r->ebx);
-      } else if (r->eax==17) {
+        break;
+      case SYSCALL_EXIT:
         tasking_exit((uint8_t)r->ebx);
-      } else if (r->eax==18) {
+        break;
+      case SYSCALL_GET_INITRD_SZ:
         serial_printf("Initrd size is %d bytes\n",initrd_sz);
         r->ebx=initrd_sz;
-      } else if (r->eax==19) {
+        break;
+      case SYSCALL_COPY_INITRD:
         serial_printf("Copying initrd\n");
         memcpy((char*)r->ebx,initrd,initrd_sz);
-      } else if (r->eax==20) {
+        break;
+      case SYSCALL_GET_PID:
         r->ebx=(pid_t)getPID();
-      } else if (r->eax==21) {
-        r->ebx=kernel_mailbox_find_by_name((char*)r->ebx);
-      } else if (r->eax==22) {
+        break;
+      case SYSCALL_BLOCK:
         tasking_block(r->ebx);
-      } else if (r->eax==23) {
+        break;
+      case SYSCALL_UNBLOCK:
         tasking_unblock(r->ebx);
+        break;
+      default:
+        break;
       } 
       break;
     }

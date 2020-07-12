@@ -2,7 +2,6 @@
 #include <grub/text_fb_info.h>
 #include <ipc/vfs.h>
 #include <elf.h>
-#include <mailboxes.h>
 #include <memory.h>
 #include <tasking.h>
 #include <stdlib.h>
@@ -97,38 +96,38 @@ char load_task(uint32_t datapos,char* initrd) {
   return 1;
 }
 
-char load_task_devfs(uint32_t datapos) {
-  serial_print("load_task_devfs\n");
-  FILE* initrd=fopen("/dev/initrd","r");
-  elf_header header;
-  fseek(initrd,datapos,SEEK_SET);
-  fread(&header,sizeof(elf_header),1,initrd);
-  if (header.magic!=ELF_MAGIC) {
-    serial_print("Bad magic number\n");
-    return 0;
-  } else {
-    void* cr3=new_address_space();
-    for (int i=0;i<header.pheader_ent_nm;i++) {
-      elf_pheader pheader;
-      fseek(initrd,(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos,SEEK_SET);
-      fread(&pheader,sizeof(elf_pheader),1,initrd);
-      serial_print("pheader.memsz=");
-      char str[256];
-      hex_to_ascii(pheader.memsz,str);
-      serial_print(str);
-      serial_print("\n");
-      char* ptr=alloc_memory(((pheader.memsz)/4096)+1);
-      memset(ptr,0,pheader.memsz);
-      if (pheader.filesz>0) {
-        fseek(initrd,pheader.offset+datapos,SEEK_SET);
-        fread(ptr,sizeof(char),pheader.filesz,initrd);
-      }
-      copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
-    }
-    createTaskCr3((void*)header.entry,cr3);
-  }
-  return 1;
-}
+// char load_task_devfs(uint32_t datapos) {
+//   serial_print("load_task_devfs\n");
+//   FILE* initrd=fopen("/dev/initrd","r");
+//   elf_header header;
+//   fseek(initrd,datapos,SEEK_SET);
+//   fread(&header,sizeof(elf_header),1,initrd);
+//   if (header.magic!=ELF_MAGIC) {
+//     serial_print("Bad magic number\n");
+//     return 0;
+//   } else {
+//     void* cr3=new_address_space();
+//     for (int i=0;i<header.pheader_ent_nm;i++) {
+//       elf_pheader pheader;
+//       fseek(initrd,(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos,SEEK_SET);
+//       fread(&pheader,sizeof(elf_pheader),1,initrd);
+//       serial_print("pheader.memsz=");
+//       char str[256];
+//       hex_to_ascii(pheader.memsz,str);
+//       serial_print(str);
+//       serial_print("\n");
+//       char* ptr=alloc_memory(((pheader.memsz)/4096)+1);
+//       memset(ptr,0,pheader.memsz);
+//       if (pheader.filesz>0) {
+//         fseek(initrd,pheader.offset+datapos,SEEK_SET);
+//         fread(ptr,sizeof(char),pheader.filesz,initrd);
+//       }
+//       copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
+//     }
+//     createTaskCr3((void*)header.entry,cr3);
+//   }
+//   return 1;
+// }
 
 
 int main() {
