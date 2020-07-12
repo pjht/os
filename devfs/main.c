@@ -105,7 +105,7 @@ char* devfs_gets_finish(vfs_message* vfs_msg) {
   if (vfs_msg->flags) {
     return NULL;
   }
-  uint8_t* gets_data=malloc(sizeof(uint8_t)*vfs_msg->data);
+  char* gets_data=malloc(sizeof(uint8_t)*vfs_msg->data);
   Message msg;
   msg.msg=gets_data;
   int_to_ascii(vfs_msg->data,str);
