@@ -193,11 +193,35 @@ void isr_handler(registers_t* r) {
       break;
     case 80:
       switch (r->eax) {
+      case SYSCALL_CREATEPROC_NEW_ADDR_SPACE:
+        tasking_createTask((void*)r->ebx);
+        break;
+      case SYSCALL_CREATEPROC_GIVEN_ADDR_SPACE:
+        tasking_createTaskCr3KmodeParam((void*)r->ebx,(void*)r->ecx,0,0,0,0,0);
+        break;
+      case SYSCALL_CREATEPROC_GIVEN_ADDR_SPACE_W_ARGS:
+        tasking_createTaskCr3KmodeParam((void*)r->ebx,(void*)r->ecx,0,1,r->edx,1,r->esi);
+        break;
       case SYSCALL_YIELD:
         tasking_yield(r);
         break;
-      case SYSCALL_CREATEPROC_NEW_ADDR_SPACE:
-        tasking_createTask((void*)r->ebx);
+      case SYSCALL_YIELD_TO_PID:
+        tasking_yieldToPID(r->ebx);
+        break;
+      case SYSCALL_BLOCK:
+        tasking_block(r->ebx);
+        break;
+      case SYSCALL_UNBLOCK:
+        tasking_unblock(r->ebx);
+        break;
+      case SYSCALL_EXIT:
+        tasking_exit((uint8_t)r->ebx);
+        break;
+      case SYSCALL_GET_ERRNO_ADDR:
+        r->ebx=(uint32_t)tasking_get_errno_address();
+        break;
+      case SYSCALL_GET_PID:
+        r->ebx=(pid_t)getPID();
         break;
       case SYSCALL_ALLOC_MEM:
         serial_printf("PID %d is allocating %d pages\n",getPID(),r->ebx);
@@ -205,19 +229,6 @@ void isr_handler(registers_t* r) {
         break;
       case SYSCALL_ALLOC_MEM_VIRT:
         alloc_pages_virt(r->ebx,(void*)r->ecx);
-        break;
-      case SYSCALL_GET_ERRNO_ADDR:
-        r->ebx=(uint32_t)tasking_get_errno_address();
-        break;
-      case SYSCALL_NEW_ADDR_SPACE:
-        r->ebx=(uint32_t)paging_new_address_space();
-        break;
-      case SYSCALL_CREATEPROC_GIVEN_ADDR_SPACE:
-        tasking_createTaskCr3KmodeParam((void*)r->ebx,(void*)r->ecx,0,0,0,0,0);
-        break;
-      case SYSCALL_ADDR_SPACES_COPY_DATA:
-        serial_printf("address_spaces_copy_data(0x%x,0x%x,0x%x,0x%x);\n",(void*)r->ebx,(void*)r->ecx,r->edx,(void*)r->esi);
-        address_spaces_copy_data((void*)r->ebx,(void*)r->ecx,r->edx,(void*)r->esi);
         break;
       case SYSCALL_PRIV_MAP_PAGES:
         if (!currentTask->priv) {
@@ -228,20 +239,18 @@ void isr_handler(registers_t* r) {
         map_pages(virt_addr,(void*)r->ebx,r->ecx,1,1);
         r->ebx=(uint32_t)virt_addr;
         break;
-      case SYSCALL_CREATEPROC_GIVEN_ADDR_SPACE_W_ARGS:
-        tasking_createTaskCr3KmodeParam((void*)r->ebx,(void*)r->ecx,0,1,r->edx,1,r->esi);
+      case SYSCALL_NEW_ADDR_SPACE:
+        r->ebx=(uint32_t)paging_new_address_space();
+        break;
+      case SYSCALL_ADDR_SPACES_COPY_DATA:
+        serial_printf("address_spaces_copy_data(0x%x,0x%x,0x%x,0x%x);\n",(void*)r->ebx,(void*)r->ecx,r->edx,(void*)r->esi);
+        address_spaces_copy_data((void*)r->ebx,(void*)r->ecx,r->edx,(void*)r->esi);
         break;
       case SYSCALL_ADDR_SPACES_PUT_DATA:
         r->ebx=(uint32_t)address_spaces_put_data((void*)r->ebx,(void*)r->ecx,r->edx);
         break;
-      case SYSCALL_YIELD_TO_PID:
-        tasking_yieldToPID(r->ebx);
-        break;
       case SYSCALL_SERIAL_PRINT:
         serial_write_string((char*)r->ebx);
-        break;
-      case SYSCALL_EXIT:
-        tasking_exit((uint8_t)r->ebx);
         break;
       case SYSCALL_GET_INITRD_SZ:
         serial_printf("Initrd size is %d bytes\n",initrd_sz);
@@ -250,15 +259,6 @@ void isr_handler(registers_t* r) {
       case SYSCALL_COPY_INITRD:
         serial_printf("Copying initrd\n");
         memcpy((char*)r->ebx,initrd,initrd_sz);
-        break;
-      case SYSCALL_GET_PID:
-        r->ebx=(pid_t)getPID();
-        break;
-      case SYSCALL_BLOCK:
-        tasking_block(r->ebx);
-        break;
-      case SYSCALL_UNBLOCK:
-        tasking_unblock(r->ebx);
         break;
       default:
         break;
