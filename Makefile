@@ -39,27 +39,27 @@ crts: kernel/crt0.o
 	@cp $^ sysroot/usr/lib
 
 init: crts libc
-	cd $@ && make
+	@cd $@ && make
 	@cp $@/$@ initrd/$@
 
 vfs: crts libc
-	cd $@ && make
+	@cd $@ && make
 	@cp $@/$@ initrd/$@
 
 devfs: crts libc
-	cd $@ && make
+	@cd $@ && make
 	@cp $@/$@ initrd/$@
 
 pci: crts libc
-	cd $@ && make
+	@cd $@ && make
 	@cp $@/$@ initrd/$@
 
 vga_drv: crts libc
-	cd $@ && make
+	@cd $@ && make
 	@cp $@/$@ initrd/$@
 
 initrd_drv: crts libc
-	cd $@ && make
+	@cd $@ && make
 	@cp $@/$@ initrd/$@
 
 kernel/kernel.elf: $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) sysroot/usr/lib/libc.a
@@ -74,7 +74,7 @@ sysroot/usr/lib/libc.a: $(LIBC_OBJ)
 	@$(CC) $(CFLAGS)  -c $< -o $@
 
 %.o: %.asm
-	$(NASM) $< -o $@
+	@$(NASM) $< -o $@
 
 %.o: %.s
 	@$(AS) $< -o $@
