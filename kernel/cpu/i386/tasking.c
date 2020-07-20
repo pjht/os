@@ -159,7 +159,7 @@ char tasking_isPrivleged() {
   return currentThread->process->priv;
 }
 
-pid_t getPID() {
+pid_t tasking_getPID() {
   return currentThread->process->pid;
 }
 
@@ -167,8 +167,8 @@ int* tasking_get_errno_address() {
   return &currentThread->errno;
 }
 
-void tasking_new_thread(void* start) {
-  tasking_createTask(start,NULL,0,0,0,0,getPID(),1);
+void tasking_new_thread(void* start,pid_t pid,char param_exists,uint32_t param_arg) {
+  tasking_createTask(start,NULL,0,param_exists,param_arg,0,pid,1);
 }
 
 void switch_to_thread(Thread* thread) {

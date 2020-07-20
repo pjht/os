@@ -210,7 +210,7 @@ void isr_handler(registers_t* r) {
         r->ebx=(uint32_t)tasking_get_errno_address();
         break;
       case SYSCALL_GET_PID:
-        r->ebx=(pid_t)getPID();
+        r->ebx=(pid_t)tasking_getPID();
         break;
       case SYSCALL_ALLOC_MEM:
         if ((void*)r->ecx==NULL) {
@@ -251,7 +251,7 @@ void isr_handler(registers_t* r) {
         memcpy((char*)r->ebx,initrd,initrd_sz);
         break;
       case SYSCALL_NEW_THREAD:
-        tasking_new_thread((void*)r->ebx);
+        tasking_new_thread((void*)r->ebx,tasking_getPID(),0,0);
         break;
       default:
         break;
