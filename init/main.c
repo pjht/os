@@ -129,13 +129,21 @@ char load_task(uint32_t datapos,char* initrd) {
 //   return 1;
 // }
 
+void thread() {
+  for (;;) yield();
+}
 
 int main() {
   serial_print("IN INIT\n");
+  new_thread(thread);
   blockTask(TASK_BLOCKED);
-  for (int i=0;i<4;i++) {
+  for (int i=0;i<5;i++) {
+    serial_print("YIELDING\n");
     yield();
+    serial_print("YIELDED\n");
   }
+  serial_print("EXITING\n");
+  exit(0);
   // long size=initrd_sz();
   // char* initrd=malloc(size);
   // initrd_get(initrd);

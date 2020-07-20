@@ -51,9 +51,16 @@ void blockTask(TaskState state) {
   "::"b"(state));
 }
 
-void unblockTask(pid_t pid) {
+void unblockTask(pid_t pid,uint32_t tid) {
   asm volatile("  \
     mov $" QU(SYSCALL_UNBLOCK) ", %%eax; \
     int $80; \
-  "::"b"(pid));
+  "::"b"(pid),"c"(tid));
+}
+
+void new_thread(void* start) {
+  asm volatile("  \
+    mov $" QU(SYSCALL_NEW_THREAD) ", %%eax; \
+    int $80; \
+  "::"b"(start));
 }

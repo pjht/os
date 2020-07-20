@@ -106,7 +106,7 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
     for (int i=0;i<4;i++) {
       yield();
     }
-    unblockTask(1);
+    unblockTask(1,0);
     for (int i=0;i<4;i++) {
       yield();
     }

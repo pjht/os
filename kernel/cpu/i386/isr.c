@@ -17,8 +17,6 @@
 void irq_handler(registers_t* r);
 static isr_t interrupt_handlers[256];
 
-extern Task* currentTask;
-
 /* Can't do this with a loop because we need the address
  * of the function names */
 void isr_install() {
@@ -131,47 +129,47 @@ __attribute__((unused)) static char *exception_messages[] = {
 
 void isr_handler(registers_t* r) {
   if (r->int_no!=80 && r->int_no!=14) {
-    vga_write_string(exception_messages[r->int_no]);
+    serial_write_string(exception_messages[r->int_no]);
   }
   switch (r->int_no) {
     case 14: {
       serial_write_string("PAGE FAULT\n");
       uint32_t addr;
       asm("movl %%cr2,%0": "=r"(addr));
-      vga_write_string("In PID ");
+      // serial_write_string("In PID ");
       char str[11];
-      int_to_ascii(getPID(),str);
-      vga_write_string(str);
-      vga_write_string(" and address ");
+      // int_to_ascii(getPID(),str);
+      // serial_write_string(str);
+      serial_write_string(" and address ");
       str[0]='\0';
       hex_to_ascii(r->eip,str);
-      vga_write_string(str);
+      serial_write_string(str);
       if (r->err_code==0) {
-        vga_write_string(", kernel process tried to read a non-present page entry at address ");
+        serial_write_string(", kernel process tried to read a non-present page entry at address ");
       } else if (r->err_code==1) {
-        vga_write_string(", kernel process tried to read a page and caused a protection fault at address ");
+        serial_write_string(", kernel process tried to read a page and caused a protection fault at address ");
       } else if (r->err_code==2) {
-        vga_write_string(", kernel process tried to write to a non-present page entry at address ");
+        serial_write_string(", kernel process tried to write to a non-present page entry at address ");
       } else if (r->err_code==3) {
-        vga_write_string(", kernel process tried to write a page and caused a protection fault at address ");
+        serial_write_string(", kernel process tried to write a page and caused a protection fault at address ");
       } else if (r->err_code==4) {
-        vga_write_string(", user process tried to read a non-present page entry at address ");
+        serial_write_string(", user process tried to read a non-present page entry at address ");
       } else if (r->err_code==5) {
-        vga_write_string(", user process tried to read a page and caused a protection fault at address ");
+        serial_write_string(", user process tried to read a page and caused a protection fault at address ");
       } else if (r->err_code==6) {
-        vga_write_string(", user process tried to write to a non-present page entry at address ");
+        serial_write_string(", user process tried to write to a non-present page entry at address ");
       } else if (r->err_code==7) {
-        vga_write_string(", user process tried to write a page and caused a protection fault at address ");
+        serial_write_string(", user process tried to write a page and caused a protection fault at address ");
       }
       str[0]='\0';
       hex_to_ascii(addr,str);
-      vga_write_string(str);
-      vga_write_string(".");
-      vga_write_string(" Stack is at ");
+      serial_write_string(str);
+      serial_write_string(".");
+      serial_write_string(" Stack is at ");
       str[0]='\0';
       hex_to_ascii(r->useresp,str);
-      vga_write_string(str);
-      vga_write_string(".\n");
+      serial_write_string(str);
+      serial_write_string(".\n");
       // if ((r->err_code&1)==0) {
       //   // int dir_entry=(addr&0xFFC00000)>>22;
       //   // int table_entry=(addr&0x3FF000)>12;
@@ -194,16 +192,16 @@ void isr_handler(registers_t* r) {
     case 80:
       switch (r->eax) {
       case SYSCALL_CREATEPROC:
-        tasking_createTaskCr3KmodeParam((void*)r->ebx,(void*)r->ecx,0,r->edx,r->esi,r->edx,r->edi);
+        tasking_createTask((void*)r->ebx,(void*)r->ecx,0,r->edx,r->esi,r->edx,r->edi,0);
         break;
       case SYSCALL_YIELD:
-        tasking_yield(r->ebx);
+        tasking_yield();
         break;
       case SYSCALL_BLOCK:
         tasking_block(r->ebx);
         break;
       case SYSCALL_UNBLOCK:
-        tasking_unblock(r->ebx);
+        tasking_unblock(r->ebx,r->ecx);
         break;
       case SYSCALL_EXIT:
         tasking_exit((uint8_t)r->ebx);
@@ -222,7 +220,7 @@ void isr_handler(registers_t* r) {
         }
         break;
       case SYSCALL_PRIV_MAP_PAGES:
-        if (!currentTask->priv) {
+        if (tasking_isPrivleged()) {
           r->ebx=0;
           return;
         }
@@ -251,6 +249,9 @@ void isr_handler(registers_t* r) {
       case SYSCALL_COPY_INITRD:
         serial_printf("Copying initrd\n");
         memcpy((char*)r->ebx,initrd,initrd_sz);
+        break;
+      case SYSCALL_NEW_THREAD:
+        tasking_new_thread((void*)r->ebx);
         break;
       default:
         break;

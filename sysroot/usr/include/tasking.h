@@ -20,7 +20,7 @@ void createTaskCr3(void* task,void* cr3);
 void createTaskCr3Param(void* task,void* cr3,uint32_t param1,uint32_t param2);
 char isPrivleged(uint32_t pid);
 void blockTask(TaskState state);
-void unblockTask(pid_t pid);
+void unblockTask(pid_t pid,uint32_t tid);
 
 
 #endif

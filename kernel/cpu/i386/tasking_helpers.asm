@@ -1,10 +1,10 @@
 section .text
-global switch_to_task_asm
-extern currentTask
+global switch_to_thread_asm
+extern currentThread
 extern tss
 ;WARNING: Caller is expected to disable IRQs before calling, and enable IRQs again after function returns
 
-switch_to_task_asm:
+switch_to_thread_asm:
 
     ;Save previous task's state
 
@@ -19,13 +19,13 @@ switch_to_task_asm:
     push edi
     push ebp
 
-    mov edi,[currentTask]    ;edi = address of the previous task's data structure
+    mov edi,[currentThread]    ;edi = address of the previous task's data structure
     mov [edi],esp         ;Save ESP for the task's kernel stack in the task's data structure
 
     ;Load next task's state
 
     mov esi,[esp+(4+1)*4]         ;esi = address of the next task's data structure
-    mov [currentTask],esi    ;Current task's task data is the next task thread data
+    mov [currentThread],esi    ;Current task's task data is the next task thread data
 
     mov esp,[esi]         ;Load ESP for next task's kernel stack from the task's data structure
     mov eax,[esi+8]         ;eax = address of page directory for next task

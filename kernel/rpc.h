@@ -3,15 +3,16 @@
 
 typedef struct RPCFuncInfo {
   char name[32];
-  char* (*code)(char*);
+  void* (*code)(void*);
 } RPCFuncInfo;
 
 typedef struct TaskRPCStruct {
-  int pendingrpc;
-  int callingpid;
-} TaskRPCStruct;
+  RPCFuncInfo funcs[32];
+  int next_func;
+  void* rpc_response;
+} ThreadRPCStruct;
 
 
-void rpc_init_struct(TaskRPCStruct* info);
+void rpc_init_struct(ThreadRPCStruct* info);
 
 #endif
