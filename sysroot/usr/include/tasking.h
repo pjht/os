@@ -5,22 +5,22 @@
 #include <sys/types.h>
 
 #ifndef INT_TASKING_H
-typedef enum TaskState {
-  TASK_RUNNING,
-  TASK_READY,
-  TASK_EXITED,
-  TASK_BLOCKED
-} TaskState;
+typedef enum ThreadState {
+  THREAD_RUNNING,
+  THREAD_READY,
+  THREAD_EXITED,
+  THREAD_BLOCKED
+} ThreadState;
 
 #endif
 
 void yield();
 void yieldToPID(uint32_t pid);
-void createTaskCr3(void* task,void* cr3);
-void createTaskCr3Param(void* task,void* cr3,uint32_t param1,uint32_t param2);
+void createProcCr3(void* start,void* cr3);
+void createProcCr3Param(void* start,void* cr3,uint32_t param1,uint32_t param2);
 char isPrivleged(uint32_t pid);
-void blockTask(TaskState state);
-void unblockTask(pid_t pid,uint32_t tid);
+void blockThread(ThreadState state);
+void unblockThread(pid_t pid,uint32_t tid);
 
 
 #endif

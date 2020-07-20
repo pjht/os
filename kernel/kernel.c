@@ -102,11 +102,11 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
       }
       copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
     }
-    createTaskCr3((void*)header.entry,cr3);
+    createProcCr3((void*)header.entry,cr3);
     for (int i=0;i<4;i++) {
       yield();
     }
-    unblockTask(1,0);
+    unblockThread(1,0);
     for (int i=0;i<4;i++) {
       yield();
     }

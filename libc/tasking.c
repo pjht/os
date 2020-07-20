@@ -13,18 +13,18 @@ void yield() {
   "::"b"(0));
 }
 
-void createTaskCr3(void* task,void* cr3) {
+void createProcCr3(void* start,void* cr3) {
   asm volatile("  \
     mov $" QU(SYSCALL_CREATEPROC) ", %%eax; \
     int $80; \
-  "::"b"(task),"d"(0),"c"(cr3));
+  "::"b"(start),"d"(0),"c"(cr3));
 }
 
-void createTaskCr3Param(void* task,void* cr3,uint32_t param1,uint32_t param2) {
+void createProcCr3Param(void* start,void* cr3,uint32_t param1,uint32_t param2) {
   asm volatile("  \
     mov $" QU(SYSCALL_CREATEPROC) ", %%eax; \
     int $80; \
-  "::"b"(task),"c"(cr3),"d"(1),"S"(param1),"D"(param2));
+  "::"b"(start),"c"(cr3),"d"(1),"S"(param1),"D"(param2));
 }
 
 void yieldToPID(uint32_t pid) {
@@ -44,14 +44,14 @@ __attribute__((noreturn)) void exit(int code) {
 }
 
 
-void blockTask(TaskState state) {
+void blockThread(ThreadState state) {
   asm volatile("  \
     mov $" QU(SYSCALL_BLOCK) ", %%eax; \
     int $80; \
   "::"b"(state));
 }
 
-void unblockTask(pid_t pid,uint32_t tid) {
+void unblockThread(pid_t pid,uint32_t tid) {
   asm volatile("  \
     mov $" QU(SYSCALL_UNBLOCK) ", %%eax; \
     int $80; \

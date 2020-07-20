@@ -6,7 +6,7 @@ typedef struct RPCFuncInfo {
   void* (*code)(void*);
 } RPCFuncInfo;
 
-typedef struct TaskRPCStruct {
+typedef struct ThreadRPCStruct {
   RPCFuncInfo funcs[32];
   int next_func;
   void* rpc_response;

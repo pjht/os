@@ -214,7 +214,7 @@ void switch_to_thread(Thread* thread) {
     }
   }
   if (currentThreadNextReady && !is_proc_scheduled(currentThread->process->pid)) {
-    // Link the task onto the list of ready to run tasks
+    // Link the thread onto the list of ready to run threads
     if (readyToRunTail) {
       currentThreadNextReady->prevReadyToRun=readyToRunTail;
       readyToRunTail->nextThreadInProcess=currentThreadNextReady;
@@ -311,7 +311,7 @@ void tasking_unblock(pid_t pid,uint32_t tid) {
     }
     thread->state=THREAD_READY;
     if (!is_proc_scheduled(thread->process->pid)) {
-    // Link the task onto the list of ready to run tasks
+    // Link the thread onto the list of ready to run threads
     if (readyToRunTail) {
       thread->prevReadyToRun=readyToRunTail;
       readyToRunTail->nextThreadInProcess=thread;

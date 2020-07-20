@@ -54,7 +54,7 @@ uint32_t find_loc(char* name,char* initrd) {
   return 0;
 }
 
-char load_task(uint32_t datapos,char* initrd) {
+char load_proc(uint32_t datapos,char* initrd) {
   int pos=0;
   elf_header header;
   pos=datapos;
@@ -91,13 +91,13 @@ char load_task(uint32_t datapos,char* initrd) {
       }
       copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
     }
-    createTaskCr3((void*)header.entry,cr3);
+    createProcCr3((void*)header.entry,cr3);
   }
   return 1;
 }
 
-// char load_task_devfs(uint32_t datapos) {
-//   serial_print("load_task_devfs\n");
+// char load_proc_devfs(uint32_t datapos) {
+//   serial_print("load_proc_devfs\n");
 //   FILE* initrd=fopen("/dev/initrd","r");
 //   elf_header header;
 //   fseek(initrd,datapos,SEEK_SET);
@@ -124,7 +124,7 @@ char load_task(uint32_t datapos,char* initrd) {
 //       }
 //       copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
 //     }
-//     createTaskCr3((void*)header.entry,cr3);
+//     createProcCr3((void*)header.entry,cr3);
 //   }
 //   return 1;
 // }
@@ -136,7 +136,7 @@ void thread() {
 int main() {
   serial_print("IN INIT\n");
   new_thread(thread);
-  blockTask(TASK_BLOCKED);
+  blockThread(THREAD_BLOCKED);
   for (int i=0;i<5;i++) {
     serial_print("YIELDING\n");
     yield();
@@ -149,20 +149,20 @@ int main() {
   // initrd_get(initrd);
   // exit(0);
   // uint32_t datapos=find_loc("vfs",initrd);
-  // load_task(datapos,initrd);
+  // load_proc(datapos,initrd);
   // yield(); // Bochs fails here
   // rescan_vfs();
   // datapos=find_loc("devfs",initrd);
-  // load_task(datapos,initrd);
+  // load_proc(datapos,initrd);
   // yieldToPID(3);
   // datapos=find_loc("initrd_drv",initrd);
-  // load_task(datapos,initrd);
+  // load_proc(datapos,initrd);
   // yieldToPID(4);
   // mount("","devfs","/dev/");
   // datapos=find_loc("vga_drv",initrd);
-  // serial_print("Making vga task\n");
-  // load_task_devfs(datapos);
-  // serial_print("Made vga task\n");
+  // serial_print("Making vga process\n");
+  // load_proc_devfs(datapos);
+  // serial_print("Made vga process\n");
   // yieldToPID(5);
   // FILE* file;
   // do {
@@ -172,7 +172,7 @@ int main() {
   //   file=fopen("/dev/vga","w");
   // } while(file==NULL);
   // datapos=find_loc("pci",initrd);
-  // load_task(datapos,initrd);
+  // load_proc(datapos,initrd);
   // free(initrd);
   // yieldToPID(4);
   // fputs("FPUTS String\n",file);
