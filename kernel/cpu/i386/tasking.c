@@ -349,6 +349,7 @@ void tasking_exit(uint8_t code) {
       }
     }
   }
+  unmark_proc_scheduled(currentThread->process->pid);
   for (Thread* thread=currentThread->process->firstThread;thread!=NULL;thread=thread->nextThreadInProcess) {
     thread->state=THREAD_EXITED;
   }
