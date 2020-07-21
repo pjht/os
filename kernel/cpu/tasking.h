@@ -6,6 +6,8 @@
 #include <sys/types.h>
 #include "../rpc.h"
 
+extern Thread* currentThread;
+
 void tasking_createTask(void* eip,void* cr3,char kmode,char param1_exists,uint32_t param1_arg,char param2_exists,uint32_t param2_arg,char isThread);
 void tasking_init();
 char tasking_isPrivleged();
@@ -17,4 +19,5 @@ void tasking_exit(uint8_t code);
 void tasking_block(ThreadState newstate);
 void tasking_unblock(pid_t pid,uint32_t tid);
 void tasking_yield();
+
 #endif
