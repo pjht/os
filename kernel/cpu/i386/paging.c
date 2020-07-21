@@ -251,7 +251,7 @@ void paging_init() {
     page_directory[i+768]=(entry_virt-0xC0000000)|0x3;
   }
   page_directory[985]=(uint32_t)(pmem_alloc(1024))|0x83;
-  for (uint32_t i=0;i<10;i++) {
+  for (uint32_t i=0;i<218;i++) {
     uint32_t entry_virt=(uint32_t)&(kstack_page_tables[i*1024]);
     page_directory[i+800]=(entry_virt-0xC0000000)|0x3;
   }
