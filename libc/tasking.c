@@ -57,10 +57,3 @@ void unblockThread(pid_t pid,uint32_t tid) {
     int $80; \
   "::"b"(pid),"c"(tid));
 }
-
-void new_thread(void* start) {
-  asm volatile("  \
-    mov $" QU(SYSCALL_NEW_THREAD) ", %%eax; \
-    int $80; \
-  "::"b"(start));
-}

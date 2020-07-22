@@ -8,7 +8,7 @@ typedef struct RPCFuncInfo {
 
 typedef struct ThreadRPCStruct {
   RPCFuncInfo funcs[32];
-  int next_func;
+  int num_funcs;
   void* rpc_response;
 } ThreadRPCStruct;
 

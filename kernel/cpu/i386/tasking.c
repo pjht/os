@@ -167,8 +167,9 @@ int* tasking_get_errno_address() {
   return &currentThread->errno;
 }
 
-void tasking_new_thread(void* start,pid_t pid,char param_exists,uint32_t param_arg) {
+uint32_t tasking_new_thread(void* start,pid_t pid,char param_exists,uint32_t param_arg) {
   tasking_createTask(start,NULL,0,param_exists,param_arg,0,pid,1);
+  return processes[pid]->firstThread->tid;
 }
 
 void switch_to_thread(Thread* thread) {

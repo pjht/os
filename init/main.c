@@ -9,6 +9,7 @@
 #include <initrd.h>
 #include <dbg.h>
 #include <vfs.h>
+#include <pthread.h>
 
 typedef struct {
   char filename[100];
@@ -129,13 +130,14 @@ char load_proc(uint32_t datapos,char* initrd) {
 //   return 1;
 // }
 
-void thread() {
+void thread_func() {
   for (;;) yield();
 }
 
 int main() {
   serial_print("IN INIT\n");
-  new_thread(thread);
+  pthread_t thread;
+  pthread_create(&thread,NULL,thread_func,NULL);
   blockThread(THREAD_BLOCKED);
   for (int i=0;i<5;i++) {
     serial_print("YIELDING\n");

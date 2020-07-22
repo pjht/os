@@ -13,7 +13,7 @@ void tasking_init();
 char tasking_isPrivleged();
 pid_t tasking_getPID();
 int* tasking_get_errno_address();
-void tasking_new_thread(void* start,pid_t pid,char param_exists,uint32_t param_arg);
+uint32_t tasking_new_thread(void* start,pid_t pid,char param_exists,uint32_t param_arg);
 
 void tasking_exit(uint8_t code);
 void tasking_block(ThreadState newstate);

@@ -250,9 +250,13 @@ void isr_handler(registers_t* r) {
         serial_printf("Copying initrd\n");
         memcpy((char*)r->ebx,initrd,initrd_sz);
         break;
-      case SYSCALL_NEW_THREAD:
-        tasking_new_thread((void*)r->ebx,tasking_getPID(),0,0);
-        break;
+      case SYSCALL_NEW_THREAD: {
+        uint32_t tid=tasking_new_thread((void*)r->ebx,tasking_getPID(),1,r->edx);
+        if ((uint32_t*)r->ecx!=NULL) {
+          *((uint32_t*)r->ecx)=tid;
+        }
+      }
+      break;
       default:
         break;
       } 
