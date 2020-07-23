@@ -2,6 +2,8 @@
 #define ELF_H
 #define ELF_MAGIC 0x464c457f
 
+#include <stdint.h>
+
 typedef struct {
   uint32_t magic;
   char type;

@@ -1,6 +1,8 @@
 #ifndef IPC_VFS_H
 #define IPC_VFS_H
 
+#include <stdint.h>
+
 typedef enum {
   VFS_OPEN,
   VFS_PUTS,
