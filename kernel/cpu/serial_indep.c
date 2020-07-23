@@ -45,7 +45,7 @@ void serial_printf(const char* format,...) {
         break;
       }
       case 'x': {
-        uint32_t i=va_arg(arg,uint32_t);
+        unsigned int i=va_arg(arg,unsigned int);
         char str[11];
         str[0]='\0';
         hex_to_ascii(i,str);

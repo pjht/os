@@ -3,9 +3,8 @@
 
 #include <stdarg.h>
 #include <stddef.h>
-#include <stdint.h>
 
-#define FILE uint32_t //We're using pointers to FILE even though it's a uint32_t so we can expand to a struct if needed
+#define FILE int //We're using pointers to FILE even though it's an int so we can expand to a struct if needed
 #define SEEK_CUR 1
 #define SEEK_END 2
 #define SEEK_SET 3

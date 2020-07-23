@@ -1,4 +1,3 @@
-#include <grub/text_fb_info.h>
 #include <mailboxes.h>
 #include <ipc/devfs.h>
 #include <ipc/vfs.h>
@@ -17,10 +16,7 @@ int main() {
   uint32_t box=mailbox_new(16,"vga");
   devfs_box=mailbox_find_by_name("devfs_driver");
   text_fb_info info;
-  info.address=map_phys((void*)0xB8000,10);
-  info.width=80;
-  info.height=25;
-  vga_init(info);
+  vga_init();
   yield();
   devfs_message* msg_data=malloc(sizeof(devfs_message));
   msg_data->msg_type=DEVFS_REGISTER;

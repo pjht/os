@@ -1,14 +1,14 @@
 #include "pci.h"
-#include "ports.h"
+#include <sys/ports.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 pci_dev_common_info** pci_devs;
-static uint32_t max_devs;
-uint32_t pci_num_devs;
+static size_t max_devs;
+size_t pci_num_devs;
 
-static uint32_t read_config(uint8_t bus,uint8_t device,uint8_t func,uint8_t offset) {
+static uint32_t read_config(int bus,int device,int func,int offset) {
   uint32_t address;
   uint32_t lbus=(uint32_t)bus;
   uint32_t ldev=(uint32_t)device;
@@ -19,7 +19,7 @@ static uint32_t read_config(uint8_t bus,uint8_t device,uint8_t func,uint8_t offs
   return data;
 }
 
-static void write_config(uint8_t bus,uint8_t device,uint8_t func,uint8_t offset,uint32_t data) {
+static void write_config(int bus,int device,int func,int offset,uint32_t data) {
   uint32_t address;
   uint32_t lbus=(uint32_t)bus;
   uint32_t ldev=(uint32_t)device;
@@ -29,7 +29,7 @@ static void write_config(uint8_t bus,uint8_t device,uint8_t func,uint8_t offset,
   port_long_out(PCI_CONFIG_DATA,data);
 }
 
-pci_dev_common_info* pci_get_dev_info(uint8_t bus,uint8_t device,uint8_t func) {
+pci_dev_common_info* pci_get_dev_info(int bus,int device,int func) {
   uint32_t* info=malloc(sizeof(uint32_t)*5);
   info[0]=read_config(bus,device,func,0);
   info[1]=read_config(bus,device,func,4);
@@ -52,14 +52,14 @@ void pci_set_dev_info(pci_dev_common_info* inf) {
 
 static void checkFunction(pci_dev_common_info* info);
 
-static void checkDevice(uint8_t bus, uint8_t device) {
+static void checkDevice(int bus, int device) {
   pci_dev_common_info* info=pci_get_dev_info(bus,device,0);
   if(info->vend_id==0xFFFF||info->class_code==0xFF) {
     return;
   }
   checkFunction(info);
   if((info->header_type&0x80)!=0) {
-    for(uint8_t function=1;function<8;function++) {
+    for(int function=1;function<8;function++) {
       pci_dev_common_info* info=pci_get_dev_info(bus,device,function);
       if(info->vend_id!=0xFFFF&&info->class_code!=0xFF) {
         checkFunction(info);

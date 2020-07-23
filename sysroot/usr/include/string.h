@@ -11,7 +11,7 @@ char* strtok(const char* str, const char* delim);
 
 char* strrev(char *str);
 void int_to_ascii(int n,char* str);
-void hex_to_ascii(int n, char* str);
+void hex_to_ascii(unsigned int n, char* str);
 void append(char* s, char n);
 void backspace(char* s);
 #endif

@@ -1,7 +1,8 @@
 #include "cpu/paging.h"
 #include "cpu/arch_consts.h"
+#include <stddef.h>
 
-void address_spaces_copy_data(void* cr3, void* data,uint32_t size,void* virt_addr) {
+void address_spaces_copy_data(void* cr3, void* data,size_t size,void* virt_addr) {
   void* old_cr3=get_cr3();
   void* phys_addr=virt_to_phys(data);
   load_address_space(cr3);
@@ -9,7 +10,7 @@ void address_spaces_copy_data(void* cr3, void* data,uint32_t size,void* virt_add
   load_address_space(old_cr3);
 }
 
-void* address_spaces_put_data(void* cr3, void* data,uint32_t size) {
+void* address_spaces_put_data(void* cr3, void* data,size_t size) {
   void* old_cr3=get_cr3();
   void* phys_addr=virt_to_phys(data);
   load_address_space(cr3);

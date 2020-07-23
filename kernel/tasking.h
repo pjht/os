@@ -19,18 +19,18 @@ struct Thread;
 
 typedef struct Process {
   char priv;
-  uint32_t pid;
-  uint32_t next_tid;
+  pid_t pid;
+  pid_t next_tid;
   int numThreads;
   int numThreadsBlocked;
   struct Thread* firstThread;
 } Process;
 
 typedef struct Thread {
-  uint32_t kernel_esp;
-  uint32_t kernel_esp_top;
+  void* kernel_esp;
+  void* kernel_esp_top;
   void* cr3; //In thread to make the task switch asm easier
-  uint32_t tid;
+  pid_t tid;
   ThreadState state;
   int errno;
   struct Thread* nextThreadInProcess;
@@ -42,16 +42,16 @@ typedef struct Thread {
 
 extern Thread* currentThread;
 
-void tasking_createTask(void* eip,void* cr3,char kmode,char param1_exists,uint32_t param1_arg,char param2_exists,uint32_t param2_arg,char isThread);
+void tasking_createTask(void* eip,void* cr3,char kmode,char param1_exists,void* param1_arg,char param2_exists,void* param2_arg,char isThread);
 void tasking_init();
 char tasking_isPrivleged();
 pid_t tasking_getPID();
 int* tasking_get_errno_address();
-uint32_t tasking_new_thread(void* start,pid_t pid,char param_exists,uint32_t param_arg);
+pid_t tasking_new_thread(void* start,pid_t pid,char param_exists,void* param_arg);
 
-void tasking_exit(uint8_t code);
+void tasking_exit(int code);
 void tasking_block(ThreadState newstate);
-void tasking_unblock(pid_t pid,uint32_t tid);
+void tasking_unblock(pid_t pid,pid_t tid);
 void tasking_yield();
 
 #endif

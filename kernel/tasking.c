@@ -11,49 +11,49 @@
 #define NUM_UNBLOCKED_THREADS(proc) (proc->numThreads-proc->numThreadsBlocked)
 #define SAME_PROC(thread1,thread2) (thread1->process->pid==thread2->process->pid)
 #define SAME_THREAD(thread1,thread2) (thread1->process->pid==thread2->process->pid&&thread1->tid==thread2->tid)
-uint32_t next_pid=0;
-uint32_t num_procs=0;
+pid_t next_pid=0;
+size_t num_procs=0;
 Process* processes[MAX_PROCS];
 char proc_schedule_bmap[MAX_PROCS/8];
 Thread* currentThread;
 static Thread* readyToRunHead=NULL;
 static Thread* readyToRunTail=NULL;
 
-static char is_proc_scheduled(uint32_t index) {
-  uint32_t byte=index/8;
-  uint32_t bit=index%8;
+static char is_proc_scheduled(pid_t index) {
+  size_t byte=index/8;
+  size_t bit=index%8;
   char entry=proc_schedule_bmap[byte];
   return (entry&(1<<bit))>0;
 }
 
-static void mark_proc_scheduled(uint32_t index) {
+static void mark_proc_scheduled(pid_t index) {
   if (is_proc_scheduled(index)) {
     serial_printf("Attempt to schedule a thread in a process with a scheduled thread! (PID %d)\n",index);
     halt();
   }
-  uint32_t byte=index/8;
-  uint32_t bit=index%8;
+  size_t byte=index/8;
+  size_t bit=index%8;
   proc_schedule_bmap[byte]=proc_schedule_bmap[byte]|(1<<bit);
 }
 
-static void unmark_proc_scheduled(uint32_t index) {
-  uint32_t byte=index/8;
-  uint32_t bit=index%8;
+static void unmark_proc_scheduled(pid_t index) {
+  size_t byte=index/8;
+  size_t bit=index%8;
   proc_schedule_bmap[byte]=proc_schedule_bmap[byte]&(~(1<<bit));
 }
 
-void tasking_createTask(void* eip,void* cr3,char kmode,char param1_exists,uint32_t param1_arg,char param2_exists,uint32_t param2_arg,char isThread) {
+void tasking_createTask(void* eip,void* cr3,char kmode,char param1_exists,void* param1_arg,char param2_exists,void* param2_arg,char isThread) {
   if (next_pid>MAX_PROCS && !isThread) {
     serial_printf("Failed to create a process, as 32k processes have been created already.\n");
     halt(); //Cannot ever create more than 32k processes, as I don't currently reuse PIDs.
   }
-  uint32_t param1;
+  void* param1;
   if (param1_exists) {
     param1=param1_arg;
   } else {
-    param1=1;
+    param1=NULL;
   }
-  uint32_t param2;
+  void* param2;
   if (param2_exists) {
     if (isThread) {
       serial_printf("Param2 in Thread!\n");
@@ -61,7 +61,7 @@ void tasking_createTask(void* eip,void* cr3,char kmode,char param1_exists,uint32
     }
     param2=param2_arg;
   } else {
-    param2=2;
+    param2=NULL;
   }
   Process* proc;
   Thread* thread=kmalloc(sizeof(Thread));
@@ -141,8 +141,8 @@ int* tasking_get_errno_address() {
   return &currentThread->errno;
 }
 
-uint32_t tasking_new_thread(void* start,pid_t pid,char param_exists,uint32_t param_arg) {
-  tasking_createTask(start,NULL,0,param_exists,param_arg,0,pid,1);
+pid_t tasking_new_thread(void* start,pid_t pid,char param_exists,void* param_arg) {
+  tasking_createTask(start,NULL,0,param_exists,param_arg,0,(void*)pid,1);
   return processes[pid]->firstThread->tid;
 }
 
@@ -261,7 +261,7 @@ void tasking_block(ThreadState newstate) {
     }
   }
 }
-void tasking_unblock(pid_t pid,uint32_t tid) {
+void tasking_unblock(pid_t pid,pid_t tid) {
     serial_printf("Unblocking PID %d TID %d\n",pid,tid);
     if (!processes[pid]) {
       serial_printf("PID %d does not exist!\n",pid);
@@ -294,7 +294,7 @@ void tasking_unblock(pid_t pid,uint32_t tid) {
   }
 }
 
-void tasking_exit(uint8_t code) {
+void tasking_exit(int code) {
   serial_printf("PID %d is exiting with code %d.\n",currentThread->process->pid,code);
   if (readyToRunHead&&SAME_PROC(readyToRunHead,currentThread)) {
     readyToRunHead=readyToRunHead->nextReadyToRun;
@@ -306,6 +306,7 @@ void tasking_exit(uint8_t code) {
     readyToRunTail=readyToRunTail->prevReadyToRun;
     if (readyToRunTail==NULL) {
       readyToRunHead=NULL;
+      
     }
   }
   if (readyToRunHead&&readyToRunHead->nextReadyToRun) {

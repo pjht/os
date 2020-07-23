@@ -7,9 +7,7 @@
 #include "vga_err.h"
 #include <elf.h>
 #include <grub/multiboot2.h>
-#include <grub/text_fb_info.h>
 #include <memory.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <tasking.h>
@@ -45,10 +43,10 @@ static void read_initrd(struct multiboot_boot_header_tag* tags) {
   }
 }
 
-uint32_t getsize(const char *in) {
-    uint32_t size=0;
-    uint32_t j;
-    uint32_t count=1;
+size_t getsize(const char *in) {
+    size_t size=0;
+    size_t j;
+    size_t count=1;
     for (j=11;j>0;j--,count*=8) {
         size+=((in[j-1]-'0')*count);
     }
@@ -66,12 +64,12 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
   vga_init((char*)0xC00B8000);
   read_initrd(tags);
   int pos=0;
-  uint32_t datapos;
+  size_t datapos;
   tar_header* tar_hdr;
   for (int i=0;;i++) {
     tar_hdr=(tar_header*)&initrd[pos];
     if (tar_hdr->filename[0]=='\0') break;
-    uint32_t size=getsize(tar_hdr->size);
+    size_t size=getsize(tar_hdr->size);
     pos+=512;
     if (strcmp(&tar_hdr->filename[0],"init")==0) {
       datapos=pos;

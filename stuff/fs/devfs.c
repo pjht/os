@@ -6,15 +6,15 @@
 
 static char** devices;
 static dev_drv* dev_drivers;
-static uint32_t num_devices;
-static uint32_t max_devices;
+static size_t num_devices;
+static size_t max_devices;
 
 char devfs_drv(fs_op op,FILE* stream,void* data1,void* data2) {
   if (op==FSOP_MOUNT) {
     return 1;
   }
   if (op==FSOP_OPEN) {
-    for (uint32_t i=0;i<num_devices;i++) {
+    for (size_t i=0;i<num_devices;i++) {
       if (strcmp(devices[i],stream->path)==0) {
         return 1;
       }
@@ -22,7 +22,7 @@ char devfs_drv(fs_op op,FILE* stream,void* data1,void* data2) {
     return 0;
   }
   if (op==FSOP_GETC) {
-    uint32_t i;
+    size_t i;
     for (i=0;i<num_devices;i++) {
       if (strcmp(devices[i],stream->path)==0) {
         break;
@@ -33,7 +33,7 @@ char devfs_drv(fs_op op,FILE* stream,void* data1,void* data2) {
     return 1;
   }
   if (op==FSOP_PUTC) {
-    uint32_t i;
+    size_t i;
     for (i=0;i<num_devices;i++) {
       if (strcmp(devices[i],stream->path)==0) {
         break;

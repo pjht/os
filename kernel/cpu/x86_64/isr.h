@@ -13,6 +13,6 @@ typedef struct {
 typedef void (*isr_t)(registers_t*);
 
 void isr_install();
-void isr_register_handler(uint8_t n,isr_t handler);
+void isr_register_handler(int n,isr_t handler);
 
 #endif

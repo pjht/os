@@ -1,6 +1,5 @@
 #include "cpu/arch_consts.h"
 #include <math.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -10,35 +9,35 @@ static char bitmap[KMALLOC_BMAP_SZ];
 static void* data=(void*)KMALLOC_START;
 
 
-static char get_bmap_bit(uint32_t index) {
-  uint32_t byte=index/8;
-  uint32_t bit=index%8;
+static char get_bmap_bit(size_t index) {
+  size_t byte=index/8;
+  size_t bit=index%8;
   char entry=bitmap[byte];
   return (entry&(1<<bit))>0;
 }
 
-static void set_bmap_bit(uint32_t index) {
-  uint32_t byte=index/8;
-  uint32_t bit=index%8;
+static void set_bmap_bit(size_t index) {
+  size_t byte=index/8;
+  size_t bit=index%8;
   bitmap[byte]=bitmap[byte]|(1<<bit);
 }
 
-static void clear_bmap_bit(uint32_t index) {
-  uint32_t byte=index/8;
-  uint32_t bit=index%8;
+static void clear_bmap_bit(size_t index) {
+  size_t byte=index/8;
+  size_t bit=index%8;
   bitmap[byte]=bitmap[byte]&(~(1<<bit));
 }
 
-void* kmalloc(uint32_t size) {
-  uint32_t num_4b_grps=(uint32_t)ceilf((float)size/4);
+void* kmalloc(size_t size) {
+  size_t num_4b_grps=(size_t)ceilf((float)size/4);
   num_4b_grps+=2;
-  uint32_t bmap_index;
-  uint32_t remaining_blks;
-  for(uint32_t i=0;i<KMALLOC_BMAP_SZ;i++) {
+  size_t bmap_index;
+  size_t remaining_blks;
+  for(size_t i=0;i<KMALLOC_BMAP_SZ;i++) {
     char got_0=0;
     remaining_blks=num_4b_grps;
-    uint32_t old_j;
-    for (uint32_t j=i*8;;j++) {
+    size_t old_j;
+    for (size_t j=i*8;;j++) {
       char bit=get_bmap_bit(j);
       if (got_0) {
         if (bit) {
@@ -72,11 +71,11 @@ void* kmalloc(uint32_t size) {
   if (remaining_blks!=0) {
     return NULL;
   }
-  for (uint32_t i=0;i<num_4b_grps;i++) {
+  for (size_t i=0;i<num_4b_grps;i++) {
     set_bmap_bit(bmap_index+i);
   }
-  uint32_t data_offset=(bmap_index*8)+8;
-  uint32_t* info=(void*)(((char*)data)+data_offset-8);
+  size_t data_offset=(bmap_index*8)+8;
+  size_t* info=(void*)(((char*)data)+data_offset-8);
   info[0]=num_4b_grps;
   info[1]=bmap_index;
   return (void*)(((char*)data)+data_offset);
@@ -84,10 +83,10 @@ void* kmalloc(uint32_t size) {
 }
 
 void kfree(void* mem) {
-  uint32_t* info=(uint32_t*)((uint32_t)mem-8);
-  uint32_t num_4b_grps=info[0];
-  uint32_t bmap_index=info[1];
-  for (uint32_t i=0;i<num_4b_grps;i++) {
+  size_t* info=(size_t*)((size_t)mem-8);
+  size_t num_4b_grps=info[0];
+  size_t bmap_index=info[1];
+  for (size_t i=0;i<num_4b_grps;i++) {
     clear_bmap_bit(bmap_index+i);
   }
 }

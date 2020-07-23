@@ -11,11 +11,11 @@
 #define IDE_SEC_CTRL 0x376
 
 static uint8_t ident[4][512];
-static uint8_t* sect_data=NULL;
-static uint32_t last_read_sector=0;
+static char* sect_data=NULL;
+static size_t last_read_sector=0;
 static int last_read_base=0;
 static int last_read_slave=0;
-static uint8_t* read_sect(int base,int slave,uint32_t lba) {
+static char* read_sect(int base,int slave,size_t lba) {
   if (last_read_sector==lba && last_read_base==base && last_read_slave==slave && sect_data) {
     return sect_data;
   }
@@ -27,7 +27,7 @@ static uint8_t* read_sect(int base,int slave,uint32_t lba) {
   port_byte_out(base+4,(lba&0xFF00)>>8);
   port_byte_out(base+5,(lba&0xFF0000)>>16);
   port_byte_out(base+7,0x20);
-  uint8_t* sect=malloc(sizeof(uint8_t)*512);
+  char* sect=malloc(sizeof(char)*512);
   while ((port_byte_in(base+7)&0x88)!=0x8);
   for (int i=0;i<512;i+=2) {
     uint16_t data=port_word_in(base);
@@ -44,7 +44,7 @@ static uint8_t* read_sect(int base,int slave,uint32_t lba) {
   return sect;
 }
 
-static void write_sect(int base,int slave,uint32_t lba,uint8_t* sect) {
+static void write_sect(int base,int slave,size_t lba,char* sect) {
   if (last_read_sector==lba && last_read_base==base && last_read_slave==slave && sect_data) {
     sect_data=sect;
   }
@@ -91,17 +91,17 @@ static int drv(char* filename,int c,long pos,char wr) {
     slave=1;
   }
   if (wr) {
-    uint32_t lba=pos/512;
+    char lba=pos/512;
     int offset=pos%512;
-    uint8_t* sect=read_sect(base,slave,lba);
-    sect[offset]=(uint8_t)c;
+    size_t* sect=read_sect(base,slave,lba);
+    sect[offset]=(char)c;
     write_sect(base,slave,lba,sect);
     return 1;
   } else {
-    uint32_t lba=pos/512;
+    size_t lba=pos/512;
     int offset=pos%512;
-    uint8_t* sect=read_sect(base,slave,lba);
-    uint8_t val=sect[offset];
+    char* sect=read_sect(base,slave,lba);
+    char val=sect[offset];
     return val;
   }
 }

@@ -137,7 +137,7 @@ void isr_handler(registers_t* r) {
   switch (r->int_no) {
     case 14: {
       serial_write_string("PAGE FAULT\n");
-      uint32_t addr;
+      void* addr;
       asm("movl %%cr2,%0": "=r"(addr));
       // serial_write_string("In PID ");
       char str[11];
@@ -165,7 +165,7 @@ void isr_handler(registers_t* r) {
         serial_write_string(", user process tried to write a page and caused a protection fault at address ");
       }
       str[0]='\0';
-      hex_to_ascii(addr,str);
+      hex_to_ascii((unsigned int)addr,str);
       serial_write_string(str);
       serial_write_string(".");
       serial_write_string(" Stack is at ");
@@ -195,7 +195,7 @@ void isr_handler(registers_t* r) {
     case 80:
       switch (r->eax) {
       case SYSCALL_CREATEPROC:
-        tasking_createTask((void*)r->ebx,(void*)r->ecx,0,r->edx,r->esi,r->edx,r->edi,0);
+        tasking_createTask((void*)r->ebx,(void*)r->ecx,0,r->edx,(void*)r->esi,r->edx,(void*)r->edi,0);
         break;
       case SYSCALL_YIELD:
         tasking_yield();
@@ -254,7 +254,7 @@ void isr_handler(registers_t* r) {
         memcpy((char*)r->ebx,initrd,initrd_sz);
         break;
       case SYSCALL_NEW_THREAD: {
-        uint32_t tid=tasking_new_thread((void*)r->ebx,tasking_getPID(),1,r->edx);
+        uint32_t tid=tasking_new_thread((void*)r->ebx,tasking_getPID(),1,(void*)r->edx);
         if ((uint32_t*)r->ecx!=NULL) {
           *((uint32_t*)r->ecx)=tid;
         }
@@ -269,7 +269,7 @@ void isr_handler(registers_t* r) {
 }
 
 
-void isr_register_handler(uint8_t n,isr_t handler) {
+void isr_register_handler(int n,isr_t handler) {
     if (n>16) {
       return;
     }

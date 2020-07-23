@@ -42,15 +42,15 @@ void pmem_init(struct multiboot_boot_header_tag* tags) {
         struct multiboot_mmap_entry* orig_ptr=(struct multiboot_mmap_entry*)(((char*)tag)+16);
         for (struct multiboot_mmap_entry* ptr=orig_ptr;(char*)ptr<((char*)orig_ptr)+tag->size;ptr++) {
           if (ptr->type!=MULTIBOOT_MEMORY_AVAILABLE) continue;
-          uint32_t start=ptr->addr;
+          size_t start=ptr->addr;
           if (start<0x100000) continue;
-          uint32_t end=start+ptr->len-1;
+          size_t end=start+ptr->len-1;
           if (start&(FRAME_SZ-1)) {
             start+=FRAME_SZ;
           }
           start=start>>FRAME_NO_OFFSET;
           end=end>>FRAME_NO_OFFSET;
-          for (uint32_t i=start;i<end;i++) {
+          for (size_t i=start;i<end;i++) {
             clear_bmap_bit(i);
           }
         }
@@ -63,19 +63,19 @@ void pmem_init(struct multiboot_boot_header_tag* tags) {
     vga_write_string("[PANIC] No memory map supplied by bootloader!");
     halt();
   }
-  for (uint32_t i=0;i<NUM_KERN_FRAMES;i++) {
+  for (size_t i=0;i<NUM_KERN_FRAMES;i++) {
     set_bmap_bit(i);
   }
 }
 
 void* pmem_alloc(int num_pages) {
-  uint32_t bmap_index;
-  uint32_t remaining_blks;
-  for(uint32_t i=0;i<131072;i++) {
+  size_t bmap_index;
+  size_t remaining_blks;
+  for(size_t i=0;i<131072;i++) {
     char got_0=0;
     remaining_blks=num_pages;
-    uint32_t old_j;
-    for (uint32_t j=i*8;;j++) {
+    size_t old_j;
+    for (size_t j=i*8;;j++) {
       char bit=get_bmap_bit(j);
       if (got_0) {
         if (bit) {

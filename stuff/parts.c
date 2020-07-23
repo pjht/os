@@ -16,8 +16,8 @@ typedef struct {
 
 static const char** part_devs=NULL;
 static partition** parts=NULL;
-static uint32_t num_part_devs=0;
-static uint32_t max_part_devs=0;
+static size_t num_part_devs=0;
+static size_t max_part_devs=0;
 
 int drv(char* filename,int c,long pos,char wr) {
   int part_no;
@@ -38,14 +38,14 @@ int drv(char* filename,int c,long pos,char wr) {
   char* str=malloc(sizeof(char)*(strlen(filename)+1));
   strcpy(str,filename);
   str[strlen(str)-1]='\0';
-  uint32_t i;
+  size_t i;
   for (i=0;i<num_part_devs;i++) {
     if (strcmp(part_devs[i]+5,str)==0) {
       break;
     }
   }
   free(str);
-  uint32_t lba=pos/512;
+  size_t lba=pos/512;
   int offset=pos%512;
   if (lba>parts[i][part_no].length) {
     klog("INFO","Outside partition boundary");
@@ -86,7 +86,7 @@ void load_parts(const char* path) {
   fread(parts[num_part_devs],sizeof(partition),4,f);
   for (int i=0;i<4;i++) {
     if (parts[num_part_devs][i].fs_id!=0) {
-      klog("INFO","Found partition %d of type %x on sectors %d-%d ",i,(uint8_t)parts[num_part_devs][i].fs_id,parts[num_part_devs][i].start_lba,parts[num_part_devs][i].start_lba+parts[num_part_devs][i].length);
+      klog("INFO","Found partition %d of type %x on sectors %d-%d ",i,(char)parts[num_part_devs][i].fs_id,parts[num_part_devs][i].start_lba,parts[num_part_devs][i].start_lba+parts[num_part_devs][i].length);
       char str[2];
       int_to_ascii(i+1,str);
       char* part_path=malloc(sizeof(char)*strlen(path)+2);

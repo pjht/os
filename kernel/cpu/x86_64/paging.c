@@ -1,3 +1,4 @@
+#include "arch_consts.h"
 #include "paging.h"
 #include "pmem.h"
 #include <stdint.h>

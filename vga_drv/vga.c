@@ -1,6 +1,5 @@
-#include <grub/text_fb_info.h>
 #include "vga.h"
-#include "ports.h"
+#include <cpu/ports.h>
 #include <string.h>
 #include <stddef.h>
 #include "vtconsole.h"
@@ -42,10 +41,10 @@ static void set_cursor(struct vtconsole* vtc, vtcursor_t* cur) {
   port_byte_out(0x3D5,(pos&0xFF00)>>8);
 }
 
-void vga_init(text_fb_info framebuffer_info) {
-  screen=framebuffer_info.address;
-  width=framebuffer_info.width;
-  height=framebuffer_info.height;
+void vga_init() {
+  screen=map_phys((void*)0xB8000,10);
+  width=80;
+  height=25;
   console=vtconsole(width,height,vt_set_char,set_cursor);
   port_byte_out(0x3D4,0xA);
   port_byte_out(0x3D5,(port_byte_in(0x3D5)&0xC0)|14);

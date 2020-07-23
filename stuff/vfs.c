@@ -8,14 +8,14 @@
 
 typedef struct _vfs_mapping_struct {
   char* mntpnt;
-  uint32_t type;
+  size_t type;
   struct _vfs_mapping_struct* next;
 } vfs_mapping;
 
 static const char** drv_names;
 static fs_drv* drvs;
-static uint32_t max_drvs;
-static uint32_t next_drv_indx;
+static size_t max_drvs;
+static size_t next_drv_indx;
 static vfs_mapping* head_mapping;
 static vfs_mapping* tail_mapping;
 
@@ -42,7 +42,7 @@ void init_vfs() {
   tail_mapping=NULL;
 }
 
-uint32_t register_fs(fs_drv drv,const char* type) {
+size_t register_fs(fs_drv drv,const char* type) {
   if (next_drv_indx==max_drvs) {
     drvs=realloc(drvs,sizeof(fs_drv)*(max_drvs+32));
     drv_names=realloc(drv_names,sizeof(char*)*(max_drvs+32));
@@ -55,7 +55,7 @@ uint32_t register_fs(fs_drv drv,const char* type) {
 }
 
 char mount(char* mntpnt,char* dev,char* type) {
-  uint32_t i;
+  size_t i;
   for (i=0;i<next_drv_indx;i++) {
     const char* name=drv_names[i];
     if (strcmp(name,type)==0) {
@@ -90,7 +90,7 @@ FILE* fopen(const char* filename,const char* mode) {
   vfs_mapping* mnt=head_mapping;
   vfs_mapping* mntpnt=NULL;
   const char* path;
-  uint32_t mntpnt_len=0;
+  size_t mntpnt_len=0;
   for (;mnt!=NULL;mnt=mnt->next) {
     char* root=mnt->mntpnt;
     if (strlen(root)>mntpnt_len) {
@@ -232,7 +232,7 @@ size_t fwrite(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
   char* buffer=(char*)buffer_ptr;
   size_t bytes=size*count;
   for (size_t i=0;i<bytes;i++) {
-    int c=fputc((uint8_t)buffer[i],stream);
+    int c=fputc((char)buffer[i],stream);
     if (c==EOF) {
       return (size_t)(i/size);
     }
@@ -288,7 +288,7 @@ int vfprintf(FILE* stream,const char* format,va_list arg) {
 				break;
       }
 			case 'x': {
-        uint32_t i=va_arg(arg,uint32_t);
+        unsigned int i=va_arg(arg,unsigned int);
         char str[11];
         str[0]='\0';
         hex_to_ascii(i,str);

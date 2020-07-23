@@ -36,7 +36,7 @@ void __stdio_init() {
 //   }
 }
 
-// static vfs_message* make_msg(vfs_message_type type,const char* mode,const char* path, uint32_t fd, int data) {
+// static vfs_message* make_msg(vfs_message_type type,const char* mode,const char* path, int fd, int data) {
 //   vfs_message* msg_data=malloc(sizeof(vfs_message));
 //   msg_data->type=type;
 //   msg_data->id=0;
@@ -80,7 +80,7 @@ void __stdio_init() {
 //     return NULL;
 //   } else {
 //     FILE* file=malloc(sizeof(FILE));
-//     *file=vfs_msg->fd; //We're using pointers to FILE even though it's a uint32_t so we can expand to a struct if needed
+//     *file=vfs_msg->fd; //We're using pointers to FILE even though it's an int so we can expand to a struct if needed
 //     free(msg.msg);
 //     return file;
 //   }
@@ -378,7 +378,7 @@ void __stdio_init() {
 // 				break;
 //       }
 // 			case 'x': {
-//         uint32_t i=va_arg(arg,uint32_t);
+//         unsigned int i=va_arg(arg, unsigned int);
 //         char str[11];
 //         str[0]='\0';
 //         hex_to_ascii(i,str);

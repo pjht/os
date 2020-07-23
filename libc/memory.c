@@ -5,7 +5,7 @@
 #define QUAUX(X) #X
 #define QU(X) QUAUX(X)
 
-void* alloc_memory(uint32_t num_pages) {
+void* alloc_memory(int num_pages) {
   void* address;
   asm volatile("  \
     mov $" QU(SYSCALL_ALLOC_MEM) ", %%eax; \
@@ -14,7 +14,7 @@ void* alloc_memory(uint32_t num_pages) {
   return address;
 }
 
-void alloc_memory_virt(uint32_t num_pages,void* addr) {
+void alloc_memory_virt(int num_pages,void* addr) {
   asm volatile("  \
     mov $" QU(SYSCALL_ALLOC_MEM) ", %%eax; \
     int $80; \
@@ -30,14 +30,14 @@ void* new_address_space() {
   return cr3;
 }
 
-void copy_data(void* cr3, void* data,uint32_t size,void* virt_addr) {
+void copy_data(void* cr3, void* data,size_t size,void* virt_addr) {
   asm volatile("  \
     mov $" QU(SYSCALL_ADDR_SPACES_COPY_DATA) ", %%eax; \
     int $80; \
   "::"b"(cr3),"c"(data),"d"(size),"S"(virt_addr));
 }
 
-void* put_data(void* cr3, void* data,uint32_t size) {
+void* put_data(void* cr3, void* data,size_t size) {
   void* virt_addr;
   asm volatile("  \
     mov $" QU(SYSCALL_ADDR_SPACES_COPY_DATA) ", %%eax; \
@@ -46,7 +46,7 @@ void* put_data(void* cr3, void* data,uint32_t size) {
   return virt_addr;
 }
 
-void* map_phys(void* phys_addr,uint32_t num_pages) {
+void* map_phys(void* phys_addr,size_t num_pages) {
   void* virt_addr;
   asm volatile("  \
     mov $" QU(SYSCALL_PRIV_MAP_PAGES) ", %%eax; \

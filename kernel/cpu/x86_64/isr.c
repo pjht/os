@@ -186,7 +186,7 @@ void isr_handler(registers_t* r) {
   }
 }
 
-void isr_register_handler(uint8_t n,isr_t handler) {
+void isr_register_handler(int n,isr_t handler) {
     if (n>16) {
       return;
     }

@@ -10,7 +10,7 @@
 
 typedef struct _vfs_mapping_struct {
   char* mntpnt;
-  uint32_t type;
+  size_t type;
   struct _vfs_mapping_struct* next;
 } vfs_mapping;
 
@@ -18,30 +18,30 @@ typedef struct {
   vfs_mapping* mntpnt;
   char* path;
   char* mode;
-  uint32_t pos;
+  size_t pos;
   char error;
   void* fs_data;
 } vfs_file;
 
 typedef struct {
-  uint32_t fd;
+  int fd;
   int max_len;
 } gets_data;
 
 
 typedef struct {
   char* path;
-  uint32_t type;
+  size_t type;
 } mount_data;
 
 static const char** drv_names;
 static uint32_t* drvs;
-static uint32_t max_drvs;
-static uint32_t num_drvs;
+static size_t max_drvs;
+static size_t num_drvs;
 static vfs_mapping* head_mapping;
 static vfs_mapping* tail_mapping;
 vfs_file* fd_tables[32768];
-uint16_t open_fds[32768];
+int open_fds[32768];
 uint32_t box;
 void** in_progress_data[32768];
 vfs_message* get_message(Message* msg) {
@@ -73,7 +73,7 @@ void init_vfs() {
   tail_mapping=NULL;
 }
 
-uint32_t register_fs_intern(uint32_t drv,const char* type) {
+size_t register_fs_intern(uint32_t drv,const char* type) {
   if (num_drvs==max_drvs) {
     drvs=realloc(drvs,sizeof(uint32_t)*(max_drvs+32));
     drv_names=realloc(drv_names,sizeof(char*)*(max_drvs+32));
@@ -91,7 +91,7 @@ void vfs_fopen(vfs_message* vfs_msg,uint32_t from) {
   }
   vfs_mapping* mnt=head_mapping;
   vfs_mapping* mntpnt=NULL;
-  uint32_t mntpnt_len=0;
+  size_t mntpnt_len=0;
   for (;mnt!=NULL;mnt=mnt->next) {
     char* root=mnt->mntpnt;
     if (strlen(root)>mntpnt_len) {
@@ -127,7 +127,7 @@ void vfs_fopen_finish(vfs_message* vfs_msg,uint32_t from) {
     fd_tables[vfs_msg->orig_mbox]=malloc(PROC_FD_LIMIT*sizeof(vfs_file));
     open_fds[vfs_msg->orig_mbox]=0;
   }
-  uint16_t fd=open_fds[vfs_msg->orig_mbox];
+  int fd=open_fds[vfs_msg->orig_mbox];
   open_fds[vfs_msg->orig_mbox]++;
   fd_tables[vfs_msg->orig_mbox][fd].mntpnt=mntpnt;
   fd_tables[vfs_msg->orig_mbox][fd].path=malloc(sizeof(char)*(strlen(&vfs_msg->path[0])+1));
@@ -157,7 +157,7 @@ void vfs_puts(vfs_message* vfs_msg,uint32_t from) {
     vfs_msg->flags=2;
     return;
   }
-  uint32_t fd=vfs_msg->fd;
+  int fd=vfs_msg->fd;
   vfs_file file_info=fd_tables[from][fd];
   strcpy(&vfs_msg->path[0],file_info.path);
   strcpy(&vfs_msg->mode[0],file_info.mode);
@@ -172,13 +172,13 @@ void vfs_puts(vfs_message* vfs_msg,uint32_t from) {
   msg.msg=data;
   mailbox_send_msg(&msg);
   free(data);
-  in_progress_data[from][vfs_msg->id]=malloc(sizeof(uint32_t));
-  *((uint32_t*)in_progress_data[from][vfs_msg->id])=fd;
+  in_progress_data[from][vfs_msg->id]=malloc(sizeof(int));
+  *((int*)in_progress_data[from][vfs_msg->id])=fd;
   vfs_msg->flags=0;
 }
 
 void vfs_puts_finish(vfs_message* vfs_msg,uint32_t from) {
-  uint32_t fd=*((uint32_t*)in_progress_data[vfs_msg->orig_mbox][vfs_msg->id]);
+  int fd=*((int*)in_progress_data[vfs_msg->orig_mbox][vfs_msg->id]);
   free(in_progress_data[vfs_msg->orig_mbox][vfs_msg->id]);
   fd_tables[vfs_msg->orig_mbox][fd].pos+=vfs_msg->data;
   vfs_msg->flags=0;
@@ -189,7 +189,7 @@ void vfs_puts_abort(vfs_message* vfs_msg,uint32_t from) {
 }
 
 void vfs_gets(vfs_message* vfs_msg,uint32_t from) {
-  uint32_t fd=vfs_msg->fd;
+  int fd=vfs_msg->fd;
   vfs_file file_info=fd_tables[from][fd];
   strcpy(&vfs_msg->path[0],file_info.path);
   strcpy(&vfs_msg->mode[0],file_info.mode);
@@ -227,7 +227,7 @@ char* vfs_gets_finish(vfs_message* vfs_msg,uint32_t from) {
     return NULL;
   }
   vfs_msg->data=data->max_len;
-  uint32_t fd=data->fd;
+  int fd=data->fd;
   free(in_progress_data[vfs_msg->orig_mbox][vfs_msg->id]);
   fd_tables[vfs_msg->orig_mbox][fd].pos+=vfs_msg->data;
   vfs_msg->flags=0;
@@ -270,7 +270,7 @@ void vfs_mount(vfs_message* vfs_msg, uint32_t from) {
     return;
   }
   char found=0;
-  uint32_t i;
+  size_t i;
   for (i=0;i<num_drvs;i++) {
     if (strcmp(type,drv_names[i])==0) {
       found=1;

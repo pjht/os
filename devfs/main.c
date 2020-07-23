@@ -1,5 +1,4 @@
 #include <dbg.h>
-#include <grub/text_fb_info.h>
 #include <ipc/devfs.h>
 #include <ipc/vfs.h>
 #include <mailboxes.h>

@@ -1,5 +1,4 @@
 #include <dbg.h>
-#include <grub/text_fb_info.h>
 #include <initrd.h>
 #include <ipc/devfs.h>
 #include <ipc/vfs.h>
@@ -58,14 +57,14 @@ char* initrd_gets(vfs_message* vfs_msg) {
   }
   char* data=malloc(sizeof(char)*vfs_msg->data);
   for (long i=0;i<vfs_msg->data;i++) {
-    data[i]=(uint8_t)initrd[i+vfs_msg->pos];
+    data[i]=(char)initrd[i+vfs_msg->pos];
     // if (i<sizeof(vfs_message)) {
     //   serial_print("data[");
     //   char str[256];
     //   int_to_ascii(i,str);
     //   serial_print(str);
     //   serial_print("]=");
-    //   hex_to_ascii((uint8_t)data[i],str);
+    //   hex_to_ascii((char)data[i],str);
     //   serial_print(str);
     //   serial_print("\n");
     // }

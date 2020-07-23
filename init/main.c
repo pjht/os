@@ -1,6 +1,5 @@
 #include <dbg.h>
 #include <elf.h>
-#include <grub/text_fb_info.h>
 #include <initrd.h>
 #include <ipc/vfs.h>
 #include <memory.h>
@@ -22,18 +21,18 @@ typedef struct {
   char typeflag[1];
 } tar_header;
 
-uint32_t getsize(const char *in) {
-    uint32_t size=0;
-    uint32_t j;
-    uint32_t count=1;
+size_t getsize(const char *in) {
+    size_t size=0;
+    size_t j;
+    size_t count=1;
     for (j=11;j>0;j--,count*=8) {
         size+=((in[j-1]-'0')*count);
     }
     return size;
 }
 
-uint32_t find_loc(char* name,char* initrd) {
-  uint32_t pos=0;
+size_t find_loc(char* name,char* initrd) {
+  size_t pos=0;
   tar_header tar_hdr;
   for (int i=0;;i++) {
     char* tar_hdr_ptr=(char*)&tar_hdr;
@@ -41,7 +40,7 @@ uint32_t find_loc(char* name,char* initrd) {
       tar_hdr_ptr[i]=initrd[pos+i];
     }
     if (tar_hdr.filename[0]=='\0') break;
-    uint32_t size=getsize(tar_hdr.size);
+    size_t size=getsize(tar_hdr.size);
     pos+=512;
     if (strcmp(tar_hdr.filename,name)==0) {
       return pos;
@@ -55,7 +54,7 @@ uint32_t find_loc(char* name,char* initrd) {
   return 0;
 }
 
-char load_proc(uint32_t datapos,char* initrd) {
+char load_proc(size_t datapos,char* initrd) {
   int pos=0;
   elf_header header;
   pos=datapos;
@@ -97,7 +96,7 @@ char load_proc(uint32_t datapos,char* initrd) {
   return 1;
 }
 
-// char load_proc_devfs(uint32_t datapos) {
+// char load_proc_devfs(size_t datapos) {
 //   serial_print("load_proc_devfs\n");
 //   FILE* initrd=fopen("/dev/initrd","r");
 //   elf_header header;
@@ -151,7 +150,7 @@ int main() {
   // char* initrd=malloc(size);
   // initrd_get(initrd);
   // exit(0);
-  // uint32_t datapos=find_loc("vfs",initrd);
+  // size_t datapos=find_loc("vfs",initrd);
   // load_proc(datapos,initrd);
   // yield(); // Bochs fails here
   // rescan_vfs();

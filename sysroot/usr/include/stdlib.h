@@ -2,7 +2,6 @@
 #define STDLIB_H
 
 #include <stddef.h>
-#include <stdint.h>
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1

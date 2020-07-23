@@ -5,9 +5,9 @@
 #include <string.h>
 
 static char** names;
-static uint32_t* offsets;
+static long* offsets;
 static unsigned long* sizes;
-static uint32_t num_files;
+static size_t num_files;
 static FILE* initrd_fd;
 
 static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
@@ -16,7 +16,7 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
   }
   if (op==FSOP_OPEN) {
     char file_exists=0;
-    for (uint32_t i=0;i<num_files;i++) {
+    for (size_t i=0;i<num_files;i++) {
       if (strcmp(names[i],stream->path)==0) {
         file_exists=1;
       }
@@ -24,7 +24,7 @@ static char drv(fs_op op,FILE* stream,void* data1,void* data2) {
     return file_exists;
   }
   if (op==FSOP_GETC) {
-    uint32_t i;
+    size_t i;
     for (i=0;i<num_files;i++) {
       if (strcmp(names[i],stream->path)==0) {
         break;
@@ -52,15 +52,15 @@ void initrd_init() {
     klog("PANIC","Cannot open initrd!");
     for(;;) {}
   }
-  uint32_t max_files=32;
+  size_t max_files=32;
   num_files=0;
   names=malloc(sizeof(char*)*32);
-  offsets=malloc(sizeof(uint32_t)*32);
+  offsets=malloc(sizeof(long)*32);
   sizes=malloc(sizeof(long)*32);
-  for (uint32_t i=0;i<1;i++) {
+  for (size_t i=0;i<1;i++) {
       if (i==max_files) {
         names=realloc(names,sizeof(char*)*(max_files+32));
-        offsets=realloc(offsets,sizeof(uint32_t)*(max_files+32));
+        offsets=realloc(offsets,sizeof(long)*(max_files+32));
         sizes=realloc(sizes,sizeof(long)*(max_files+32));
         max_files+=32;
       }
