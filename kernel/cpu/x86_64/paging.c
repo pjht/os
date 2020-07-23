@@ -85,7 +85,7 @@ void paging_init() {
   pml4[256]=(((uint64_t)&pdpt)-0xffff800000000000)|0x7;
   pml4[511]=(((uint64_t)&pml4)-0xffff800000000000)|0x7;
   pdpt[0]=(((uint64_t)&page_directory)-0xffff800000000000)|0x7;
-  for (int i=0;i<NUM_KERN_DIRS;i++) {
+  for (int i=0;i<NUM_KERN_FRAMES/1024;i++) {
     page_directory[i]=(i*0x200000)|0x87;
   }
   asm volatile("mov %0,%%cr3"::"r"((uint64_t)pml4-0xffff800000000000));
