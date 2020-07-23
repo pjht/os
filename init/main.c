@@ -1,15 +1,15 @@
-#include <string.h>
-#include <grub/text_fb_info.h>
-#include <ipc/vfs.h>
-#include <elf.h>
-#include <memory.h>
-#include <tasking.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <initrd.h>
 #include <dbg.h>
-#include <vfs.h>
+#include <elf.h>
+#include <grub/text_fb_info.h>
+#include <initrd.h>
+#include <ipc/vfs.h>
+#include <memory.h>
 #include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <tasking.h>
+#include <vfs.h>
 
 typedef struct {
   char filename[100];

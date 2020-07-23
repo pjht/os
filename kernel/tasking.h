@@ -1,10 +1,8 @@
 #ifndef KERN_TASKING_H
 #define KERN_TASKING_H
 
-#include <sys/types.h>
-
-
 #include <stdint.h>
+#include <sys/types.h>
 
 #ifndef TASKING_H
 

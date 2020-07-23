@@ -1,18 +1,18 @@
-#include <grub/text_fb_info.h>
-#include <stdlib.h>
-#include <tasking.h>
-#include "tasking.h"
-#include <string.h>
-#include <memory.h>
-#include <grub/multiboot2.h>
-#include <stdint.h>
 #include "cpu/cpu_init.h"
-#include "vga_err.h"
-#include <elf.h>
+#include "cpu/isr.h"
+#include "cpu/paging.h"
 #include "cpu/serial.h"
 #include "pmem.h"
-#include "cpu/paging.h"
-#include "cpu/isr.h"
+#include "tasking.h"
+#include "vga_err.h"
+#include <elf.h>
+#include <grub/multiboot2.h>
+#include <grub/text_fb_info.h>
+#include <memory.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <tasking.h>
 
 typedef struct {
   char filename[100];

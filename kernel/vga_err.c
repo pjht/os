@@ -1,5 +1,6 @@
 #include <cpu/ports.h>
 #include <string.h>
+
 #define VGA_BLACK 0
 #define VGA_WHITE 15
 static char* screen;

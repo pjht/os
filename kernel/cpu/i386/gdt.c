@@ -1,6 +1,7 @@
+#include "seg_upd.h"
 #include <stdint.h>
 #include <string.h>
-#include "seg_upd.h"
+
 #define NUM_ENTRIES 6
 
 extern uint32_t int_stack_top;

@@ -1,9 +1,9 @@
-// #include "cpu/tasking.h"
-// #include <string.h>
-// #include "rpc.h"
-// #include "cpu/i386/serial.h"
 // #include "cpu/halt.h"
 // #include "cpu/i386/address_spaces.h"
+// #include "cpu/i386/serial.h"
+// #include "cpu/tasking.h"
+// #include "rpc.h"
+// #include <string.h>
 // void rpc_init_struct(ThreadRPCStruct* info) {
 //   for (size_t i = 0; i < 32; i++) {
 //     info->funcs[i].code=NULL;

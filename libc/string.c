@@ -1,7 +1,7 @@
-#include <string.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 void* memcpy(void* dest_ptr,const void* source_ptr,size_t len) {
     char* source=(char*)source_ptr;

@@ -1,10 +1,11 @@
-#include <stdint.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
 #include "vfs.h"
+#include <errno.h>
+#include <stdarg.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 typedef struct _vfs_mapping_struct {
   char* mntpnt;
   uint32_t type;

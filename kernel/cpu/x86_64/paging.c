@@ -1,6 +1,6 @@
-#include <stdint.h>
 #include "paging.h"
 #include "pmem.h"
+#include <stdint.h>
 
 static uint64_t pml4[512] __attribute__((aligned(4096)));
 static uint64_t pdpt[512] __attribute__((aligned(4096)));

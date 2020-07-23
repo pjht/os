@@ -1,5 +1,5 @@
-#ifndef DEVFS_H
 #define DEVFS_H
+#ifndef DEVFS_H
 
 typedef int (*dev_drv)(char* filename,int c,long pos,char wr);
 

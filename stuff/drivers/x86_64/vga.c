@@ -1,8 +1,9 @@
-#include <grub/text_fb_info.h>
-#include "../vga.h"
 #include "../../cpu/x86_64/ports.h"
-#include <string.h>
+#include "../vga.h"
+#include <grub/text_fb_info.h>
 #include <stddef.h>
+#include <string.h>
+
 #define xy_to_indx(x,y) ((x+(y*width))*2)
 static char* screen;
 static int width;

@@ -1,19 +1,20 @@
-#include "../isr.h"
-#include "idt.h"
-#include "gdt.h"
-#include <cpu/ports.h>
-#include "../paging.h"
-#include "../halt.h"
-#include "../../vga_err.h"
 #include "../../kernel.h"
 #include "../../tasking.h"
-#include "interrupt.h"
+#include "../../vga_err.h"
 #include "../address_spaces.h"
-#include <string.h>
-#include <stdint.h>
+#include "../halt.h"
+#include "../isr.h"
+#include "../paging.h"
 #include "../serial.h"
-#include <sys/types.h>
+#include "gdt.h"
+#include "idt.h"
+#include "interrupt.h"
+#include <cpu/ports.h>
+#include <stdint.h>
+#include <string.h>
 #include <sys/syscalls.h>
+#include <sys/types.h>
+
 void irq_handler(registers_t* r);
 static isr_t irq_handlers[16];
 

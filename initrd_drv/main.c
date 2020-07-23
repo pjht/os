@@ -1,14 +1,14 @@
-#include <tasking.h>
-#include <stdlib.h>
-#include <mailboxes.h>
-#include <ipc/vfs.h>
-#include <memory.h>
-#include <grub/text_fb_info.h>
-#include <vfs.h>
-#include <ipc/devfs.h>
-#include <string.h>
 #include <dbg.h>
+#include <grub/text_fb_info.h>
 #include <initrd.h>
+#include <ipc/devfs.h>
+#include <ipc/vfs.h>
+#include <mailboxes.h>
+#include <memory.h>
+#include <stdlib.h>
+#include <string.h>
+#include <tasking.h>
+#include <vfs.h>
 
 #define VFS_PID 2
 #define DEVFS_PID 3

@@ -1,8 +1,8 @@
 #ifndef PCI_INTERN_H
 #define PCI_INTERN_H
 
-#include <stdint.h>
 #include "../pci.h"
+#include <stdint.h>
 
 #define PCI_CONFIG_ADDRESS 0xCF8
 #define PCI_CONFIG_DATA 0xCFC

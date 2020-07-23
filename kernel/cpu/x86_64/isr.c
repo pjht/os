@@ -1,13 +1,14 @@
+// #include "../tasking.h"
+// #include "paging.h"
+#include "../../drivers/vga.h"
+#include "../halt.h"
 #include "../isr.h"
 #include "idt.h"
-#include <cpu/ports.h>
-// #include "paging.h"
-#include "../halt.h"
-#include "../../drivers/vga.h"
-// #include "../tasking.h"
 #include "interrupt.h"
-#include <string.h>
+#include <cpu/ports.h>
 #include <stdint.h>
+#include <string.h>
+
 static isr_t irq_handlers[16];
 
 /* Can't do this with a loop because we need the address

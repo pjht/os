@@ -1,13 +1,13 @@
-#include <tasking.h>
-#include <stdlib.h>
-#include <mailboxes.h>
-#include <ipc/vfs.h>
-#include <memory.h>
-#include <grub/text_fb_info.h>
-#include <vfs.h>
-#include <ipc/devfs.h>
-#include <string.h>
 #include <dbg.h>
+#include <grub/text_fb_info.h>
+#include <ipc/devfs.h>
+#include <ipc/vfs.h>
+#include <mailboxes.h>
+#include <memory.h>
+#include <stdlib.h>
+#include <string.h>
+#include <tasking.h>
+#include <vfs.h>
 
 uint32_t vfs_box;
 uint32_t devfs_vfs_box;

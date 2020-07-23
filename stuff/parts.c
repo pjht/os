@@ -1,9 +1,9 @@
+#include "../fs/devfs.h"
+#include <klog.h>
 #include <stdint.h>
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <klog.h>
-#include "../fs/devfs.h"
+#include <string.h>
 
 typedef struct {
   char bootable;

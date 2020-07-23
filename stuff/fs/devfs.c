@@ -1,8 +1,8 @@
 #include "../..//vfs.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include "devfs.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static char** devices;
 static dev_drv* dev_drivers;

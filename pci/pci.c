@@ -1,8 +1,8 @@
-#include <stdint.h>
-#include "ports.h"
 #include "pci.h"
-#include <stdlib.h>
+#include "ports.h"
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 pci_dev_common_info** pci_devs;
 static uint32_t max_devs;

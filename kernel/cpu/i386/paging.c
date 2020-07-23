@@ -1,12 +1,12 @@
-#include <stdint.h>
-#include <stdlib.h>
-#include "paging_helpers.h"
-#include "../paging.h"
 #include "../../pmem.h"
 #include "../../vga_err.h"
-#include <klog.h>
 #include "../halt.h"
+#include "../paging.h"
 #include "arch_consts.h"
+#include "paging_helpers.h"
+#include <klog.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 static uint32_t page_directory[1024] __attribute__((aligned(4096)));
 static uint32_t kern_page_tables[NUM_KERN_FRAMES] __attribute__((aligned(4096)));

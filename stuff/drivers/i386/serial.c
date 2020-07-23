@@ -1,13 +1,13 @@
-#include "../../cpu/i386/ports.h"
 #include "../../cpu/i386/isr.h"
-#include "../serial.h"
-#include <stdio.h>
-#include <string.h>
-#include <devbuf.h>
-#include "../vga.h"
+#include "../../cpu/i386/ports.h"
 #include "../../fs/devfs.h"
+#include "../serial.h"
+#include "../vga.h"
+#include <devbuf.h>
 #include <klog.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 #define SERIAL_LINE_ENABLE_DLAB 0x80
 

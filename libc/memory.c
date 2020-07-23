@@ -1,6 +1,6 @@
 #include <stdint.h>
-#include <sys/syscalls.h>
 #include <stdlib.h>
+#include <sys/syscalls.h>
 
 #define QUAUX(X) #X
 #define QU(X) QUAUX(X)

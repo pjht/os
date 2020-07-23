@@ -1,8 +1,8 @@
-#include <stdint.h>
 #include "../../cpu/i386/ports.h"
-#include <klog.h>
-#include "pci.h"
 #include "../vga.h"
+#include "pci.h"
+#include <klog.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 pci_dev_common_info** pci_devs;

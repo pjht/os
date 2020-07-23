@@ -1,8 +1,8 @@
 #ifndef PAGING_H
 #define PAGING_H
 
-#include <stdint.h>
 #include "arch_consts.h"
+#include <stdint.h>
 
 void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,char wr);
 int new_kstack();

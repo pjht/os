@@ -1,9 +1,10 @@
-#include "../../fs/devfs.h"
 #include "../../cpu/i386/ports.h"
+#include "../../fs/devfs.h"
+#include <klog.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <klog.h>
+
 #define IDE_PRIM_IO 0x1f0
 #define IDE_PRIM_CTRL 0x3f6
 #define IDE_SEC_IO 0x170

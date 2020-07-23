@@ -1,10 +1,11 @@
-#include "tasking.h"
-#include <sys/types.h>
-#include "kmalloc.h"
-#include "cpu/serial.h"
 #include "cpu/halt.h"
 #include "cpu/paging.h"
+#include "cpu/serial.h"
 #include "cpu/tasking_helpers.h"
+#include "kmalloc.h"
+#include "tasking.h"
+#include <sys/types.h>
+
 #define MAX_PROCS 32768
 #define HAS_UNBLOCKED_THREADS(proc) (proc->numThreads!=proc->numThreadsBlocked)
 #define NUM_UNBLOCKED_THREADS(proc) (proc->numThreads-proc->numThreadsBlocked)

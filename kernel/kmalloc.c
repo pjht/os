@@ -1,8 +1,8 @@
-#include <string.h>
-#include <stdlib.h>
+#include "cpu/arch_consts.h"
 #include <math.h>
 #include <stdint.h>
-#include "cpu/arch_consts.h"
+#include <stdlib.h>
+#include <string.h>
 
 #define KMALLOC_BMAP_SZ (((KMALLOC_SZ*1024)/4)/8)
 

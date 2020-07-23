@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include <tasking.h>
-#include <sys/types.h>
 #include <sys/syscalls.h>
+#include <sys/types.h>
+#include <tasking.h>
 
 #define QUAUX(X) #X
 #define QU(X) QUAUX(X)

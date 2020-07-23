@@ -1,10 +1,10 @@
-#include <grub/multiboot2.h>
+#include "cpu/arch_consts.h"
 #include "cpu/halt.h"
 #include "vga_err.h"
+#include <grub/multiboot2.h>
+#include <klog.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <klog.h>
-#include "cpu/arch_consts.h"
 
 #define BMAP_LEN (NUM_FRAMES/8)
 

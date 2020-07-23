@@ -1,5 +1,6 @@
-#include <stdio.h>
 #include "pci.h"
+#include <stdio.h>
+
 int main() {
   FILE* file;
   do {

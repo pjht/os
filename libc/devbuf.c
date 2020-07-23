@@ -1,6 +1,6 @@
 #include <devbuf.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 devbuf* devbuf_init() {
   devbuf* buf=malloc(sizeof(devbuf));

@@ -1,8 +1,8 @@
-#include <string.h>
-#include <stdlib.h>
 #include <math.h>
-#include <stdint.h>
 #include <memory.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define MAX_BLOCKS 512
 
