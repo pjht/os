@@ -211,28 +211,6 @@ void unmap_pages(void* start_virt,uint32_t num_pages) {
   }
 }
 
-char make_protector(int page) {
-  int table=page>>10;
-  if (is_page_present(page)) return 0;
-  page=page&0x3FF;
-  smap_page_tables[table+1]=(smap[table]&0xFFFFFC00)|0x3;
-  uint32_t page_val=smap[(1024+(1024*table))+page];
-  page_val=page_val&(~0x6);
-  page_val=page_val|0x800;
-  smap[(1024+(1024*table))+page]=page_val;
-  return 1;
-}
-
-char is_in_protector(void* addr) {
-  int page=((uint32_t)addr)>>12;
-  if (is_page_present(page)) return 0;
-  int table=page>>10;
-  page=page&0x3FF;
-  smap_page_tables[table+1]=(smap[table]&0xFFFFFC00)|0x3;
-  return smap[(1024+(1024*table))+page]&0x800;
-  return 1;
-}
-
 void paging_init() {
   for (uint32_t i=0;i<NUM_KERN_FRAMES;i++) {
     kern_page_tables[i]=(i<<12)|0x3;

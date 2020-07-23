@@ -15,8 +15,6 @@ void load_address_space(void* cr3);
 void* virt_to_phys(void* virt_addr);
 void* find_free_pages(int num_pages);
 void load_smap(void* cr3);
-char make_protector(int page);
-char is_in_protector(void* addr);
 void* get_cr3();
 
 #endif
