@@ -1,7 +1,7 @@
 #include "../../kernel.h"
 #include "../../tasking.h"
 #include "../../vga_err.h"
-#include "../address_spaces.h"
+#include "../../address_spaces.h"
 #include "../halt.h"
 #include "../isr.h"
 #include "../paging.h"

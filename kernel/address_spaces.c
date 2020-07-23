@@ -1,5 +1,5 @@
-#include "../paging.h"
-#include "arch_consts.h"
+#include "cpu/paging.h"
+#include "cpu/arch_consts.h"
 
 void address_spaces_copy_data(void* cr3, void* data,uint32_t size,void* virt_addr) {
   void* old_cr3=get_cr3();
