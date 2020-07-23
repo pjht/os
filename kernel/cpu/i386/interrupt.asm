@@ -13,11 +13,12 @@ isr_common_stub:
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
-
-	push esp
 	
     ; 2. Call C handler
+    push esp
+
 	call isr_handler
+
     ; 3. Restore state
 	pop eax
 	pop eax
@@ -41,11 +42,11 @@ irq_common_stub:
     mov fs, ax
     mov gs, ax
 		
-		push esp
+	push esp
 		
     call irq_handler ; Different than the ISR code
-		
-		pop ebx
+
+	pop ebx
 		
     pop ebx  ; Different than the ISR code
     mov ds, bx

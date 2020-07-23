@@ -1,9 +1,8 @@
-#include "ports.h"
-#include "../../cpu/i386/isr.h"
-#include "serial.h"
-#include <stdio.h>
+#include <cpu/ports.h>
+#include "../isr.h"
+#include "../serial.h"
+#include <stdarg.h>
 #include <string.h>
-#include <devbuf.h>
 #include <stdint.h>
 
 #define SERIAL_LINE_ENABLE_DLAB 0x80

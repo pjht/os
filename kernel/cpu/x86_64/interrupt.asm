@@ -21,9 +21,10 @@ isr_common_stub:
 	push r13
 	push r14
 	push r15
-    ; 2. Call C handler
+  ; 2. Call C handler
+	mov rdi,rsp
 	call isr_handler
-    ; 3. Restore state
+  ; 3. Restore state
 	pop r15
 	pop r14
 	pop r13
@@ -65,6 +66,7 @@ irq_common_stub:
 	push r14
 	push r15
 	; 2. Call C handler
+	mov rdi,rsp
 	call irq_handler
 	; 3. Restore state
 	pop r15

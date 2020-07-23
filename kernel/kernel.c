@@ -1,6 +1,7 @@
 #include <grub/text_fb_info.h>
 #include <stdlib.h>
 #include <tasking.h>
+#include "tasking.h"
 #include <string.h>
 #include <memory.h>
 #include <grub/multiboot2.h>
@@ -8,6 +9,10 @@
 #include "cpu/cpu_init.h"
 #include "vga_err.h"
 #include <elf.h>
+#include "cpu/serial.h"
+#include "pmem.h"
+#include "cpu/paging.h"
+#include "cpu/isr.h"
 
 typedef struct {
   char filename[100];
@@ -52,7 +57,12 @@ uint32_t getsize(const char *in) {
 
 void kmain(struct multiboot_boot_header_tag* hdr) {
   tags=hdr;
-  cpu_init(tags);
+  cpu_init();
+  isr_install();
+  serial_init();
+  pmem_init(tags);
+  paging_init();
+  tasking_init();
   vga_init((char*)0xC00B8000);
   read_initrd(tags);
   int pos=0;

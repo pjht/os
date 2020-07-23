@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#ifndef INT_TASKING_H
+#ifndef KERN_TASKING_H
 typedef enum ThreadState {
   THREAD_RUNNING,
   THREAD_READY,

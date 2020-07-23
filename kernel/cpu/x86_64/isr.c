@@ -1,4 +1,4 @@
-#include "isr.h"
+#include "../isr.h"
 #include "idt.h"
 #include <cpu/ports.h>
 // #include "paging.h"
@@ -8,8 +8,7 @@
 #include "interrupt.h"
 #include <string.h>
 #include <stdint.h>
-void irq_handler(registers_t r);
-static isr_t interrupt_handlers[256];
+static isr_t irq_handlers[16];
 
 /* Can't do this with a loop because we need the address
  * of the function names */
@@ -78,6 +77,8 @@ void isr_install() {
     idt_set_gate(47,(uint64_t)irq15);
 
     load_idt();
+    
+    asm volatile("sti");
 }
 
 
@@ -120,26 +121,26 @@ static char *exception_messages[] = {
     "Reserved"
 };
 
-void isr_handler(registers_t r) {
-  switch (r.int_no) {
+void isr_handler(registers_t* r) {
+  switch (r->int_no) {
     case 14: {
       uint64_t addr;
       asm("movq %%cr2,%0": "=r"(addr));
-      if (r.err_code==0) {
+      if (r->err_code==0) {
         vga_write_string("Kernel process tried to read a non-present page entry at address ");
-      } else if (r.err_code==1) {
+      } else if (r->err_code==1) {
         vga_write_string("Kernel process tried to read a page and caused a protection fault at address ");
-      } else if (r.err_code==2) {
+      } else if (r->err_code==2) {
         vga_write_string("Kernel process tried to write to a non-present page entry at address ");
-      } else if (r.err_code==3) {
+      } else if (r->err_code==3) {
         vga_write_string("Kernel process tried to write a page and caused a protection fault at address ");
-      } else if (r.err_code==4) {
+      } else if (r->err_code==4) {
         vga_write_string("User process tried to read a non-present page entry at address ");
-      } else if (r.err_code==5) {
+      } else if (r->err_code==5) {
         vga_write_string("User process tried to read a page and caused a protection fault at address ");
-      } else if (r.err_code==6) {
+      } else if (r->err_code==6) {
         vga_write_string("User process tried to write to a non-present page entry at address ");
-      } else if (r.err_code==7) {
+      } else if (r->err_code==7) {
         vga_write_string("User process tried to write a page and caused a protection fault at address ");
       }
       char str[11];
@@ -147,7 +148,7 @@ void isr_handler(registers_t r) {
       hex_to_ascii(addr,str);
       vga_write_string(str);
       vga_write_string("\n");
-      // if ((r.err_code&1)==0) {
+      // if ((r->err_code&1)==0) {
       //   // int dir_entry=(addr&0xFFC00000)>>22;
       //   // int table_entry=(addr&0x3FF000)>12;
       //   // if (dir_entry_present(dir_entry)) {
@@ -167,36 +168,38 @@ void isr_handler(registers_t r) {
       halt();
       break;
     case 80:
-      // if (r.eax==1) {
+      // if (r->eax==1) {
       //   tss_stack_reset();
       //   tasking_yield();
-      // } else if (r.eax==2) {
-      //   tasking_createTask((void*)r.ebx);
-      // } else if (r.eax==3) {
-      //   r.ebx=(uint64_t)alloc_pages(r.ebx);
-      // } else if (r.eax==4) {
-      //   alloc_pages_virt(r.ebx,(void*)r.ecx);
-      // } else if (r.eax==5) {
-      //   r.ebx=(uint64_t)tasking_get_errno_address();
+      // } else if (r->eax==2) {
+      //   tasking_createTask((void*)r->ebx);
+      // } else if (r->eax==3) {
+      //   r->ebx=(uint64_t)alloc_pages(r->ebx);
+      // } else if (r->eax==4) {
+      //   alloc_pages_virt(r->ebx,(void*)r->ecx);
+      // } else if (r->eax==5) {
+      //   r->ebx=(uint64_t)tasking_get_errno_address();
       // }
     break;
     }
   }
 }
 
-
 void isr_register_handler(uint8_t n,isr_t handler) {
-    interrupt_handlers[n] = handler;
+    if (n>16) {
+      return;
+    }
+    irq_handlers[n] = handler;
 }
 
-void irq_handler(registers_t r) {
+void irq_handler(registers_t* r) {
     /* After every interrupt we need to send an EOI to the PICs
      * or they will not send another interrupt again */
-    if (r.int_no >= 40) port_byte_out(0xA0,0x20); /* slave */
+    if (r->int_no >= 40) port_byte_out(0xA0,0x20); /* slave */
     port_byte_out(0x20,0x20); /* master */
     /* Handle the interrupt in a more modular way */
-    if (interrupt_handlers[r.int_no] != 0) {
-        isr_t handler = interrupt_handlers[r.int_no];
+    if (irq_handlers[r->int_no-32] != NULL) {
+        isr_t handler = irq_handlers[r->int_no];
         handler(r);
     }
 }

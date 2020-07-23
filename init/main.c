@@ -130,8 +130,9 @@ char load_proc(uint32_t datapos,char* initrd) {
 //   return 1;
 // }
 
-void thread_func() {
+void* thread_func(void* arg) {
   for (;;) yield();
+  return NULL;
 }
 
 int main() {

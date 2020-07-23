@@ -1,21 +1,21 @@
-#include "isr.h"
+#include "../isr.h"
 #include "idt.h"
 #include "gdt.h"
 #include <cpu/ports.h>
-#include "paging.h"
+#include "../paging.h"
 #include "../halt.h"
 #include "../../vga_err.h"
 #include "../../kernel.h"
-#include "../tasking.h"
+#include "../../tasking.h"
 #include "interrupt.h"
-#include "address_spaces.h"
+#include "../address_spaces.h"
 #include <string.h>
 #include <stdint.h>
-#include "serial.h"
+#include "../serial.h"
 #include <sys/types.h>
 #include <sys/syscalls.h>
 void irq_handler(registers_t* r);
-static isr_t interrupt_handlers[256];
+static isr_t irq_handlers[16];
 
 /* Can't do this with a loop because we need the address
  * of the function names */
@@ -84,6 +84,8 @@ void isr_install() {
     idt_set_gate(47,(uint32_t)irq15);
 
     load_idt();
+    
+    asm volatile("sti");
 }
 
 
@@ -267,7 +269,10 @@ void isr_handler(registers_t* r) {
 
 
 void isr_register_handler(uint8_t n,isr_t handler) {
-    interrupt_handlers[n] = handler;
+    if (n>16) {
+      return;
+    }
+    irq_handlers[n] = handler;
 }
 
 void irq_handler(registers_t* r) {
@@ -276,8 +281,8 @@ void irq_handler(registers_t* r) {
     if (r->int_no >= 40) port_byte_out(0xA0,0x20); /* slave */
     port_byte_out(0x20,0x20); /* master */
     /* Handle the interrupt in a more modular way */
-    if (interrupt_handlers[r->int_no] != 0) {
-        isr_t handler = interrupt_handlers[r->int_no];
+    if (irq_handlers[r->int_no-32] != NULL) {
+        isr_t handler = irq_handlers[r->int_no];
         handler(r);
     }
 }

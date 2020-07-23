@@ -1,14 +1,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "paging_helpers.h"
-#include "paging.h"
-#include "pmem.h"
-#include "../..//vga_err.h"
+#include "../paging.h"
+#include "../../pmem.h"
+#include "../../vga_err.h"
 #include <klog.h>
 #include "../halt.h"
+#include "arch_consts.h"
 
 static uint32_t page_directory[1024] __attribute__((aligned(4096)));
-static uint32_t kern_page_tables[NUM_KERN_DIRS*1024] __attribute__((aligned(4096)));
+static uint32_t kern_page_tables[NUM_KERN_FRAMES] __attribute__((aligned(4096)));
 static uint32_t kstack_page_tables[218*1024] __attribute__((aligned(4096)));
 static uint32_t kmalloc_page_tables[4*1024] __attribute__((aligned(4096)));
 static uint32_t smap_page_tables[2048] __attribute__((aligned(4096)));
@@ -178,13 +179,13 @@ void* paging_new_address_space() {
   return dir;
 }
 
-void load_address_space(uint32_t cr3) {
+void load_address_space(void* cr3) {
   load_smap(cr3);
   load_page_directory((uint32_t*)cr3);
 }
 
-void load_smap(uint32_t cr3) {
-  smap_page_tables[0]=cr3|0x3;
+void load_smap(void* cr3) {
+  smap_page_tables[0]=(uint32_t)cr3|0x3;
   invl_page(&smap[0]);
   for (uint32_t i=1;i<2048;i++) {
     invl_page(&smap[i*1024]);
@@ -222,7 +223,7 @@ char make_protector(int page) {
   return 1;
 }
 
-char is_in_protector(uint32_t* addr) {
+char is_in_protector(void* addr) {
   int page=((uint32_t)addr)>>12;
   if (is_page_present(page)) return 0;
   int table=page>>10;
@@ -233,7 +234,7 @@ char is_in_protector(uint32_t* addr) {
 }
 
 void paging_init() {
-  for (uint32_t i=0;i<NUM_KERN_DIRS*1024;i++) {
+  for (uint32_t i=0;i<NUM_KERN_FRAMES;i++) {
     kern_page_tables[i]=(i<<12)|0x3;
   }
   for (uint32_t i=0;i<218*1024;i++) {
@@ -246,7 +247,7 @@ void paging_init() {
   for (uint32_t i=1;i<2048;i++) {
     smap_page_tables[i]=0;
   }
-  for (uint32_t i=0;i<NUM_KERN_DIRS;i++) {
+  for (uint32_t i=0;i<NUM_KERN_FRAMES/1024;i++) {
     uint32_t entry_virt=(uint32_t)&(kern_page_tables[i*1024]);
     page_directory[i+768]=(entry_virt-0xC0000000)|0x3;
   }
@@ -268,4 +269,10 @@ void paging_init() {
     page_directory[i+1022]=(entry_virt-0xC0000000)|0x3;
   }
   load_page_directory((uint32_t*)((uint32_t)page_directory-0xC0000000));
+}
+
+void* get_cr3() {
+  void* cr3;
+  asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(cr3)::"%eax");
+  return cr3;
 }

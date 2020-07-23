@@ -1,11 +1,14 @@
 #include <grub/multiboot2.h>
-#include "../halt.h"
-#include "../..//vga_err.h"
+#include "cpu/halt.h"
+#include "vga_err.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <klog.h>
+#include "cpu/arch_consts.h"
 
-static char bmap[131072];
+#define BMAP_LEN (NUM_FRAMES/8)
+
+static char bmap[BMAP_LEN];
 
 static char get_bmap_bit(int index) {
   int byte=index/8;
@@ -27,7 +30,7 @@ static void clear_bmap_bit(int index) {
 }
 
 void pmem_init(struct multiboot_boot_header_tag* tags) {
-  for (int i=0;i<131072;i++) {
+  for (int i=0;i<BMAP_LEN;i++) {
     bmap[i]=0xFF;
   }
   char found_mmap=0;
@@ -42,11 +45,11 @@ void pmem_init(struct multiboot_boot_header_tag* tags) {
           uint32_t start=ptr->addr;
           if (start<0x100000) continue;
           uint32_t end=start+ptr->len-1;
-          if (start&0xFFF) {
-            start+=0x1000;
+          if (start&(FRAME_SZ-1)) {
+            start+=FRAME_SZ;
           }
-          start=start>>12;
-          end=end>>12;
+          start=start>>FRAME_NO_OFFSET;
+          end=end>>FRAME_NO_OFFSET;
           for (uint32_t i=start;i<end;i++) {
             clear_bmap_bit(i);
           }
@@ -60,7 +63,7 @@ void pmem_init(struct multiboot_boot_header_tag* tags) {
     vga_write_string("[PANIC] No memory map supplied by bootloader!");
     halt();
   }
-  for (uint32_t i=0;i<2048;i++) {
+  for (uint32_t i=0;i<NUM_KERN_FRAMES;i++) {
     set_bmap_bit(i);
   }
 }

@@ -70,7 +70,12 @@ libc: sysroot/usr/lib/libc.a
 sysroot/usr/lib/libc.a: $(LIBC_OBJ)
 	@$(AR) rcs $@ $^
 
-%.o: %.c
+kernel/cpu/arch_consts.h: kernel/cpu/$(PLAT)/arch_consts.h
+	cp kernel/cpu/$(PLAT)/arch_consts.h kernel/cpu/arch_consts.h
+kernel/cpu/isr.h: kernel/cpu/$(PLAT)/isr.h
+	cp kernel/cpu/$(PLAT)/isr.h kernel/cpu/isr.h
+
+%.o: %.c kernel/cpu/arch_consts.h kernel/cpu/isr.h
 	@$(CC) $(CFLAGS)  -c $< -o $@
 
 %.o: %.asm

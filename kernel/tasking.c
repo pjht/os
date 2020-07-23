@@ -1,11 +1,10 @@
 #include "tasking.h"
-#include "../tasking.h"
 #include <sys/types.h>
 #include "kmalloc.h"
-#include "serial.h"
-#include "../halt.h"
-#include "paging.h"
-#include "tasking_helpers.h"
+#include "cpu/serial.h"
+#include "cpu/halt.h"
+#include "cpu/paging.h"
+#include "cpu/tasking_helpers.h"
 #define MAX_PROCS 32768
 #define HAS_UNBLOCKED_THREADS(proc) (proc->numThreads!=proc->numThreadsBlocked)
 #define NUM_UNBLOCKED_THREADS(proc) (proc->numThreads-proc->numThreadsBlocked)
@@ -18,7 +17,7 @@ char proc_schedule_bmap[MAX_PROCS/8];
 Thread* currentThread;
 static Thread* readyToRunHead=NULL;
 static Thread* readyToRunTail=NULL;
-static uint32_t* kstacks=(uint32_t*)0xC8000000;
+static uint32_t* kstacks=(uint32_t*)KSTACKS_START;
 
 static char is_proc_scheduled(uint32_t index) {
   uint32_t byte=index/8;
@@ -90,10 +89,9 @@ void tasking_createTask(void* eip,void* cr3,char kmode,char param1_exists,uint32
   thread->errno=0;
   thread->tid=proc->next_tid;
   proc->next_tid++;
-  void* old_cr3;
-  asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(old_cr3)::"%eax");
+  void* old_cr3=get_cr3();
   uint32_t kstack_num=new_kstack();
-  load_address_space((uint32_t)thread->cr3);
+  load_address_space(thread->cr3);
   if (kmode) {
     uint32_t top_idx=(1024*(kstack_num+1));
     thread->kernel_esp=((uint32_t)(&kstacks[top_idx-5]));
@@ -113,7 +111,7 @@ void tasking_createTask(void* eip,void* cr3,char kmode,char param1_exists,uint32
     kstacks[top_idx-2]=(uint32_t)user_stack;
     kstacks[top_idx-1]=(uint32_t)eip;
   }
-  load_address_space((uint32_t)old_cr3);
+  load_address_space(old_cr3);
   thread->prevReadyToRun=NULL;
   thread->nextReadyToRun=NULL;
   if (isThread) {
@@ -150,9 +148,7 @@ void tasking_createTask(void* eip,void* cr3,char kmode,char param1_exists,uint32
 }
 
 void tasking_init() {
-  void* cr3;
-  asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(cr3)::"%eax");
-  tasking_createTask(NULL,cr3,1,0,0,0,0,0);
+  tasking_createTask(NULL,get_cr3(),1,0,0,0,0,0);
 }
 
 char tasking_isPrivleged() {
@@ -227,7 +223,7 @@ void switch_to_thread(Thread* thread) {
     mark_proc_scheduled(currentThread->process->pid);
   }
   serial_printf("Switching to PID %d TID %d.\n",thread->process->pid,thread->tid);
-  load_smap((uint32_t)thread->cr3);
+  load_smap(thread->cr3);
   switch_to_thread_asm(thread);
 }
 
@@ -250,11 +246,7 @@ void tasking_yield() {
       } else {
         serial_printf("All threads in all processes blocked, waiting for an IRQ which unblocks a thread\n");
         // All threads in all processes blocked, so wait for an IRQ whose handler unblocks a thread.
-        do {
-          asm volatile("sti"); //As interrupts are stopped, re-enable them.
-          asm volatile("hlt"); //Wait for an interrupt handler to run and return.
-          asm volatile("cli"); //Clear interrupts, as tasking code must not be interrupted.
-        } while (readyToRunHead==NULL);
+        do { wait_for_unblocked_thread_asm(); } while (readyToRunHead==NULL);
       }
       serial_printf("Attempting to switch to PID %d TID %d\n",readyToRunHead->process->pid,readyToRunHead->tid);
       switch_to_thread(readyToRunHead);

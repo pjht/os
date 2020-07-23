@@ -66,3 +66,10 @@ task_init:
   push 0x1B
   push ebx
   iret
+
+global wait_for_unblocked_thread_asm
+
+wait_for_unblocked_thread_asm:
+  sti ;As interrupts are stopped in tasking code, re-enable them
+  hlt ;Wait for an interrupt handler to run and return.
+  cli ;Clear interrupts, as tasking code must not be run with interrupts on.

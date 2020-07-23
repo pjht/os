@@ -2,9 +2,12 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdint.h>
+#include "cpu/arch_consts.h"
 
-static char bitmap[2097152];
-static void* data=(void*)0xFE800000;
+#define KMALLOC_BMAP_SZ (((KMALLOC_SZ*1024)/4)/8)
+
+static char bitmap[KMALLOC_BMAP_SZ];
+static void* data=(void*)KMALLOC_START;
 
 
 static char get_bmap_bit(uint32_t index) {
@@ -31,7 +34,7 @@ void* kmalloc(uint32_t size) {
   num_4b_grps+=2;
   uint32_t bmap_index;
   uint32_t remaining_blks;
-  for(uint32_t i=0;i<2097152;i++) {
+  for(uint32_t i=0;i<KMALLOC_BMAP_SZ;i++) {
     char got_0=0;
     remaining_blks=num_4b_grps;
     uint32_t old_j;
