@@ -65,11 +65,11 @@ static void set_bmap_bit(uint32_t index) {
   kstack_bmap[byte]=kstack_bmap[byte]|(1<<bit);
 }
 
-static void clear_bmap_bit(uint32_t index) {
-  uint32_t byte=index/8;
-  uint32_t bit=index%8;
-  kstack_bmap[byte]=kstack_bmap[byte]&(~(1<<bit));
-}
+// static void clear_bmap_bit(uint32_t index) {
+//   uint32_t byte=index/8;
+//   uint32_t bit=index%8;
+//   kstack_bmap[byte]=kstack_bmap[byte]&(~(1<<bit));
+// }
 
 int new_kstack() {
   int num=-1;
