@@ -201,7 +201,6 @@ void switch_to_thread(Thread* thread) {
     mark_proc_scheduled(currentThread->process->pid);
   }
   serial_printf("Switching to PID %d TID %d.\n",thread->process->pid,thread->tid);
-  load_smap(thread->cr3);
   switch_to_thread_asm(thread);
 }
 

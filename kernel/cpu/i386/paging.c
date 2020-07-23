@@ -179,11 +179,6 @@ void* paging_new_address_space() {
   return dir;
 }
 
-void load_address_space(void* cr3) {
-  load_smap(cr3);
-  load_page_directory((uint32_t*)cr3);
-}
-
 void load_smap(void* cr3) {
   smap_page_tables[0]=(uint32_t)cr3|0x3;
   invl_page(&smap[0]);
@@ -191,6 +186,12 @@ void load_smap(void* cr3) {
     invl_page(&smap[i*1024]);
     smap_page_tables[i]=0;
   }
+}
+
+
+void load_address_space(void* cr3) {
+  load_smap(cr3);
+  load_page_directory((uint32_t*)cr3);
 }
 
 void unmap_pages(void* start_virt,uint32_t num_pages) {
