@@ -14,7 +14,6 @@ static uint32_t kstack_page_tables[218*1024] __attribute__((aligned(4096)));
 static uint32_t kmalloc_page_tables[4*1024] __attribute__((aligned(4096)));
 static uint32_t smap_page_tables[2048] __attribute__((aligned(4096)));
 static uint32_t* smap=(uint32_t*)0xFF800000;
-static uint32_t kstack_bmap[(218*1024)/8];
 static char is_page_present(int page) {
    int table=page>>10;
    page=page&0x3FF;
@@ -49,44 +48,6 @@ void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,ch
     }
     phys_addr+=0x1000;
   }
-}
-
-
-static char get_bmap_bit(uint32_t index) {
-  uint32_t byte=index/8;
-  uint32_t bit=index%8;
-  char entry=kstack_bmap[byte];
-  return (entry&(1<<bit))>0;
-}
-
-static void set_bmap_bit(uint32_t index) {
-  uint32_t byte=index/8;
-  uint32_t bit=index%8;
-  kstack_bmap[byte]=kstack_bmap[byte]|(1<<bit);
-}
-
-// static void clear_bmap_bit(uint32_t index) {
-//   uint32_t byte=index/8;
-//   uint32_t bit=index%8;
-//   kstack_bmap[byte]=kstack_bmap[byte]&(~(1<<bit));
-// }
-
-int new_kstack() {
-  int num=-1;
-  for (int i=0;i<(218*1024);i++) {
-    if (get_bmap_bit(i)==0) {
-      num=i;
-      break;
-    }
-  }
-  if (num==-1) {
-    return -1;
-  }
-  set_bmap_bit(num);
-  if (!(kstack_page_tables[num]&0x1)) {
-    kstack_page_tables[num]=(uint32_t)pmem_alloc(1)|0x3;
-  }
-  return num;
 }
 
 void* find_free_pages(int num_pages) {
@@ -231,13 +192,6 @@ void paging_init() {
     page_directory[i+768]=(entry_virt-0xC0000000)|0x3;
   }
   page_directory[985]=(uint32_t)(pmem_alloc(1024))|0x83;
-  for (uint32_t i=0;i<218;i++) {
-    uint32_t entry_virt=(uint32_t)&(kstack_page_tables[i*1024]);
-    page_directory[i+800]=(entry_virt-0xC0000000)|0x3;
-  }
-  for (uint32_t i=0;i<(218*1024)/8;i++) {
-    kstack_bmap[i]=0;
-  }
   for (uint32_t i=0;i<4;i++) {
     uint32_t entry_virt=(uint32_t)&(kmalloc_page_tables[i*1024]);
     page_directory[i+1018]=(entry_virt-0xC0000000)|0x3;
