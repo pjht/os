@@ -1,5 +1,5 @@
 PLAT=i386
-C_SOURCES = $(wildcard kernel/*.c drivers/$(PLAT)/*.c drivers/$(PLAT)/*/*.c kernel/cpu/$(PLAT)/*.c fs/*.c)
+C_SOURCES = $(wildcard kernel/*.c kernel/cpu/$(PLAT)/*.c kernel/cpu/*.c) 
 ASM = $(wildcard kernel/cpu/$(PLAT)/*.asm)
 S_ASM = $(wildcard kernel/cpu/$(PLAT)/*.s)
 LIBC_SOURCES = $(wildcard libc/*.c libc/*/*.c)
