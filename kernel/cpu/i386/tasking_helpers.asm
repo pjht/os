@@ -3,7 +3,6 @@ global switch_to_thread_asm
 extern load_address_space
 extern currentThread
 extern tss
-extern 
 ;WARNING: Caller is expected to disable IRQs before calling, and enable IRQs again after function returns
 
 switch_to_thread_asm:
