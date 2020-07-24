@@ -3,7 +3,6 @@
 #include "../halt.h"
 #include "../paging.h"
 #include "arch_consts.h"
-#include "paging_helpers.h"
 #include <klog.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -136,7 +135,7 @@ void* paging_new_address_space() {
 }
 
 void load_address_space(void* cr3) {
-  load_page_directory((uint32_t*)cr3);
+  asm volatile("movl %0, %%eax; movl %%eax, %%cr3;":"=m"(cr3)::"%eax");
 }
 
 void unmap_pages(void* start_virt,int num_pages) {
@@ -176,7 +175,7 @@ void paging_init() {
     page_directory[i+1018]=(entry_virt-0xC0000000)|0x3;
   }
   page_directory[1023]=((uint32_t)page_directory-0xC0000000)|0x3;
-  load_page_directory((uint32_t*)((uint32_t)page_directory-0xC0000000));
+  load_address_space((uint32_t*)((uint32_t)page_directory-0xC0000000));
 }
 
 void* get_cr3() {

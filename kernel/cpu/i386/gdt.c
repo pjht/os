@@ -1,4 +1,3 @@
-#include "seg_upd.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -129,8 +128,17 @@ void gdt_init() {
   write_tss(5,0x10,int_stack_top+0xC0000000);
   gdt_desc.size=(sizeof(gdt_entry)*NUM_ENTRIES)-1;
   gdt_desc.address=gdt;
-  asm volatile("lgdt (%%eax)"::"a"((uint32_t)&gdt_desc));
-  seg_upd();
+  asm volatile(" \
+                lgdt (%%eax); \
+                jmp $0x8,$gdt_init_asm_code_upd; \
+                gdt_init_asm_code_upd: \
+                mov $0x10, %%ax; \
+                mov %%ax, %%ds; \
+                mov %%ax, %%ss; \
+                mov %%ax, %%es; \
+                mov %%ax, %%fs; \
+                mov %%ax, %%gs; \
+              "::"a"((uint32_t)&gdt_desc));
   asm volatile("mov $0x2B, %ax; \
     ltr %ax; \
   ");
