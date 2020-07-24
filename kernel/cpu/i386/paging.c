@@ -12,16 +12,15 @@ static uint32_t page_directory[1024] __attribute__((aligned(4096)));
 static uint32_t kern_page_tables[NUM_KERN_FRAMES] __attribute__((aligned(4096)));
 static uint32_t kstack_page_tables[218*1024] __attribute__((aligned(4096)));
 static uint32_t kmalloc_page_tables[4*1024] __attribute__((aligned(4096)));
-static uint32_t smap_page_tables[2048] __attribute__((aligned(4096)));
-static uint32_t* smap=(uint32_t*)0xFF800000;
+static uint32_t* pagdirmap=(uint32_t*)0xFFFFF000;
+static uint32_t* pagtblmap=(uint32_t*)0xFFC00000;
 static char is_page_present(size_t page) {
    int table=page>>10;
    page=page&0x3FF;
-   if ((smap[table]&0x1)==0) {
+   if ((pagdirmap[table]&0x1)==0) {
      return 0;
    }
-   smap_page_tables[table+1]=(smap[table]&0xFFFFFC00)|0x3;
-   return smap[(1024+(1024*table))+page]&0x1;
+   return pagtblmap[page+1024*table]&0x1;
 }
 
 void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,char wr) {
@@ -29,18 +28,17 @@ void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,ch
   uint32_t phys_addr=(uint32_t)phys_addr_ptr;
   int dir_entry=(virt_addr&0xFFC00000)>>22;
   int table_entry=(virt_addr&0x3FF000)>>12;
-  for (int i=0;i<=num_pages;i++) {
-    if (!(smap[dir_entry]&0x1)) {
+  for (int i=0;i<num_pages;i++) {
+    if (!(pagdirmap[dir_entry]&0x1)) {
       int flags=1;
       flags=flags|((wr&1)<<1);
       flags=flags|((usr&1)<<2);
-      smap[dir_entry]=(uint32_t)pmem_alloc(1)|flags;
+      pagdirmap[dir_entry]=(uint32_t)pmem_alloc(1)|flags;
     }
-    smap_page_tables[dir_entry+1]=(smap[dir_entry]&0xFFFFFC00)|0x3;
     int flags=1;
     flags=flags|((wr&1)<<1);
     flags=flags|((usr&1)<<2);
-    smap[(1024+(1024*dir_entry))+table_entry]=phys_addr|flags;
+    pagtblmap[table_entry+1024*dir_entry]=phys_addr|flags;
     table_entry++;
     if (table_entry==1024) {
       table_entry=0;
@@ -109,11 +107,10 @@ void* virt_to_phys(void* virt_addr_arg) {
   if (!is_page_present(virt_addr>>12)) return NULL;
   int dir_idx=(virt_addr&0xFFC00000)>>22;
   int tbl_idx=(virt_addr&0x3FFC00)>>12;
-  if ((smap[dir_idx]&0x1)==0) {
+  if ((pagdirmap[dir_idx]&0x1)==0) {
     return 0;
   }
-  smap_page_tables[dir_idx+1]=(smap[dir_idx]&0xFFFFFC00)|0x3;
-  return (void*)((smap[(1024+(1024*dir_idx))+tbl_idx]&0xFFFFFC00)+offset);
+  return (void*)((pagtblmap[tbl_idx+1024*dir_idx]&0xFFFFFC00)+offset);
 }
 
 
@@ -127,30 +124,18 @@ void invl_page(void* addr) {
 }
 
 void* paging_new_address_space() {
-  uint32_t cr3=(uint32_t)get_cr3();
   void* dir=pmem_alloc(1);
-  smap_page_tables[0]=((uint32_t)dir)|0x3;
-  invl_page(smap);
+  uint32_t* freepg=find_free_pages(1);
+  map_pages(freepg,dir,1,0,1);
   for (size_t i=0;i<1024;i++) {
-    smap[i]=page_directory[i];
+    freepg[i]=page_directory[i];
   }
-  smap_page_tables[0]=cr3|0x3;
-  invl_page(smap);
+  freepg[1023]=((uint32_t)dir)|0x3;
+  unmap_pages(freepg,1);
   return dir;
 }
 
-void load_smap(void* cr3) {
-  smap_page_tables[0]=(uint32_t)cr3|0x3;
-  invl_page(&smap[0]);
-  for (size_t i=1;i<2048;i++) {
-    invl_page(&smap[i*1024]);
-    smap_page_tables[i]=0;
-  }
-}
-
-
 void load_address_space(void* cr3) {
-  load_smap(cr3);
   load_page_directory((uint32_t*)cr3);
 }
 
@@ -159,9 +144,8 @@ void unmap_pages(void* start_virt,int num_pages) {
   int dir_entry=(virt_addr&0xFFC00000)>>22;
   int table_entry=(virt_addr&0x3FF000)>>12;
   for (int i=0;i<=num_pages;i++) {
-    if (smap[dir_entry]&0x1) {
-      smap_page_tables[dir_entry+1]=(smap[dir_entry]&0xFFFFFC00)|0x3;
-      smap[(1024+(1024*dir_entry))+table_entry]=0;
+    if (pagtblmap[dir_entry]&0x1) {
+      pagtblmap[table_entry+1024*dir_entry]=0;
       invl_page(start_virt+(i*1024));
       table_entry++;
       if (table_entry==1024) {
@@ -182,10 +166,6 @@ void paging_init() {
   for (size_t i=0;i<4*1024;i++) {
     kmalloc_page_tables[i]=(uint32_t)pmem_alloc(1)|0x3;
   }
-  smap_page_tables[0]=(((uint32_t)&(page_directory))-0xC0000000)|0x3;
-  for (size_t i=1;i<2048;i++) {
-    smap_page_tables[i]=0;
-  }
   for (size_t i=0;i<NUM_KERN_FRAMES/1024;i++) {
     uint32_t entry_virt=(uint32_t)&(kern_page_tables[i*1024]);
     page_directory[i+768]=(entry_virt-0xC0000000)|0x3;
@@ -195,11 +175,7 @@ void paging_init() {
     uint32_t entry_virt=(uint32_t)&(kmalloc_page_tables[i*1024]);
     page_directory[i+1018]=(entry_virt-0xC0000000)|0x3;
   }
-  // page_directory[1018,1021]=(((uint32_t)kmalloc_page_tables)-0xC0000000)|0x3;
-  for (size_t i=0;i<2;i++) {
-    uint32_t entry_virt=(uint32_t)&(smap_page_tables[i*1024]);
-    page_directory[i+1022]=(entry_virt-0xC0000000)|0x3;
-  }
+  page_directory[1023]=((uint32_t)page_directory-0xC0000000)|0x3;
   load_page_directory((uint32_t*)((uint32_t)page_directory-0xC0000000));
 }
 
