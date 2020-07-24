@@ -3,6 +3,7 @@ global switch_to_thread_asm
 extern load_address_space
 extern currentThread
 extern tss
+extern 
 ;WARNING: Caller is expected to disable IRQs before calling, and enable IRQs again after function returns
 
 switch_to_thread_asm:
@@ -37,9 +38,8 @@ switch_to_thread_asm:
     cmp eax,ecx                   ;Does the virtual address space need to being changed?
     je .doneVAS                   ; no, virtual address space is the same, so don't reload it and cause TLB flushes
     ; yes, load the next thread's virtual address space
-    push eax
-    call load_address_space
-    add esp,4
+    mov cr3, eax
+
 .doneVAS:
     pop ebp
     pop edi
