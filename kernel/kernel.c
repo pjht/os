@@ -56,10 +56,11 @@ size_t getsize(const char *in) {
 void kmain(struct multiboot_boot_header_tag* hdr) {
   tags=hdr;
   cpu_init();
-  isr_install();
   serial_init();
   pmem_init(tags);
   paging_init();
+  isr_install();
+  asm volatile("sti");
   tasking_init();
   vga_init((char*)0xC00B8000);
   read_initrd(tags);
