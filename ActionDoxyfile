@@ -1,0 +1,14 @@
+PROJECT_NAME           = "MyOS Kernel"
+OUTPUT_DIRECTORY       = ./kerneldoc
+OPTIMIZE_OUTPUT_FOR_C  = YES
+TYPEDEF_HIDES_STRUCT   = YES
+EXTRACT_STATIC         = YES
+WARN_NO_PARAMDOC       = YES
+INPUT                  = ./kernel
+RECURSIVE              = YES
+EXCLUDE                = kernel/cpu/x86_64
+HTML_DYNAMIC_SECTIONS  = YES
+GENERATE_TREEVIEW      = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = __attribute__(x)=
