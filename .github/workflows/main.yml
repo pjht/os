@@ -24,4 +24,3 @@ jobs:
 
     - name: Doxygen Action
       uses: mattnotmitt/doxygen-action@v1.1.0
-    working-directory: # default is .
