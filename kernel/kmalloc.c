@@ -1,14 +1,22 @@
+/**
+ * \file 
+*/
+
 #include "cpu/arch_consts.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define KMALLOC_BMAP_SZ (((KMALLOC_SZ*1024)/4)/8)
+#define KMALLOC_BMAP_SZ (((KMALLOC_SZ*1024)/4)/8) //!< The size of the kmalloc bitmap
 
-static char bitmap[KMALLOC_BMAP_SZ];
-static void* data=(void*)KMALLOC_START;
+static char bitmap[KMALLOC_BMAP_SZ]; //!< Bitmap of used areas of the heap
+static void* data=(void*)KMALLOC_START; //!< Start of the kmalloc heap
 
-
+/**
+ * Get a bit in the heap bitmap
+ * \param index The bit to get
+ * \return the bit
+*/
 static char get_bmap_bit(size_t index) {
   size_t byte=index/8;
   size_t bit=index%8;
@@ -16,12 +24,20 @@ static char get_bmap_bit(size_t index) {
   return (entry&(1<<bit))>0;
 }
 
+/**
+ * Set a bit in the heap bitmap
+ * \param index The bit to set
+*/
 static void set_bmap_bit(size_t index) {
   size_t byte=index/8;
   size_t bit=index%8;
   bitmap[byte]=bitmap[byte]|(1<<bit);
 }
 
+/**
+ * Clear a bit in the heap bitmap
+ * \param index The bit to clear
+*/
 static void clear_bmap_bit(size_t index) {
   size_t byte=index/8;
   size_t bit=index%8;

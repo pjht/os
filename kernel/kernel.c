@@ -12,15 +12,18 @@
 #include <string.h>
 #include <tasking.h>
 
+/**
+ * REspresents a TAR file header
+*/
 typedef struct {
-  char filename[100];
-  char mode[8];
-  char uid[8];
-  char gid[8];
-  char size[12];
-  char mtime[12];
-  char chksum[8];
-  char typeflag[1];
+  char filename[100]; //!< Filename of file descried by the tar header
+  char mode[8]; //!< Mode as an octal string
+  char uid[8]; //!< UID of owner as an octal string
+  char gid[8]; //!< GID of owner as an octal string
+  char size[12]; //!< Size of file as an octal string
+  char mtime[12]; //!< Modification time as an octal string
+  char chksum[8]; //!< Checksum as octal string
+  char typeflag[1]; //!< File type. (0 for normal file)
 } tar_header;
 
 long initrd_sz;

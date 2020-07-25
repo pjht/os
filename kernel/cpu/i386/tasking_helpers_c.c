@@ -1,29 +1,46 @@
+/**
+ * \file 
+*/
+
 #include "../../tasking.h"
 #include "../paging.h"
 #include "../tasking_helpers.h"
 #include "../../pmem.h"
 #include <stddef.h>
 
-static void** kstacks=(void*)0xC8000000;
-static char kstack_bmap[(218*1024)/8]={0};
+static void** kstacks=(void*)0xC8000000; //!< Pointer to all the thread kernel stacks
+static char kstack_bmap[(218*1024)/8]={0}; //!< Bitmap of what kernel stacks have been allocated
 
-static char get_bmap_bit(size_t index) {
+/**
+ * Check whether a kernel stack is allocated
+ * \param index The kernel stack to check
+ * \return whether the kernel stack is allocated
+*/
+static char is_kstack_allocated(size_t index) {
   size_t byte=index/8;
   size_t bit=index%8;
   char entry=kstack_bmap[byte];
   return (entry&(1<<bit))>0;
 }
 
-static void set_bmap_bit(size_t index) {
+/**
+ * Mark that a kernel stack is allocated
+ * \param index The kernel stack to mark
+*/
+static void mark_kstack_allocated(size_t index) {
   size_t byte=index/8;
   size_t bit=index%8;
   kstack_bmap[byte]=kstack_bmap[byte]|(1<<bit);
 }
 
-int new_kstack() {
+/**
+ * Allocate a kernel stack for a thread
+ * \return The number of the new kernel stack, or -1 if none are unallocated.
+*/
+static int new_kstack() {
   int num=-1;
   for (int i=0;i<(218*1024);i++) {
-    if (get_bmap_bit(i)==0) {
+    if (is_kstack_allocated(i)==0) {
       num=i;
       break;
     }
@@ -31,7 +48,7 @@ int new_kstack() {
   if (num==-1) {
     return -1;
   }
-  set_bmap_bit(num);
+  mark_kstack_allocated(num);
   map_pages(((char*)kstacks+num*0x1000),pmem_alloc(1),1,1,1);
   return num;
 }

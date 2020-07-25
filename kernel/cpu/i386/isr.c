@@ -1,3 +1,6 @@
+/**
+ * \file 
+*/
 #include "../../kernel.h"
 #include "../../tasking.h"
 #include "../../vga_err.h"
@@ -8,6 +11,7 @@
 #include "../serial.h"
 #include "gdt.h"
 #include "idt.h"
+#include "isr.h"
 #include "interrupt.h"
 #include <cpu/ports.h>
 #include <stdint.h>
@@ -16,10 +20,8 @@
 #include <sys/types.h>
 
 void irq_handler(registers_t* r);
-static isr_t irq_handlers[16];
+static isr_t irq_handlers[16]; //!< Handlers for the PIC interrupts
 
-/* Can't do this with a loop because we need the address
- * of the function names */
 void isr_install() {
     idt_set_gate(0,(uint32_t)isr0);
     idt_set_gate(1,(uint32_t)isr1);
@@ -90,8 +92,8 @@ void isr_install() {
 }
 
 
-/* To print the message which defines every exception */
 
+//! List of messages for each exception
 __attribute__((unused)) static char *exception_messages[] = {
     "Division By Zero",
     "Debug",
@@ -130,6 +132,11 @@ __attribute__((unused)) static char *exception_messages[] = {
     "Reserved"
 };
 
+
+/**
+ * Handler for non-PIC interrupts
+ * \param r The saved state of the CPU
+*/
 void isr_handler(registers_t* r) {
   if (r->int_no!=80 && r->int_no!=14) {
     serial_write_string(exception_messages[r->int_no]);
@@ -276,6 +283,10 @@ void isr_register_handler(int n,isr_t handler) {
     irq_handlers[n] = handler;
 }
 
+/**
+ * Handler for PIC interrupts
+ * \param r The saved state of the CPU
+*/
 void irq_handler(registers_t* r) {
     /* After every interrupt we need to send an EOI to the PICs
      * or they will not send another interrupt again */

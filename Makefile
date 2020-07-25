@@ -1,5 +1,6 @@
 PLAT=i386
 C_SOURCES = $(wildcard kernel/*.c kernel/cpu/$(PLAT)/*.c kernel/cpu/*.c) 
+C_HEADERS = $(wildcard kernel/*.h kernel/cpu/$(PLAT)/*.h kernel/cpu/*.h) 
 ASM = $(wildcard kernel/cpu/$(PLAT)/*.asm)
 S_ASM = $(wildcard kernel/cpu/$(PLAT)/*.s)
 LIBC_SOURCES = $(wildcard libc/*.c libc/*/*.c)
@@ -86,3 +87,6 @@ kernel/cpu/isr.h: kernel/cpu/$(PLAT)/isr.h
 
 clean:
 	@rm -rf initrd/* kernel/*.o drivers/*/*.o drivers/*/*/*.o cpu/*/*.o fs/*.o libc/libc.a kernel/cstart.o cpu/memory.h os.iso */*.elf sysroot/boot/initrd.tar
+
+doc: $(C_SOURCES) $(C_HEADERS)
+	@doxygen > /dev/null

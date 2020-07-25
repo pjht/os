@@ -1,3 +1,7 @@
+/**
+ * \file 
+*/
+
 #include "cpu/arch_consts.h"
 #include "cpu/halt.h"
 #include "vga_err.h"
@@ -6,10 +10,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define BMAP_LEN (NUM_FRAMES/8)
+#define BMAP_LEN (NUM_FRAMES/8) //!< The size of the physical memory manager's bitmap
 
-static char bmap[BMAP_LEN];
+static char bmap[BMAP_LEN]; //!< Bitmap of allocated/non-present page frames
 
+/**
+ * Get a bit in the bitmap
+ * \param index The bit to get
+ * \return the bit
+*/
 static char get_bmap_bit(int index) {
   int byte=index/8;
   int bit=index%8;
@@ -17,12 +26,20 @@ static char get_bmap_bit(int index) {
   return (entry&(1<<bit))>0;
 }
 
+/**
+ * Set a bit in the heap bitmap
+ * \param index The bit to set
+*/
 static void set_bmap_bit(int index) {
   int byte=index/8;
   int bit=index%8;
   bmap[byte]=bmap[byte]|(1<<bit);
 }
 
+/**
+ * Clear a bit in the heap bitmap
+ * \param index The bit to clear
+*/
 static void clear_bmap_bit(int index) {
   int byte=index/8;
   int bit=index%8;

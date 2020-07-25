@@ -1,6 +1,5 @@
 // #include "../tasking.h"
 // #include "paging.h"
-#include "../../drivers/vga.h"
 #include "../halt.h"
 #include "../isr.h"
 #include "idt.h"
@@ -170,7 +169,6 @@ void isr_handler(registers_t* r) {
       break;
     case 80:
       // if (r->eax==1) {
-      //   tss_stack_reset();
       //   tasking_yield();
       // } else if (r->eax==2) {
       //   tasking_createTask((void*)r->ebx);

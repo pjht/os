@@ -1,3 +1,7 @@
+/**
+ * \file 
+*/
+
 #include "cpu/halt.h"
 #include "cpu/paging.h"
 #include "cpu/serial.h"
@@ -6,19 +10,24 @@
 #include "tasking.h"
 #include <sys/types.h>
 
-#define MAX_PROCS 32768
-#define HAS_UNBLOCKED_THREADS(proc) (proc->numThreads!=proc->numThreadsBlocked)
-#define NUM_UNBLOCKED_THREADS(proc) (proc->numThreads-proc->numThreadsBlocked)
-#define SAME_PROC(thread1,thread2) (thread1->process->pid==thread2->process->pid)
-#define SAME_THREAD(thread1,thread2) (thread1->process->pid==thread2->process->pid&&thread1->tid==thread2->tid)
-pid_t next_pid=0;
-size_t num_procs=0;
-Process* processes[MAX_PROCS];
-char proc_schedule_bmap[MAX_PROCS/8];
-Thread* currentThread;
-static Thread* readyToRunHead=NULL;
-static Thread* readyToRunTail=NULL;
+#define MAX_PROCS 32768 //!< Maximum number of processes that can be running at a time
+#define HAS_UNBLOCKED_THREADS(proc) (proc->numThreads!=proc->numThreadsBlocked) //!< Macro to check whethe a process has unblocked threads
+#define NUM_UNBLOCKED_THREADS(proc) (proc->numThreads-proc->numThreadsBlocked) //!< Macro to get the number of unblocked threads for a process
+#define SAME_PROC(thread1,thread2) (thread1->process->pid==thread2->process->pid) //!< Macro to check whether two threads have the same PID
+#define SAME_THREAD(thread1,thread2) (thread1->process->pid==thread2->process->pid&&thread1->tid==thread2->tid) //!< Macro to check whether two threads have the same PID and TID
+pid_t next_pid=0; //!< PID to use for the next created process
+size_t num_procs=0; //!< Number of non-exited processes
+Process* processes[MAX_PROCS]; //!< Array pf processes by PID
+char proc_schedule_bmap[MAX_PROCS/8]; //!< Bitmap of what processes are scheduled
+Thread* currentThread; //!< Currently running thread
+static Thread* readyToRunHead=NULL; //!< Head of the linked list of ready to run threads
+static Thread* readyToRunTail=NULL; //!< Tail of the linked list of ready to run threads
 
+/**
+ * Check whether a process is scheduled
+ * \param index The PID to check
+ * \return whether the process is scheduled
+*/
 static char is_proc_scheduled(pid_t index) {
   size_t byte=index/8;
   size_t bit=index%8;
@@ -26,6 +35,10 @@ static char is_proc_scheduled(pid_t index) {
   return (entry&(1<<bit))>0;
 }
 
+/**
+ * Mark a process as scheduled
+ * \param index The PID to mark
+*/
 static void mark_proc_scheduled(pid_t index) {
   if (is_proc_scheduled(index)) {
     serial_printf("Attempt to schedule a thread in a process with a scheduled thread! (PID %d)\n",index);
@@ -36,6 +49,10 @@ static void mark_proc_scheduled(pid_t index) {
   proc_schedule_bmap[byte]=proc_schedule_bmap[byte]|(1<<bit);
 }
 
+/**
+ * Unmark a process as scheduled
+ * \param index The PID to unmark
+*/
 static void unmark_proc_scheduled(pid_t index) {
   size_t byte=index/8;
   size_t bit=index%8;
@@ -146,6 +163,10 @@ pid_t tasking_new_thread(void* start,pid_t pid,char param_exists,void* param_arg
   return processes[pid]->firstThread->tid;
 }
 
+/**
+ * Switch to a thread and schedule the next ready thread in the current process, if there is one.
+ * \param thread The thread to switch to
+*/
 void switch_to_thread(Thread* thread) {
   // Unlink the thread from the list of ready-to-run threads
   if (thread!=readyToRunHead) {

@@ -1,18 +1,16 @@
+/**
+ * \file 
+*/
+
 #ifndef RPC_H
 #define RPC_H
 
+/**
+ * Represents an RPC fumctiom 
+*/
 typedef struct RPCFuncInfo {
-  char name[32];
-  void* (*code)(void*);
+  char name[32]; //!< THe name of the function
+  void* (*code)(void*); //!< A pointer to the code that implements the funtcion
 } RPCFuncInfo;
-
-typedef struct ThreadRPCStruct {
-  RPCFuncInfo funcs[32];
-  int num_funcs;
-  void* rpc_response;
-} ThreadRPCStruct;
-
-
-void rpc_init_struct(ThreadRPCStruct* info);
 
 #endif
