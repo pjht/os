@@ -43,6 +43,6 @@
 //   if (func_idx==-1) {
 //     serial_printf("No such rpc function %s for PID %d",name,pid);
 //   }
-//   void* copieddata=address_spaces_put_data(currentThread->cr3,data,size);
+//   void* copieddata=address_spaces_put_data(current_thread->cr3,data,size);
 //   tasking_new_thread(info->funcs[func_idx].code,pid,1,copieddata);
 // }

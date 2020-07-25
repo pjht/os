@@ -13,12 +13,12 @@
 /**
  * Represents the state of a thread
 */
-typedef enum ThreadState {
+typedef enum thread_state {
   THREAD_RUNNING, //!< The state of a running thread
   THREAD_READY,  //!< The state of a ready to run thread
   THREAD_EXITED,  //!< The state of an exited thread
   THREAD_BLOCKED  //!< The state of a generically blocked thread
-} ThreadState;
+} thread_state;
 
 #endif
 
@@ -44,7 +44,7 @@ typedef struct Thread {
   void* kernel_esp_top; //!< The top of the thread's kernel stack.
   void* cr3; //!< The address space of this thread. (it is in here and not in the process to simplify the task switch asembly)
   pid_t tid; //!< The TID of this thread.
-  ThreadState state; //!< The state of this thread. (running,ready to run,blocked,etc.)
+  thread_state state; //!< The state of this thread. (running,ready to run,blocked,etc.)
   int errno; //!< The errno value for this thread.
   struct Thread* nextThreadInProcess; //!< The next thread in the process.
   struct Thread* prevThreadInProcess; //!< The previous thread in the process.
@@ -53,7 +53,7 @@ typedef struct Thread {
   Process* process; //!< The thread's process.
 } Thread;
 
-extern Thread* currentThread;
+extern Thread* current_thread;
 
 /**
  * Create a task
@@ -66,7 +66,7 @@ extern Thread* currentThread;
  * \param param2_arg The thread's start function second parameter/
  * \param isThread Whether we are creating a new process or a thread in a process. If we are creating a theead, param2_arg becomes the PID for the newly created thread, and param2_exists must be 0.
 */
-void tasking_createTask(void* eip,void* cr3,char kmode,char param1_exists,void* param1_arg,char param2_exists,void* param2_arg,char isThread);
+void tasking_create_task(void* eip,void* cr3,char kmode,char param1_exists,void* param1_arg,char param2_exists,void* param2_arg,char isThread);
 /**
  * Initialize tasking
 */
@@ -74,11 +74,11 @@ void tasking_init();
 /** 
  * Check whether the current process is privleged
 */
-char tasking_isPrivleged();
+char tasking_is_privleged();
 /** 
  * Get the PID of the current thread.
 */
-pid_t tasking_getPID();
+pid_t tasking_get_PID();
 /** 
  * Get the adddress of errno for the current thread
 */
@@ -103,7 +103,7 @@ void tasking_exit(int code);
  * Block the current thread & yield
  * \param newstate The state to block it in
 */
-void tasking_block(ThreadState newstate);
+void tasking_block(thread_state newstate);
 /**
  * Unblock a thread
  * \param pid The PID that contains the thread to unblock

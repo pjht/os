@@ -37,16 +37,16 @@ typedef struct {
 static idt_gate_t idt[IDT_ENTRIES]; //!< The IDT
 static idt_register_t idt_reg; //!< The value to load into the IDTR
 
-#define low_16(address) (uint16_t)((address) & 0xFFFF) //!< Macro to get the low 16 bits of an address
-#define high_16(address) (uint16_t)(((address) >> 16) & 0xFFFF) //!< Macro to get the high 16 bits of an address
+#define LOW_16(address) (uint16_t)((address) & 0xFFFF) //!< Macro to get the low 16 bits of an address
+#define HIGH_16(address) (uint16_t)(((address) >> 16) & 0xFFFF) //!< Macro to get the high 16 bits of an address
 
 
 void idt_set_gate(int n,uint32_t handler) {
-  idt[n].low_offset=low_16(handler);
+  idt[n].low_offset=LOW_16(handler);
   idt[n].sel=0x08;
   idt[n].always0=0;
   idt[n].flags=0xEE;
-  idt[n].high_offset=high_16(handler);
+  idt[n].high_offset=HIGH_16(handler);
 }
 
 void load_idt() {

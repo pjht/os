@@ -1,7 +1,7 @@
 section .text
 global switch_to_thread_asm
 extern load_address_space
-extern currentThread
+extern current_thread
 extern tss
 ;WARNING: Caller is expected to disable IRQs before calling, and enable IRQs again after function returns
 
@@ -20,13 +20,13 @@ switch_to_thread_asm:
     push edi
     push ebp
 
-    mov edi,[currentThread]    ;edi = address of the previous thread's data structure
+    mov edi,[current_thread]    ;edi = address of the previous thread's data structure
     mov [edi],esp         ;Save ESP for the thread's kernel stack in the thread's data structure
 
     ;Load next thread's state
 
     mov esi,[esp+(4+1)*4]         ;esi = address of the next thread's data structure
-    mov [currentThread],esi    ;Set the current thread to the thread we are switching to
+    mov [current_thread],esi    ;Set the current thread to the thread we are switching to
 
     mov esp,[esi]         ;Load ESP for next thread's kernel stack from the thread's data structure
     mov eax,[esi+8]         ;eax = address of page directory for next thread

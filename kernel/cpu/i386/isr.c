@@ -202,7 +202,7 @@ void isr_handler(registers_t* r) {
     case 80:
       switch (r->eax) {
       case SYSCALL_CREATEPROC:
-        tasking_createTask((void*)r->ebx,(void*)r->ecx,0,r->edx,(void*)r->esi,r->edx,(void*)r->edi,0);
+        tasking_create_task((void*)r->ebx,(void*)r->ecx,0,r->edx,(void*)r->esi,r->edx,(void*)r->edi,0);
         break;
       case SYSCALL_YIELD:
         tasking_yield();
@@ -220,7 +220,7 @@ void isr_handler(registers_t* r) {
         r->ebx=(uint32_t)tasking_get_errno_address();
         break;
       case SYSCALL_GET_PID:
-        r->ebx=(pid_t)tasking_getPID();
+        r->ebx=(pid_t)tasking_get_PID();
         break;
       case SYSCALL_ALLOC_MEM:
         if ((void*)r->ecx==NULL) {
@@ -230,7 +230,7 @@ void isr_handler(registers_t* r) {
         }
         break;
       case SYSCALL_PRIV_MAP_PAGES:
-        if (tasking_isPrivleged()) {
+        if (tasking_is_privleged()) {
           r->ebx=0;
           return;
         }
@@ -261,7 +261,7 @@ void isr_handler(registers_t* r) {
         memcpy((char*)r->ebx,initrd,initrd_sz);
         break;
       case SYSCALL_NEW_THREAD: {
-        uint32_t tid=tasking_new_thread((void*)r->ebx,tasking_getPID(),1,(void*)r->edx);
+        uint32_t tid=tasking_new_thread((void*)r->ebx,tasking_get_PID(),1,(void*)r->edx);
         if ((uint32_t*)r->ecx!=NULL) {
           *((uint32_t*)r->ecx)=tid;
         }

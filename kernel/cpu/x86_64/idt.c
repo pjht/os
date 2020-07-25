@@ -32,13 +32,13 @@ typedef struct {
 static idt_gate_t idt[IDT_ENTRIES];
 static idt_register_t idt_reg;
 
-#define low_16(address) (uint16_t)((address) & 0xFFFF)
+#define LOW_16(address) (uint16_t)((address) & 0xFFFF)
 #define middle_16(address) (uint16_t)(((address) >> 16) & 0xFFFF)
 #define high_32(address) (uint32_t)(((address) >> 32) & 0xFFFFFFFF)
 
 
 void idt_set_gate(int n,uint64_t handler) {
-    idt[n].low_offset=low_16(handler);
+    idt[n].low_offset=LOW_16(handler);
     idt[n].sel=KERNEL_CS;
     idt[n].always0=0;
     idt[n].flags=0xEE;

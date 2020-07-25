@@ -33,7 +33,7 @@ static uint32_t kern_page_tables[NUM_KERN_FRAMES] __attribute__((aligned(4096)))
 static uint32_t kstack_page_tables[218*1024] __attribute__((aligned(4096))); //!< Page tables for thread kernel stacks
 static uint32_t kmalloc_page_tables[4*1024] __attribute__((aligned(4096))); //!< Page tables for the kmalloc heap
 static uint32_t* pagdirmap=(uint32_t*)0xFFFFF000; //!< Pointer to the page directory entries in the recursive mapping
-static uint32_t* pagtblmap=(uint32_t*)0xFFC00000; //!< Pointer to the page table entries in the recursive mapping
+static uint32_t* page_table_map=(uint32_t*)0xFFC00000; //!< Pointer to the page table entries in the recursive mapping
 /**
  * Checks whether a page is present
  * \param page The page number to check
@@ -45,7 +45,7 @@ static char is_page_present(size_t page) {
    if ((pagdirmap[table]&0x1)==0) {
      return 0;
    }
-   return pagtblmap[page+1024*table]&0x1;
+   return page_table_map[page+1024*table]&0x1;
 }
 
 void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,char wr) {
@@ -63,7 +63,7 @@ void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,ch
     int flags=1;
     flags=flags|((wr&1)<<1);
     flags=flags|((usr&1)<<2);
-    pagtblmap[table_entry+1024*dir_entry]=phys_addr|flags;
+    page_table_map[table_entry+1024*dir_entry]=phys_addr|flags;
     table_entry++;
     if (table_entry==1024) {
       table_entry=0;
@@ -135,7 +135,7 @@ void* virt_to_phys(void* virt_addr_arg) {
   if ((pagdirmap[dir_idx]&0x1)==0) {
     return 0;
   }
-  return (void*)((pagtblmap[tbl_idx+1024*dir_idx]&0xFFFFFC00)+offset);
+  return (void*)((page_table_map[tbl_idx+1024*dir_idx]&0xFFFFFC00)+offset);
 }
 
 
@@ -173,8 +173,8 @@ void unmap_pages(void* start_virt,int num_pages) {
   int dir_entry=(virt_addr&0xFFC00000)>>22;
   int table_entry=(virt_addr&0x3FF000)>>12;
   for (int i=0;i<=num_pages;i++) {
-    if (pagtblmap[dir_entry]&0x1) {
-      pagtblmap[table_entry+1024*dir_entry]=0;
+    if (page_table_map[dir_entry]&0x1) {
+      page_table_map[table_entry+1024*dir_entry]=0;
       invl_page(start_virt+(i*1024));
       table_entry++;
       if (table_entry==1024) {

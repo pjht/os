@@ -36,7 +36,7 @@ __attribute__((noreturn)) void exit(int code) {
 }
 
 
-void blockThread(ThreadState state) {
+void blockThread(thread_state state) {
   asm volatile("  \
     mov $" QU(SYSCALL_BLOCK) ", %%eax; \
     int $80; \

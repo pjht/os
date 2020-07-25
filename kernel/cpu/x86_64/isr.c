@@ -171,7 +171,7 @@ void isr_handler(registers_t* r) {
       // if (r->eax==1) {
       //   tasking_yield();
       // } else if (r->eax==2) {
-      //   tasking_createTask((void*)r->ebx);
+      //   tasking_create_task((void*)r->ebx);
       // } else if (r->eax==3) {
       //   r->ebx=(uint64_t)alloc_pages(r->ebx);
       // } else if (r->eax==4) {
