@@ -7,11 +7,13 @@
 
 /**
  * Initilaze the VGA error writing driver
+ * \param screen Pointer to VGA screen memory
 */
 void vga_init(char* screen);
 
 /**
  * Write a string starting at the top line of the VGA display
+ * \param string The string to write
 */
 void vga_write_string(const char *string);
 

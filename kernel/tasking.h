@@ -73,14 +73,17 @@ void tasking_create_task(void* eip,void* cr3,char kmode,char param1_exists,void*
 void tasking_init();
 /** 
  * Check whether the current process is privleged
+ * \return whether the current process is privleged
 */
 char tasking_is_privleged();
 /** 
  * Get the PID of the current thread.
+ * \return The current thread's PID
 */
 pid_t tasking_get_PID();
 /** 
  * Get the adddress of errno for the current thread
+ * \return The address of errno
 */
 int* tasking_get_errno_address();
 /** 
@@ -97,6 +100,7 @@ pid_t tasking_new_thread(void* start,pid_t pid,char param_exists,void* param_arg
  * Terminate the current thread
  * If the main thread terminates, the whole process terminates.
  * \note Currently, calling tasking_exit from any thread terminates the whole process.
+ * \param code The exit code of the thread
 */
 void tasking_exit(int code);
 /**
