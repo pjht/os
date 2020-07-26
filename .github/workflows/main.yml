@@ -28,7 +28,7 @@ jobs:
       with:
         doxyfile-path: "./ActionDoxyfile"
     - name: Move files
-      run: mv kerneldoc/html docsite/kernel
+      run: sudo mv kerneldoc/html docsite/kernel
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
