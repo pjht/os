@@ -27,8 +27,9 @@ jobs:
       uses: mattnotmitt/doxygen-action@v1.1.0
       with:
         doxyfile-path: "./ActionDoxyfile"
-    - name: Move files
-      run: sudo mv kerneldoc/html docsite/kernel
+    - name: Put files in the right place
+      run: sudo mv kerneldoc/html docsite/kernel; sudo cp docindex.html docsite/index.html
+
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
