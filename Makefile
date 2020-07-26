@@ -72,14 +72,17 @@ sysroot/usr/lib/libc.a: $(LIBC_OBJ)
 	@$(AR) rcs $@ $^
 
 sysroot/usr/share/man: doc
-	cp -r kernel/docs/man/man9 sysroot/usr/share/man
+	@ cp -r kernel/docs/man/man9 sysroot/usr/share/man
+
+sysroot/usr/include: $(LIBC_SOURCES) $(LIBC_HEADERS)
+	@ cd libc;rsync -R *.h */*.h ../sysroot/usr/include/
 
 kernel/cpu/arch_consts.h: kernel/cpu/$(PLAT)/arch_consts.h
 	@cp kernel/cpu/$(PLAT)/arch_consts.h kernel/cpu/arch_consts.h
 kernel/cpu/isr.h: kernel/cpu/$(PLAT)/isr.h
 	@cp kernel/cpu/$(PLAT)/isr.h kernel/cpu/isr.h
 
-%.o: %.c kernel/cpu/arch_consts.h kernel/cpu/isr.h
+%.o: %.c kernel/cpu/arch_consts.h kernel/cpu/isr.h sysroot/usr/include
 	@$(CC) $(CFLAGS)  -c $< -o $@
 
 %.o: %.asm
