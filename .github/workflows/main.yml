@@ -28,7 +28,7 @@ jobs:
       with:
         doxyfile-path: "./kernel/ActionDoxyfile"
     - name: Put files in the right place
-      run: sudo mv kerneldoc/html docsite/kernel; sudo cp docindex.html docsite/index.html
+      run: sudo mv kernel/docs/html docsite/kernel; sudo cp docindex.html docsite/index.html
 
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3

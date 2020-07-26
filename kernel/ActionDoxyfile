@@ -1,5 +1,5 @@
 PROJECT_NAME           = "MyOS Kernel"
-OUTPUT_DIRECTORY       = ./kerneldocs
+OUTPUT_DIRECTORY       = ./kernel/docs
 OPTIMIZE_OUTPUT_FOR_C  = YES
 TYPEDEF_HIDES_STRUCT   = YES
 EXTRACT_STATIC         = YES
