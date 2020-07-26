@@ -73,6 +73,7 @@ sysroot/usr/lib/libc.a: $(LIBC_OBJ)
 
 sysroot/usr/share/man: doc
 	@ cp -r kernel/docs/man/man9 sysroot/usr/share/man
+	@ cp -r libc/docs/man/man3 sysroot/usr/share/man
 
 sysroot/usr/include: $(LIBC_SOURCES) $(LIBC_HEADERS)
 	@ cd libc;rsync -R *.h */*.h ../sysroot/usr/include/
@@ -96,3 +97,4 @@ clean:
 
 doc: $(C_SOURCES) $(C_HEADERS)
 	@doxygen kernel/Doxyfile > /dev/null
+	@doxygen libc/Doxyfile > /dev/null

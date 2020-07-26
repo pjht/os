@@ -27,9 +27,12 @@ jobs:
       uses: mattnotmitt/doxygen-action@v1.1.0
       with:
         doxyfile-path: "./kernel/ActionDoxyfile"
+    - name: Generate libc docs
+      uses: mattnotmitt/doxygen-action@v1.1.0
+      with:
+        doxyfile-path: "./libc/ActionDoxyfile"
     - name: Put files in the right place
-      run: sudo mv kernel/docs/html docsite/kernel; sudo cp docindex.html docsite/index.html
-
+      run: sudo mv kernel/docs/html docsite/kernel; sudo mv libc/docs/html docsite/libc; sudo cp docindex.html docsite/index.html
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:

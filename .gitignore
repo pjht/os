@@ -18,3 +18,4 @@ vga_drv/vga_drv
 .vscode
 kernel/docs
 sysroot/usr/share/man
+libc/docs

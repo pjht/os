@@ -1,0 +1,14 @@
+PROJECT_NAME           = "MyOS Kernel"
+OUTPUT_DIRECTORY       = ./libc/docs
+OPTIMIZE_OUTPUT_FOR_C  = YES
+TYPEDEF_HIDES_STRUCT   = YES
+EXTRACT_STATIC         = YES
+WARN_NO_PARAMDOC       = YES
+INPUT                  = ./libc
+RECURSIVE              = YES
+EXCLUDE                = elf.h grub/multiboot2.h
+HTML_DYNAMIC_SECTIONS  = YES
+GENERATE_TREEVIEW      = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = __attribute__(x)= DOXYGEN_SHOULD_SKIP_THIS=

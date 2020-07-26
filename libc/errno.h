@@ -1,8 +1,19 @@
+/**
+ * \file 
+*/
+
 #ifndef ERRNO_H
 #define ERRNO_H
 
-#define errno (*(__get_errno_address()))
-int* __get_errno_address();
+#define errno (*(__get_errno_address()))  //!< wrapper around __get_errno_address to provide the errno variable
+/**
+ * Gets the address of errno for the current thread.
+ * \note This is an internal function. DO NOT CALL THIS DIRECTLY
+ * \return the address of errno for the current thread
+*/ 
+int* __get_errno_address(); 
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 #define E2BIG 1
 #define EACCES 2
@@ -85,5 +96,7 @@ int* __get_errno_address();
 #define ETXTBSY 79
 #define EWOULDBLOCK 80
 #define EXDEV 81
+
+#endif
 
 #endif

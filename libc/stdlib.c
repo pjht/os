@@ -1,22 +1,35 @@
+/**
+ * \file 
+*/
+
 #include <math.h>
 #include <memory.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_BLOCKS 512
+#define MAX_BLOCKS 512 //!< Maximum number of blocks that can be used
 
+/**
+ * Represents a contiguos block in the heap 
+*/
 typedef struct {
-  char* bitmap;
-  size_t bitmap_byt_size;
-  size_t bitmap_bit_size;
-  size_t avail_data_size;
-  void* data_block;
+  char* bitmap; //!< Bitmap of avilable four byte groups
+  size_t bitmap_byt_size; //!< Size of the bitmap in bytes
+  size_t bitmap_bit_size; //!< Size of the bitmap in bits
+  size_t avail_data_size; //!< Size of the data block
+  void* data_block; //!< Data block 
 } heap_block;
 
 
-static heap_block entries[MAX_BLOCKS];
-static size_t num_used_entries=0;
+static heap_block entries[MAX_BLOCKS]; //!< List of blocks in the heap
+static size_t num_used_entries=0; //!< Number of blocks in the heap
 
+/**
+ * Get a bit in a bitmap
+ * \param bmap The bitmap
+ * \param index The index in the bitmap
+ * \return the bit
+*/
 static char get_bmap_bit(char* bmap,size_t index) {
   size_t byte=index/8;
   size_t bit=index%8;
@@ -24,18 +37,32 @@ static char get_bmap_bit(char* bmap,size_t index) {
   return (entry&(1<<bit))>0;
 }
 
+/**
+ * Set a bit in a bitmap
+ * \param bmap The bitmap
+ * \param index The index in the bitmap
+*/
 static void set_bmap_bit(char* bmap,size_t index) {
   size_t byte=index/8;
   size_t bit=index%8;
   bmap[byte]=bmap[byte]|(1<<bit);
 }
 
+/**
+ * Clear a bit in a bitmap
+ * \param bmap The bitmap
+ * \param index The index in the bitmap
+*/
 static void clear_bmap_bit(char* bmap,size_t index) {
   size_t byte=index/8;
   size_t bit=index%8;
   bmap[byte]=bmap[byte]&(~(1<<bit));
 }
 
+/**
+ * Add a block to the heap
+ * \param mem_blks The number of pages that this block will use
+*/
 static void reserve_block(size_t mem_blks) {
   size_t bmap_byts=((mem_blks*BLK_SZ)/4)/8;
   entries[num_used_entries].bitmap=alloc_memory((size_t)ceilf((double)bmap_byts/BLK_SZ));
