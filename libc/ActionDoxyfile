@@ -1,4 +1,4 @@
-PROJECT_NAME           = "MyOS Kernel"
+PROJECT_NAME           = "MyOS Libc"
 OUTPUT_DIRECTORY       = ./libc/docs
 OPTIMIZE_OUTPUT_FOR_C  = YES
 TYPEDEF_HIDES_STRUCT   = YES
