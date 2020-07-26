@@ -89,4 +89,4 @@ clean:
 	@rm -rf initrd/* kernel/*.o drivers/*/*.o drivers/*/*/*.o cpu/*/*.o fs/*.o libc/libc.a kernel/cstart.o cpu/memory.h os.iso */*.elf sysroot/boot/initrd.tar
 
 doc: $(C_SOURCES) $(C_HEADERS)
-	@doxygen > /dev/null
+	@doxygen kernel/Doxyfile > /dev/null

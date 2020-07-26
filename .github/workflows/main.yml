@@ -26,7 +26,7 @@ jobs:
     - name: Generate kernel docs
       uses: mattnotmitt/doxygen-action@v1.1.0
       with:
-        doxyfile-path: "./ActionDoxyfile"
+        doxyfile-path: "./kernel/ActionDoxyfile"
     - name: Put files in the right place
       run: sudo mv kerneldoc/html docsite/kernel; sudo cp docindex.html docsite/index.html
 

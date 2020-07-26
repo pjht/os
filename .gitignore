@@ -16,4 +16,4 @@ serout
 vga_drv/vga_drv
 .vagrant
 .vscode
-kerneldoc
+kernel/docs
