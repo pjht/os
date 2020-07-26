@@ -21,14 +21,16 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
-
-    - name: Generate
+    - name: Create docsite directory
+      run: mkdir docsite
+    - name: Generate kernel docs
       uses: mattnotmitt/doxygen-action@v1.1.0
       with:
         doxyfile-path: "./ActionDoxyfile"
+    - name: Move files
+      run: mv kerneldoc/html docsite/kernel
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./kerneldoc/html
-        destination_dir: ./kernel
+        publish_dir: ./docsite
