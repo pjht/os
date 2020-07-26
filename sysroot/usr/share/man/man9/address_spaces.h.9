@@ -1,0 +1,56 @@
+.TH "kernel/address_spaces.h" 9 "Sun Jul 26 2020" "MyOS Kernel" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kernel/address_spaces.h
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBaddress_spaces_copy_data\fP (void *cr3, void *\fBdata\fP, uint32_t size, void *virt_addr)"
+.br
+.ti -1c
+.RI "void * \fBaddress_spaces_put_data\fP (void *cr3, void *\fBdata\fP, uint32_t size)"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "void address_spaces_copy_data (void * cr3, void * data, uint32_t size, void * virt_addr)"
+Copy data into an address space at a specified virtual address 
+.PP
+\fBParameters\fP
+.RS 4
+\fIcr3\fP The adress space to copy data to\&. 
+.br
+\fIdata\fP The data to copy 
+.br
+\fIsize\fP The size of the data 
+.br
+\fIvirt_addr\fP The address to copy the data to in the address space 
+.RE
+.PP
+
+.SS "void* address_spaces_put_data (void * cr3, void * data, uint32_t size)"
+Put data into an address space at an unknown virtual address 
+.PP
+\fBParameters\fP
+.RS 4
+\fIcr3\fP The adress space to copy data to\&. 
+.br
+\fIdata\fP The data to copy 
+.br
+\fIsize\fP The size of the data 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The address that the data was copied to\&. 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for MyOS Kernel from the source code\&.

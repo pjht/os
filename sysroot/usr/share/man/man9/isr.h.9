@@ -1,0 +1,54 @@
+.TH "kernel/cpu/isr.h" 9 "Sun Jul 26 2020" "MyOS Kernel" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kernel/cpu/isr.h
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stdint\&.h>\fP
+.br
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBregisters_t\fP"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef void(* \fBisr_t\fP) (\fBregisters_t\fP *)"
+.br
+.RI "Type of an ISR handler function pointer\&. "
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBisr_install\fP ()"
+.br
+.ti -1c
+.RI "void \fBisr_register_handler\fP (int n, \fBisr_t\fP handler)"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "void isr_install ()"
+Install the interrupt handlers into the IDT\&. 
+.SS "void isr_register_handler (int n, \fBisr_t\fP handler)"
+Register an IRQ handler 
+.PP
+\fBParameters\fP
+.RS 4
+\fIn\fP the IRQ to register a handler for 
+.br
+\fIhandler\fP the handler to register 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for MyOS Kernel from the source code\&.

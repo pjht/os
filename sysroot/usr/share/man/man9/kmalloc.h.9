@@ -1,0 +1,49 @@
+.TH "kernel/kmalloc.h" 9 "Sun Jul 26 2020" "MyOS Kernel" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kernel/kmalloc.h
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stddef\&.h>\fP
+.br
+
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void * \fBkmalloc\fP (size_t size)"
+.br
+.ti -1c
+.RI "void \fBkfree\fP (void *mem)"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "void kfree (void * mem)"
+Free a block in the kernel heap 
+.PP
+\fBParameters\fP
+.RS 4
+\fImem\fP The address of the block 
+.RE
+.PP
+
+.SS "void* kmalloc (size_t size)"
+Allocate a block in the kernel heap 
+.PP
+\fBParameters\fP
+.RS 4
+\fIsize\fP The size of the block 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+the address of the block in the heap\&. 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for MyOS Kernel from the source code\&.

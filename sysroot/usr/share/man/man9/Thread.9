@@ -1,0 +1,65 @@
+.TH "Thread" 9 "Sun Jul 26 2020" "MyOS Kernel" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Thread
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <tasking\&.h>\fP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "void * \fBkernel_esp\fP"
+.br
+.RI "The thread's kernel stack\&. "
+.ti -1c
+.RI "void * \fBkernel_esp_top\fP"
+.br
+.RI "The top of the thread's kernel stack\&. "
+.ti -1c
+.RI "void * \fBcr3\fP"
+.br
+.RI "The address space of this thread\&. (it is in here and not in the process to simplify the task switch asembly) "
+.ti -1c
+.RI "pid_t \fBtid\fP"
+.br
+.RI "The TID of this thread\&. "
+.ti -1c
+.RI "\fBthread_state\fP \fBstate\fP"
+.br
+.RI "The state of this thread\&. (running,ready to run,blocked,etc\&.) "
+.ti -1c
+.RI "int \fBerrno\fP"
+.br
+.RI "The errno value for this thread\&. "
+.ti -1c
+.RI "struct \fBThread\fP * \fBnextThreadInProcess\fP"
+.br
+.RI "The next thread in the process\&. "
+.ti -1c
+.RI "struct \fBThread\fP * \fBprevThreadInProcess\fP"
+.br
+.RI "The previous thread in the process\&. "
+.ti -1c
+.RI "struct \fBThread\fP * \fBnextReadyToRun\fP"
+.br
+.RI "If the thread is in the ready to run list, this is the next ready to run thread\&. (potentially in a different process) "
+.ti -1c
+.RI "struct \fBThread\fP * \fBprevReadyToRun\fP"
+.br
+.RI "If the thread is in the ready to run list, this is the previous ready to run thread\&. (potentially in a different process) "
+.ti -1c
+.RI "\fBProcess\fP * \fBprocess\fP"
+.br
+.RI "The thread's process\&. "
+.in -1c
+.SH "Detailed Description"
+.PP 
+Represents a thread of a process 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for MyOS Kernel from the source code\&.

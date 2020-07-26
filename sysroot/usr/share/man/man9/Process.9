@@ -1,0 +1,45 @@
+.TH "Process" 9 "Sun Jul 26 2020" "MyOS Kernel" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Process
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <tasking\&.h>\fP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "char \fBpriv\fP"
+.br
+.RI "Whether the process is privileged (can execute syscalls to acesss all of memory/has acess to IO ports)\&. "
+.ti -1c
+.RI "pid_t \fBpid\fP"
+.br
+.RI "The PID of this process\&. "
+.ti -1c
+.RI "pid_t \fBnext_tid\fP"
+.br
+.RI "The TID that the next created thread will use\&. "
+.ti -1c
+.RI "int \fBnumThreads\fP"
+.br
+.RI "The number of threads in this process\&. "
+.ti -1c
+.RI "int \fBnumThreadsBlocked\fP"
+.br
+.RI "The number of blocked threads in this process\&. "
+.ti -1c
+.RI "struct \fBThread\fP * \fBfirstThread\fP"
+.br
+.RI "A pointer to the head of the linked list of threads for this process\&. "
+.in -1c
+.SH "Detailed Description"
+.PP 
+Represents a process 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for MyOS Kernel from the source code\&.

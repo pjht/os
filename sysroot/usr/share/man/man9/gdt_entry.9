@@ -1,0 +1,75 @@
+.TH "gdt_entry" 9 "Sun Jul 26 2020" "MyOS Kernel" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+gdt_entry
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "uint16_t \fBlimit_low16\fP"
+.br
+.RI "Low 16 bits of the limit\&. "
+.ti -1c
+.RI "uint16_t \fBbase_low16\fP"
+.br
+.RI "Low 16 bits of the base\&. "
+.ti -1c
+.RI "uint8_t \fBbase_mid8\fP"
+.br
+.RI "Middle 8 bits of the base\&. "
+.ti -1c
+.RI "uint8_t \fBaccess\fP"
+.br
+.ti -1c
+.RI "uint8_t \fBlimit_flags\fP"
+.br
+.ti -1c
+.RI "uint8_t \fBbase_high8\fP"
+.br
+.RI "High 8 bits of the base\&. "
+.in -1c
+.SH "Detailed Description"
+.PP 
+Represents an entry in the GDT\&. 
+.SH "Field Documentation"
+.PP 
+.SS "uint8_t gdt_entry::access"
+Access byte\&. Gives info about the descriptor\&. 
+.br
+ Format: 
+.br
+ Bit 7: Present\&. Must be 1 for all valid selectors\&. 
+.br
+ Bits 6-5\&. Privilege\&. Contains the ring level for the selector\&. 0 for kernel mode, 3 for user mode\&. 
+.br
+ Bit 4\&. Descriptor type\&. Must be set for code/data segments and cleared for system segments like the TSS\&. 
+.br
+ Bit 3\&. Executable\&. If this bit is set, it is a code selector, otherwise a data selector\&. 
+.br
+ Bit 2\&. Direction/Conforming\&. Too complex to explain, should be set to 0\&. 
+.br
+ Bit 1\&. Readable/Writable\&. For code sels, this bit sets whther you can use it like a read-only data segment\&. For data sels, it sets whether the selector is writable\&. 
+.br
+ Bit 0\&. Acessed bit\&. Set to 0\&. 
+.br
+ 
+.SS "uint8_t gdt_entry::limit_flags"
+High nibble of this contains two flags, and the lower niblle contains the high 4 bits of the limit\&. 
+.br
+ The flags are: 
+.br
+ Bit 3\&. Granularity\&. 0 for byte granularity, 1 for 4 KB granularity\&. 
+.br
+ Bit 2\&. Size\&. 0 for 16 bit protected mode, 1 for 32 bit protected mode\&. 
+.br
+ Bits 1-0\&. Unused\&. Set to 0\&. 
+.br
+ 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for MyOS Kernel from the source code\&.

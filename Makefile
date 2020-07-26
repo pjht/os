@@ -31,7 +31,7 @@ debug: os.iso kernel/kernel.elf
 	@$(GDB)
 	#gdbgui -g i386-elf-gdb --project $(CWD)
 
-os.iso: kernel/kernel.elf init # vfs devfs initrd vga_drv initrd_drv pci
+os.iso: kernel/kernel.elf init sysroot/usr/share/man # vfs devfs initrd vga_drv initrd_drv pci
 	@cp kernel/kernel.elf sysroot/boot
 	@cd initrd; tar -f ../sysroot/boot/initrd.tar -c *
 	@grub-mkrescue -o $@ sysroot >/dev/null 2>/dev/null
@@ -70,6 +70,9 @@ libc: sysroot/usr/lib/libc.a
 
 sysroot/usr/lib/libc.a: $(LIBC_OBJ)
 	@$(AR) rcs $@ $^
+
+sysroot/usr/share/man: doc
+	cp -r kernel/docs/man/man9 sysroot/usr/share/man
 
 kernel/cpu/arch_consts.h: kernel/cpu/$(PLAT)/arch_consts.h
 	@cp kernel/cpu/$(PLAT)/arch_consts.h kernel/cpu/arch_consts.h

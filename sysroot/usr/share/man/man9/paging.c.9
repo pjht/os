@@ -1,0 +1,231 @@
+.TH "kernel/cpu/i386/paging.c" 9 "Sun Jul 26 2020" "MyOS Kernel" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kernel/cpu/i386/paging.c
+.SH SYNOPSIS
+.br
+.PP
+\fC#include '\&.\&./\&.\&./pmem\&.h'\fP
+.br
+\fC#include '\&.\&./\&.\&./vga_err\&.h'\fP
+.br
+\fC#include '\&.\&./halt\&.h'\fP
+.br
+\fC#include '\&.\&./paging\&.h'\fP
+.br
+\fC#include 'arch_consts\&.h'\fP
+.br
+\fC#include <klog\&.h>\fP
+.br
+\fC#include <stdint\&.h>\fP
+.br
+\fC#include <stdlib\&.h>\fP
+.br
+
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "static char \fBis_page_present\fP (size_t page)"
+.br
+.ti -1c
+.RI "void \fBmap_pages\fP (void *virt_addr_ptr, void *phys_addr_ptr, int num_pages, char usr, char wr)"
+.br
+.ti -1c
+.RI "void * \fBfind_free_pages\fP (int num_pages)"
+.br
+.ti -1c
+.RI "void * \fBalloc_pages\fP (int num_pages)"
+.br
+.ti -1c
+.RI "void * \fBvirt_to_phys\fP (void *virt_addr_arg)"
+.br
+.ti -1c
+.RI "void \fBalloc_pages_virt\fP (int num_pages, void *addr)"
+.br
+.ti -1c
+.RI "static void \fBinvl_page\fP (void *addr)"
+.br
+.ti -1c
+.RI "void * \fBpaging_new_address_space\fP ()"
+.br
+.ti -1c
+.RI "void \fBload_address_space\fP (void *cr3)"
+.br
+.ti -1c
+.RI "void \fBunmap_pages\fP (void *start_virt, int num_pages)"
+.br
+.ti -1c
+.RI "void \fBpaging_init\fP ()"
+.br
+.ti -1c
+.RI "void * \fBget_cr3\fP ()"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "static uint32_t \fBpage_directory\fP [1024]"
+.br
+.RI "The kernel process's page directory\&. "
+.ti -1c
+.RI "static uint32_t \fBkern_page_tables\fP [NUM_KERN_FRAMES]"
+.br
+.RI "The page tables where the kernel binary is mapped in\&. "
+.ti -1c
+.RI "static uint32_t \fBkstack_page_tables\fP [218 *1024]"
+.br
+.RI "Page tables for thread kernel stacks\&. "
+.ti -1c
+.RI "static uint32_t \fBkmalloc_page_tables\fP [4 *1024]"
+.br
+.RI "Page tables for the kmalloc heap\&. "
+.ti -1c
+.RI "static uint32_t * \fBpagdirmap\fP =(uint32_t*)0xFFFFF000"
+.br
+.RI "Pointer to the page directory entries in the recursive mapping\&. "
+.ti -1c
+.RI "static uint32_t * \fBpage_table_map\fP =(uint32_t*)0xFFC00000"
+.br
+.RI "Pointer to the page table entries in the recursive mapping\&. "
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "void* alloc_pages (int num_pages)"
+Allocate virtual pages & map them to physical memory\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fInum_pages\fP The number of pages to allocate\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+a pointer to the allocated pages\&. 
+.RE
+.PP
+
+.SS "void alloc_pages_virt (int num_pages, void * addr)"
+Allocate virtual pages at a specific address & map them to physical memory\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fInum_pages\fP The number of pages to allocate\&. 
+.br
+\fIaddr\fP The adress to start allocation at\&. 
+.RE
+.PP
+
+.SS "void* find_free_pages (int num_pages)"
+Finds free virtual pages and returns the start address 
+.PP
+\fBParameters\fP
+.RS 4
+\fInum_pages\fP The minimum size of the free area 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+the start of the free area 
+.RE
+.PP
+
+.SS "void* get_cr3 ()"
+Get the current address space 
+.PP
+\fBReturns\fP
+.RS 4
+a pointer to the current address space in physical memory\&. 
+.RE
+.PP
+
+.SS "static void invl_page (void * addr)\fC [static]\fP"
+Invalidates a page in the TLB, 
+.PP
+\fBParameters\fP
+.RS 4
+\fIaddr\fP The address of the page to invalidate\&. 
+.RE
+.PP
+
+.SS "static char is_page_present (size_t page)\fC [static]\fP"
+Checks whether a page is present 
+.PP
+\fBParameters\fP
+.RS 4
+\fIpage\fP The page number to check 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+Whether the page is present 
+.RE
+.PP
+
+.SS "void load_address_space (void * cr3)"
+Load an address space 
+.PP
+\fBParameters\fP
+.RS 4
+\fIcr3\fP The address space to load 
+.RE
+.PP
+
+.SS "void map_pages (void * virt_addr_ptr, void * phys_addr_ptr, int num_pages, char usr, char wr)"
+Map virtual pages to physical frames\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIvirt_addr_ptr\fP The start of the virtual range to map\&. 
+.br
+\fIphys_addr_ptr\fP The start of the physical range to map\&. 
+.br
+\fInum_pages\fP The number of pages to map\&. 
+.br
+\fIusr\fP Are the pages acessible by user mode code 
+.br
+\fIwr\fP Are the pages writable by user mode code (kernel always has write permissions) 
+.RE
+.PP
+
+.SS "void paging_init ()"
+Initialize paging 
+.SS "void* paging_new_address_space ()"
+Create a new address space 
+.PP
+\fBReturns\fP
+.RS 4
+a pointer to the new address space in physical memory\&. 
+.RE
+.PP
+
+.SS "void unmap_pages (void * start_virt, int num_pages)"
+Unmap virtual pages, 
+.PP
+\fBParameters\fP
+.RS 4
+\fIstart_virt\fP The start of the virtual range to unmap\&. 
+.br
+\fInum_pages\fP The number of pages to map\&. 
+.RE
+.PP
+
+.SS "void* virt_to_phys (void * virt_addr)"
+Convert a virtual address to a physical one\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIvirt_addr\fP The virtual address to convert 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+the physical adress it maps to, or NULL if it is not mapped\&. 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for MyOS Kernel from the source code\&.

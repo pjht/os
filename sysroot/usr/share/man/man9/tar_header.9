@@ -1,0 +1,51 @@
+.TH "tar_header" 9 "Sun Jul 26 2020" "MyOS Kernel" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+tar_header
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "char \fBfilename\fP [100]"
+.br
+.RI "Filename of file descried by the tar header\&. "
+.ti -1c
+.RI "char \fBmode\fP [8]"
+.br
+.RI "Mode as an octal string\&. "
+.ti -1c
+.RI "char \fBuid\fP [8]"
+.br
+.RI "UID of owner as an octal string\&. "
+.ti -1c
+.RI "char \fBgid\fP [8]"
+.br
+.RI "GID of owner as an octal string\&. "
+.ti -1c
+.RI "char \fBsize\fP [12]"
+.br
+.RI "Size of file as an octal string\&. "
+.ti -1c
+.RI "char \fBmtime\fP [12]"
+.br
+.RI "Modification time as an octal string\&. "
+.ti -1c
+.RI "char \fBchksum\fP [8]"
+.br
+.RI "Checksum as octal string\&. "
+.ti -1c
+.RI "char \fBtypeflag\fP [1]"
+.br
+.RI "File type\&. (0 for normal file) "
+.in -1c
+.SH "Detailed Description"
+.PP 
+REspresents a TAR file header 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for MyOS Kernel from the source code\&.

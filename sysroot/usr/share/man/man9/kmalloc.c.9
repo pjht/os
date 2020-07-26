@@ -1,0 +1,116 @@
+.TH "kernel/kmalloc.c" 9 "Sun Jul 26 2020" "MyOS Kernel" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kernel/kmalloc.c
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'cpu/arch_consts\&.h'\fP
+.br
+\fC#include <math\&.h>\fP
+.br
+\fC#include <stdlib\&.h>\fP
+.br
+\fC#include <string\&.h>\fP
+.br
+
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBKMALLOC_BMAP_SZ\fP   (((KMALLOC_SZ*1024)/4)/8)"
+.br
+.RI "The size of the kmalloc bitmap\&. "
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "static char \fBget_bmap_bit\fP (size_t index)"
+.br
+.ti -1c
+.RI "static void \fBset_bmap_bit\fP (size_t index)"
+.br
+.ti -1c
+.RI "static void \fBclear_bmap_bit\fP (size_t index)"
+.br
+.ti -1c
+.RI "void * \fBkmalloc\fP (size_t size)"
+.br
+.ti -1c
+.RI "void \fBkfree\fP (void *mem)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "static char \fBbitmap\fP [\fBKMALLOC_BMAP_SZ\fP]"
+.br
+.RI "Bitmap of used areas of the heap\&. "
+.ti -1c
+.RI "static void * \fBdata\fP =(void*)KMALLOC_START"
+.br
+.RI "Start of the kmalloc heap\&. "
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "static void clear_bmap_bit (size_t index)\fC [static]\fP"
+Clear a bit in the heap bitmap 
+.PP
+\fBParameters\fP
+.RS 4
+\fIindex\fP The bit to clear 
+.RE
+.PP
+
+.SS "static char get_bmap_bit (size_t index)\fC [static]\fP"
+Get a bit in the heap bitmap 
+.PP
+\fBParameters\fP
+.RS 4
+\fIindex\fP The bit to get 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+the bit 
+.RE
+.PP
+
+.SS "void kfree (void * mem)"
+Free a block in the kernel heap 
+.PP
+\fBParameters\fP
+.RS 4
+\fImem\fP The address of the block 
+.RE
+.PP
+
+.SS "void* kmalloc (size_t size)"
+Allocate a block in the kernel heap 
+.PP
+\fBParameters\fP
+.RS 4
+\fIsize\fP The size of the block 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+the address of the block in the heap\&. 
+.RE
+.PP
+
+.SS "static void set_bmap_bit (size_t index)\fC [static]\fP"
+Set a bit in the heap bitmap 
+.PP
+\fBParameters\fP
+.RS 4
+\fIindex\fP The bit to set 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for MyOS Kernel from the source code\&.

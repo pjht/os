@@ -1,0 +1,135 @@
+.TH "tss_entry" 9 "Sun Jul 26 2020" "MyOS Kernel" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+tss_entry
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "uint32_t \fBprev_tss\fP"
+.br
+.RI "The previous TSS - if we used hardware task switching this would form a linked list\&. "
+.ti -1c
+.RI "uint32_t \fBesp0\fP"
+.br
+.RI "The stack pointer to load when we change to kernel mode\&. "
+.ti -1c
+.RI "uint32_t \fBss0\fP"
+.br
+.RI "The stack segment to load when we change to kernel mode\&. "
+.ti -1c
+.RI "uint32_t \fBesp1\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBss1\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBss2\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBesp2\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBcr3\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBeip\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBeflags\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBeax\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBecx\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBedx\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBebx\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBesp\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBebp\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBesi\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBedi\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint32_t \fBes\fP"
+.br
+.RI "The value to load into ES when we change to kernel mode\&. "
+.ti -1c
+.RI "uint32_t \fBcs\fP"
+.br
+.RI "The value to load into CS when we change to kernel mode\&. "
+.ti -1c
+.RI "uint32_t \fBss\fP"
+.br
+.RI "The value to load into SS when we change to kernel mode\&. "
+.ti -1c
+.RI "uint32_t \fBds\fP"
+.br
+.RI "The value to load into DS when we change to kernel mode\&. "
+.ti -1c
+.RI "uint32_t \fBfs\fP"
+.br
+.RI "The value to load into FS when we change to kernel mode\&. "
+.ti -1c
+.RI "uint32_t \fBgs\fP"
+.br
+.RI "The value to load into GS when we change to kernel mode\&. "
+.ti -1c
+.RI "uint32_t \fBldt\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint16_t \fBtrap\fP"
+.br
+.RI "Unused\&. "
+.ti -1c
+.RI "uint16_t \fBiomap_base\fP"
+.br
+.RI "Offset of the IOPB in the TSS\&. "
+.ti -1c
+.RI "char \fBiopb\fP [8192]"
+.br
+.RI "IO port bitmap\&. "
+.ti -1c
+.RI "uint8_t \fBset_ff\fP"
+.br
+.RI "Must be set to 0xFF to mark the end of the IOPB\&. "
+.in -1c
+.SH "Detailed Description"
+.PP 
+Represents a TSS\&. 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for MyOS Kernel from the source code\&.

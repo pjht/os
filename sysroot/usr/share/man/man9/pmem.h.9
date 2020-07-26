@@ -1,0 +1,63 @@
+.TH "kernel/pmem.h" 9 "Sun Jul 26 2020" "MyOS Kernel" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kernel/pmem.h
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <grub/multiboot2\&.h>\fP
+.br
+
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBpmem_init\fP (struct multiboot_boot_header_tag *tags)"
+.br
+.ti -1c
+.RI "void * \fBpmem_alloc\fP (int num_pages)"
+.br
+.ti -1c
+.RI "void \fBpmem_free\fP (int start_page, int num_pages)"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "void* pmem_alloc (int num_pages)"
+Allocate physical frames 
+.PP
+\fBParameters\fP
+.RS 4
+\fInum_pages\fP The number of frames to allocate 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+the physical address of the allocated frames 
+.RE
+.PP
+
+.SS "void pmem_free (int start_page, int num_pages)"
+Free allocated physical frames 
+.PP
+\fBParameters\fP
+.RS 4
+\fIstart_page\fP The frame to start freeing at\&. 
+.br
+\fInum_pages\fP The number of frames to free 
+.RE
+.PP
+
+.SS "void pmem_init (struct multiboot_boot_header_tag * tags)"
+Initialize the physical memory manager 
+.PP
+\fBParameters\fP
+.RS 4
+\fItags\fP The multiboot header 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for MyOS Kernel from the source code\&.

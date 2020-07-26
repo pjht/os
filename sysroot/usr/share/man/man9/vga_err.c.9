@@ -1,0 +1,84 @@
+.TH "kernel/vga_err.c" 9 "Sun Jul 26 2020" "MyOS Kernel" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kernel/vga_err.c
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <cpu/ports\&.h>\fP
+.br
+\fC#include <string\&.h>\fP
+.br
+
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBVGA_BLACK\fP   0"
+.br
+.RI "The color black\&. "
+.ti -1c
+.RI "#define \fBVGA_WHITE\fP   15"
+.br
+.RI "The color white\&. "
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "static void \fBset_char\fP (int \fBx\fP, char c)"
+.br
+.ti -1c
+.RI "void \fBvga_init\fP (char *addr)"
+.br
+.ti -1c
+.RI "void \fBvga_write_string\fP (const char *string)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "static char * \fBscreen\fP"
+.br
+.RI "Pointer to VGA screen memory\&. "
+.ti -1c
+.RI "static int \fBx\fP =0"
+.br
+.RI "Next character offset in VGA sreen memory\&. "
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "static void set_char (int x, char c)\fC [static]\fP"
+Set a character on the screen 
+.PP
+\fBParameters\fP
+.RS 4
+\fIx\fP The character index to set 
+.br
+\fIc\fP The character to write 
+.RE
+.PP
+
+.SS "void vga_init (char * screen)"
+Initilaze the VGA error writing driver 
+.PP
+\fBParameters\fP
+.RS 4
+\fIscreen\fP Pointer to VGA screen memory 
+.RE
+.PP
+
+.SS "void vga_write_string (const char * string)"
+Write a string starting at the top line of the VGA display 
+.PP
+\fBParameters\fP
+.RS 4
+\fIstring\fP The string to write 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for MyOS Kernel from the source code\&.

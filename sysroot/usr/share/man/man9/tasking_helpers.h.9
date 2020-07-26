@@ -1,0 +1,62 @@
+.TH "kernel/cpu/tasking_helpers.h" 9 "Sun Jul 26 2020" "MyOS Kernel" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kernel/cpu/tasking_helpers.h
+.SH SYNOPSIS
+.br
+.PP
+\fC#include '\&.\&./tasking\&.h'\fP
+.br
+
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBswitch_to_thread_asm\fP (\fBThread\fP *thread)"
+.br
+.ti -1c
+.RI "void \fBtask_init\fP ()"
+.br
+.ti -1c
+.RI "void \fBwait_for_unblocked_thread_asm\fP ()"
+.br
+.ti -1c
+.RI "void \fBsetup_kstack\fP (\fBThread\fP *thread, void *param1, void *param2, char kmode, void *eip)"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "void setup_kstack (\fBThread\fP * thread, void * param1, void * param2, char kmode, void * eip)"
+Setup a kernel stack for a thread 
+.PP
+\fBParameters\fP
+.RS 4
+\fIthread\fP The thread to setup a stack for 
+.br
+\fIparam1\fP The thread's start function first parameter 
+.br
+\fIparam2\fP The thread's start function second parameter 
+.br
+\fIkmode\fP Whether the thread is a kernel mode thread 
+.br
+\fIeip\fP The start address of the thread 
+.RE
+.PP
+
+.SS "void switch_to_thread_asm (\fBThread\fP * thread)"
+The assembly part of switching to a thread\&. Performs the actual context switch\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIthread\fP The thread to switch to\&. 
+.RE
+.PP
+
+.SS "void task_init ()"
+Initializes a usermode task 
+.SS "void wait_for_unblocked_thread_asm ()"
+An assembly helper for waiting for an unblocked thread Starts interrupts, halts, then clears interrupts\&. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for MyOS Kernel from the source code\&.

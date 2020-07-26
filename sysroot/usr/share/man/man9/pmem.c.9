@@ -1,0 +1,132 @@
+.TH "kernel/pmem.c" 9 "Sun Jul 26 2020" "MyOS Kernel" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kernel/pmem.c
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'cpu/arch_consts\&.h'\fP
+.br
+\fC#include 'cpu/halt\&.h'\fP
+.br
+\fC#include 'vga_err\&.h'\fP
+.br
+\fC#include <grub/multiboot2\&.h>\fP
+.br
+\fC#include <klog\&.h>\fP
+.br
+\fC#include <stdint\&.h>\fP
+.br
+\fC#include <stdlib\&.h>\fP
+.br
+
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBBMAP_LEN\fP   (NUM_FRAMES/8)"
+.br
+.RI "The size of the physical memory manager's bitmap\&. "
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "static char \fBget_bmap_bit\fP (int index)"
+.br
+.ti -1c
+.RI "static void \fBset_bmap_bit\fP (int index)"
+.br
+.ti -1c
+.RI "static void \fBclear_bmap_bit\fP (int index)"
+.br
+.ti -1c
+.RI "void \fBpmem_init\fP (struct multiboot_boot_header_tag *tags)"
+.br
+.ti -1c
+.RI "void * \fBpmem_alloc\fP (int num_pages)"
+.br
+.ti -1c
+.RI "void \fBpmem_free\fP (int start_page, int num_pages)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "static char \fBbmap\fP [\fBBMAP_LEN\fP]"
+.br
+.RI "Bitmap of allocated/non-present page frames\&. "
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "static void clear_bmap_bit (int index)\fC [static]\fP"
+Clear a bit in the heap bitmap 
+.PP
+\fBParameters\fP
+.RS 4
+\fIindex\fP The bit to clear 
+.RE
+.PP
+
+.SS "static char get_bmap_bit (int index)\fC [static]\fP"
+Get a bit in the bitmap 
+.PP
+\fBParameters\fP
+.RS 4
+\fIindex\fP The bit to get 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+the bit 
+.RE
+.PP
+
+.SS "void* pmem_alloc (int num_pages)"
+Allocate physical frames 
+.PP
+\fBParameters\fP
+.RS 4
+\fInum_pages\fP The number of frames to allocate 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+the physical address of the allocated frames 
+.RE
+.PP
+
+.SS "void pmem_free (int start_page, int num_pages)"
+Free allocated physical frames 
+.PP
+\fBParameters\fP
+.RS 4
+\fIstart_page\fP The frame to start freeing at\&. 
+.br
+\fInum_pages\fP The number of frames to free 
+.RE
+.PP
+
+.SS "void pmem_init (struct multiboot_boot_header_tag * tags)"
+Initialize the physical memory manager 
+.PP
+\fBParameters\fP
+.RS 4
+\fItags\fP The multiboot header 
+.RE
+.PP
+
+.SS "static void set_bmap_bit (int index)\fC [static]\fP"
+Set a bit in the heap bitmap 
+.PP
+\fBParameters\fP
+.RS 4
+\fIindex\fP The bit to set 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for MyOS Kernel from the source code\&.
