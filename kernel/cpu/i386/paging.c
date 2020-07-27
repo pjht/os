@@ -7,7 +7,6 @@
 #include "../halt.h"
 #include "../paging.h"
 #include "arch_consts.h"
-#include <klog.h>
 #include <stdint.h>
 #include <stdlib.h>
 

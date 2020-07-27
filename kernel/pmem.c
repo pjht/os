@@ -6,7 +6,6 @@
 #include "cpu/halt.h"
 #include "vga_err.h"
 #include <grub/multiboot2.h>
-#include <klog.h>
 #include <stdint.h>
 #include <stdlib.h>
 
