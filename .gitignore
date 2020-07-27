@@ -19,3 +19,4 @@ vga_drv/vga_drv
 kernel/docs
 sysroot/usr/share/man
 libc/docs
+sysroot/usr/include
