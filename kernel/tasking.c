@@ -300,6 +300,10 @@ void tasking_unblock(pid_t pid,pid_t tid) {
       serial_printf("Error! Got wrong thread! (Wanted TID %d, got TID %d)\n",tid,thread->tid);
       halt();
     }
+    if (thread->state==THREAD_EXITED||thread->state==THREAD_READY||thread->state==THREAD_RUNNING) {
+      serial_printf("Tried to unblock an exited/ready/running thread!\n");
+      return;
+    }
     thread->state=THREAD_READY;
     if (!is_proc_scheduled(thread->process->pid)) {
     // Link the thread onto the list of ready to run threads
