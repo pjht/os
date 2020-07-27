@@ -213,7 +213,7 @@ void switch_to_thread(Thread* thread) {
     // Link the thread onto the list of ready to run threads
     if (ready_to_run_tail) {
       current_threadNextReady->prevReadyToRun=ready_to_run_tail;
-      ready_to_run_tail->nextThreadInProcess=current_threadNextReady;
+      ready_to_run_tail->nextReadyToRun=current_threadNextReady;
       ready_to_run_tail=current_threadNextReady;
     } else {
       ready_to_run_head=current_threadNextReady;
