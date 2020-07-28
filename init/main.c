@@ -1,14 +1,12 @@
 #include <dbg.h>
 #include <elf.h>
 #include <initrd.h>
-#include <ipc/vfs.h>
 #include <memory.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <tasking.h>
-#include <vfs.h>
 
 typedef struct {
   char filename[100];
