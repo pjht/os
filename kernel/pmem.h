@@ -21,9 +21,9 @@ void* pmem_alloc(int num_pages);
 
 /**
  * Free allocated physical frames
- * \param start_page The frame to start freeing at.
+ * \param start The address to start freeing at.
  * \param num_pages The number of frames to free
 */
-void pmem_free(int start_page,int num_pages);
+void pmem_free(int start,int num_pages);
 
 #endif

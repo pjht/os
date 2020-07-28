@@ -132,7 +132,8 @@ void* pmem_alloc(int num_pages) {
   return addr;
 }
 
-void pmem_free(int start_page,int num_pages) {
+void pmem_free(void* start,int num_pages) {
+  int start_page=(size_t)start>>FRAME_NO_OFFSET;
   for (int i=start_page;i<num_pages;i++) {
     set_bmap_bit(i);
   }
