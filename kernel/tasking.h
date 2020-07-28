@@ -31,9 +31,9 @@ typedef struct Process {
   char priv; //!< Whether the process is privileged (can execute syscalls to acesss all of memory/has acess to IO ports).
   pid_t pid; //!< The PID of this process
   pid_t next_tid; //!< The TID that the next created thread will use.
-  int numThreads; //!< The number of threads in this process
-  int numThreadsBlocked; //!< The number of blocked threads in this process
-  struct Thread* firstThread; //!< A pointer to the head of the linked list of threads for this process.
+  int num_threads; //!< The number of threads in this process
+  int num_threads_blocked; //!< The number of blocked threads in this process
+  struct Thread* first_thread; //!< A pointer to the head of the linked list of threads for this process.
 } Process;
 
 /**
@@ -46,10 +46,10 @@ typedef struct Thread {
   pid_t tid; //!< The TID of this thread.
   thread_state state; //!< The state of this thread. (running,ready to run,blocked,etc.)
   int errno; //!< The errno value for this thread.
-  struct Thread* nextThreadInProcess; //!< The next thread in the process.
-  struct Thread* prevThreadInProcess; //!< The previous thread in the process.
-  struct Thread* nextReadyToRun; //!< If the thread is in the ready to run list, this is the next ready to run thread. (potentially in a different process)
-  struct Thread* prevReadyToRun; //!< If the thread is in the ready to run list, this is the previous ready to run thread. (potentially in a different process)
+  struct Thread* next_thread_in_process; //!< The next thread in the process.
+  struct Thread* prev_thread_in_process; //!< The previous thread in the process.
+  struct Thread* next_ready_to_run; //!< If the thread is in the ready to run list, this is the next ready to run thread. (potentially in a different process)
+  struct Thread* prev_ready_to_run; //!< If the thread is in the ready to run list, this is the previous ready to run thread. (potentially in a different process)
   Process* process; //!< The thread's process.
 } Thread;
 

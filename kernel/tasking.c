@@ -11,8 +11,8 @@
 #include <sys/types.h>
 
 #define MAX_PROCS 32768 //!< Maximum number of processes that can be running at a time
-#define HAS_UNBLOCKED_THREADS(proc) (proc->numThreads!=proc->numThreadsBlocked) //!< Macro to check whethe a process has unblocked threads
-#define NUM_UNBLOCKED_THREADS(proc) (proc->numThreads-proc->numThreadsBlocked) //!< Macro to get the number of unblocked threads for a process
+#define HAS_UNBLOCKED_THREADS(proc) (proc->num_threads!=proc->num_threads_blocked) //!< Macro to check whethe a process has unblocked threads
+#define NUM_UNBLOCKED_THREADS(proc) (proc->num_threads-proc->num_threads_blocked) //!< Macro to get the number of unblocked threads for a process
 #define SAME_PROC(thread1,thread2) (thread1->process->pid==thread2->process->pid) //!< Macro to check whether two threads have the same PID
 #define SAME_THREAD(thread1,thread2) (thread1->process->pid==thread2->process->pid&&thread1->tid==thread2->tid) //!< Macro to check whether two threads have the same PID and TID
 pid_t next_pid=0; //!< PID to use for the next created process
@@ -84,8 +84,8 @@ void tasking_create_task(void* eip,void* cr3,char kmode,char param1_exists,void*
   Thread* thread=kmalloc(sizeof(Thread));
   if (isThread) {
     proc=processes[(pid_t)param2_arg];
-    proc->numThreads++;
-    thread->cr3=proc->firstThread->cr3;
+    proc->num_threads++;
+    thread->cr3=proc->first_thread->cr3;
   } else {
     proc=kmalloc(sizeof(Process));
     if (current_thread) {
@@ -96,9 +96,9 @@ void tasking_create_task(void* eip,void* cr3,char kmode,char param1_exists,void*
     proc->pid=next_pid;
     next_pid++;
     proc->next_tid=0;
-    proc->numThreads=1;
-    proc->numThreadsBlocked=0;
-    proc->firstThread=thread;
+    proc->num_threads=1;
+    proc->num_threads_blocked=0;
+    proc->first_thread=thread;
     processes[proc->pid]=proc;
     thread->cr3=cr3;
   }
@@ -107,22 +107,22 @@ void tasking_create_task(void* eip,void* cr3,char kmode,char param1_exists,void*
   thread->tid=proc->next_tid;
   proc->next_tid++;
   setup_kstack(thread,param1,param2,kmode,eip);
-  thread->prevReadyToRun=NULL;
-  thread->nextReadyToRun=NULL;
+  thread->prev_ready_to_run=NULL;
+  thread->next_ready_to_run=NULL;
   if (isThread) {
-    thread->nextThreadInProcess=proc->firstThread;
-    thread->prevThreadInProcess=NULL;
+    thread->next_thread_in_process=proc->first_thread;
+    thread->prev_thread_in_process=NULL;
     thread->state=THREAD_READY;
-    proc->firstThread->prevThreadInProcess=thread;
-    proc->firstThread=thread;
+    proc->first_thread->prev_thread_in_process=thread;
+    proc->first_thread=thread;
   } else {
-    thread->nextThreadInProcess=NULL;
-    thread->prevThreadInProcess=NULL;
+    thread->next_thread_in_process=NULL;
+    thread->prev_thread_in_process=NULL;
     if (!is_proc_scheduled(proc->pid)) {
       if (ready_to_run_tail) {
         thread->state=THREAD_READY;
-        ready_to_run_tail->nextReadyToRun=thread;
-        thread->prevReadyToRun=ready_to_run_tail;
+        ready_to_run_tail->next_ready_to_run=thread;
+        thread->prev_ready_to_run=ready_to_run_tail;
         ready_to_run_tail=thread;
         mark_proc_scheduled(proc->pid);
       } else if (current_thread) {
@@ -160,7 +160,7 @@ int* tasking_get_errno_address() {
 
 pid_t tasking_new_thread(void* start,pid_t pid,char param_exists,void* param_arg) {
   tasking_create_task(start,NULL,0,param_exists,param_arg,0,(void*)pid,1);
-  return processes[pid]->firstThread->tid;
+  return processes[pid]->first_thread->tid;
 }
 
 /**
@@ -170,54 +170,54 @@ pid_t tasking_new_thread(void* start,pid_t pid,char param_exists,void* param_arg
 void switch_to_thread(Thread* thread) {
   // Unlink the thread from the list of ready-to-run threads
   if (thread!=ready_to_run_head) {
-    thread->prevReadyToRun->nextReadyToRun=thread->nextReadyToRun;
-    if (thread->nextReadyToRun) {
-      thread->nextReadyToRun->prevReadyToRun=thread->prevReadyToRun;
+    thread->prev_ready_to_run->next_ready_to_run=thread->next_ready_to_run;
+    if (thread->next_ready_to_run) {
+      thread->next_ready_to_run->prev_ready_to_run=thread->prev_ready_to_run;
     }
   } else {
-    ready_to_run_head=thread->nextReadyToRun;
+    ready_to_run_head=thread->next_ready_to_run;
     if (ready_to_run_head==NULL) {
       ready_to_run_tail=NULL;
     }
   }
   unmark_proc_scheduled(thread->process->pid);
-  thread->prevReadyToRun=NULL;
-  thread->nextReadyToRun=NULL;
+  thread->prev_ready_to_run=NULL;
+  thread->next_ready_to_run=NULL;
   if (current_thread->state==THREAD_RUNNING) {
     current_thread->state=THREAD_READY;
   }
-  Thread* current_threadNextReady=current_thread->nextThreadInProcess;
-  while ((current_threadNextReady&&current_threadNextReady->state!=THREAD_READY)||(current_threadNextReady&&SAME_THREAD(thread,current_threadNextReady))) {
-    current_threadNextReady=current_threadNextReady->nextThreadInProcess;
+  Thread* current_thread_next_ready=current_thread->next_thread_in_process;
+  while ((current_thread_next_ready&&current_thread_next_ready->state!=THREAD_READY)||(current_thread_next_ready&&SAME_THREAD(thread,current_thread_next_ready))) {
+    current_thread_next_ready=current_thread_next_ready->next_thread_in_process;
   }
-  if (!current_threadNextReady) {
-    current_threadNextReady=current_thread->process->firstThread;
-    while ((current_threadNextReady&&current_threadNextReady->state!=THREAD_READY)||(current_threadNextReady&&SAME_THREAD(thread,current_threadNextReady))) {
-      current_threadNextReady=current_threadNextReady->nextThreadInProcess;
+  if (!current_thread_next_ready) {
+    current_thread_next_ready=current_thread->process->first_thread;
+    while ((current_thread_next_ready&&current_thread_next_ready->state!=THREAD_READY)||(current_thread_next_ready&&SAME_THREAD(thread,current_thread_next_ready))) {
+      current_thread_next_ready=current_thread_next_ready->next_thread_in_process;
     }
   }
-  if (!current_threadNextReady) {
+  if (!current_thread_next_ready) {
     //This process is fully blocked, try the process of the thread we're yielding to
-    current_threadNextReady=thread->nextThreadInProcess;
-    while ((current_threadNextReady&&current_threadNextReady->state!=THREAD_READY)||(current_threadNextReady&&SAME_THREAD(thread,current_threadNextReady))) {
-      current_threadNextReady=current_threadNextReady->nextThreadInProcess;
+    current_thread_next_ready=thread->next_thread_in_process;
+    while ((current_thread_next_ready&&current_thread_next_ready->state!=THREAD_READY)||(current_thread_next_ready&&SAME_THREAD(thread,current_thread_next_ready))) {
+      current_thread_next_ready=current_thread_next_ready->next_thread_in_process;
     }
-    if (!current_threadNextReady) {
-      current_threadNextReady=thread->process->firstThread;
-      while ((current_threadNextReady&&current_threadNextReady->state!=THREAD_READY)||(current_threadNextReady&&SAME_THREAD(thread,current_threadNextReady))) {
-        current_threadNextReady=current_threadNextReady->nextThreadInProcess;
+    if (!current_thread_next_ready) {
+      current_thread_next_ready=thread->process->first_thread;
+      while ((current_thread_next_ready&&current_thread_next_ready->state!=THREAD_READY)||(current_thread_next_ready&&SAME_THREAD(thread,current_thread_next_ready))) {
+        current_thread_next_ready=current_thread_next_ready->next_thread_in_process;
       }
     }
   }
-  if (current_threadNextReady && !is_proc_scheduled(current_thread->process->pid)) {
+  if (current_thread_next_ready && !is_proc_scheduled(current_thread->process->pid)) {
     // Link the thread onto the list of ready to run threads
     if (ready_to_run_tail) {
-      current_threadNextReady->prevReadyToRun=ready_to_run_tail;
-      ready_to_run_tail->nextReadyToRun=current_threadNextReady;
-      ready_to_run_tail=current_threadNextReady;
+      current_thread_next_ready->prev_ready_to_run=ready_to_run_tail;
+      ready_to_run_tail->next_ready_to_run=current_thread_next_ready;
+      ready_to_run_tail=current_thread_next_ready;
     } else {
-      ready_to_run_head=current_threadNextReady;
-      ready_to_run_tail=current_threadNextReady;
+      ready_to_run_head=current_thread_next_ready;
+      ready_to_run_tail=current_thread_next_ready;
     }
     mark_proc_scheduled(current_thread->process->pid);
   }
@@ -254,29 +254,29 @@ void tasking_yield() {
 
 void tasking_block(thread_state newstate) {
   if (ready_to_run_head&&SAME_THREAD(ready_to_run_head,current_thread)) {
-    ready_to_run_head=ready_to_run_head->nextReadyToRun;
+    ready_to_run_head=ready_to_run_head->next_ready_to_run;
     if (ready_to_run_head==NULL) {
       ready_to_run_tail=NULL;
     }
   }
   if (ready_to_run_tail&&SAME_THREAD(ready_to_run_tail,current_thread)) {
-    ready_to_run_tail=ready_to_run_tail->prevReadyToRun;
+    ready_to_run_tail=ready_to_run_tail->prev_ready_to_run;
     if (ready_to_run_tail==NULL) {
       ready_to_run_head=NULL;
     }
   }
-  if (ready_to_run_head&&ready_to_run_head->nextReadyToRun) {
-    for (Thread* thread=ready_to_run_head->nextReadyToRun;thread!=NULL;thread=thread->nextReadyToRun) {
+  if (ready_to_run_head&&ready_to_run_head->next_ready_to_run) {
+    for (Thread* thread=ready_to_run_head->next_ready_to_run;thread!=NULL;thread=thread->next_ready_to_run) {
       if (SAME_THREAD(thread,current_thread)) {
-        thread->prevReadyToRun->nextReadyToRun=thread->nextReadyToRun;
-        if (thread->nextReadyToRun) {
-          thread->nextReadyToRun->prevReadyToRun=thread->prevReadyToRun;
+        thread->prev_ready_to_run->next_ready_to_run=thread->next_ready_to_run;
+        if (thread->next_ready_to_run) {
+          thread->next_ready_to_run->prev_ready_to_run=thread->prev_ready_to_run;
         }
         break;
       }
     }
   }
-  for (Thread* thread=current_thread->process->firstThread;thread!=NULL;thread=thread->nextThreadInProcess) {
+  for (Thread* thread=current_thread->process->first_thread;thread!=NULL;thread=thread->next_thread_in_process) {
     if (thread->tid==current_thread->tid) {
       thread->state=newstate;
     }
@@ -287,8 +287,8 @@ void tasking_unblock(pid_t pid,pid_t tid) {
     if (!processes[pid]) {
       serial_printf("PID %d does not exist!\n",pid);
     }
-    Thread* thread=processes[pid]->firstThread;
-    for (;thread!=NULL;thread=thread->nextThreadInProcess) {
+    Thread* thread=processes[pid]->first_thread;
+    for (;thread!=NULL;thread=thread->next_thread_in_process) {
       if (thread->tid==tid) {
         break;
       }
@@ -308,8 +308,8 @@ void tasking_unblock(pid_t pid,pid_t tid) {
     if (!is_proc_scheduled(thread->process->pid)) {
     // Link the thread onto the list of ready to run threads
     if (ready_to_run_tail) {
-      thread->prevReadyToRun=ready_to_run_tail;
-      ready_to_run_tail->nextThreadInProcess=thread;
+      thread->prev_ready_to_run=ready_to_run_tail;
+      ready_to_run_tail->next_thread_in_process=thread;
       ready_to_run_tail=thread;
     } else {
       ready_to_run_head=thread;
@@ -322,34 +322,34 @@ void tasking_unblock(pid_t pid,pid_t tid) {
 void tasking_exit(int code) {
   serial_printf("PID %d is exiting with code %d.\n",current_thread->process->pid,code);
   if (ready_to_run_head&&SAME_PROC(ready_to_run_head,current_thread)) {
-    ready_to_run_head=ready_to_run_head->nextReadyToRun;
+    ready_to_run_head=ready_to_run_head->next_ready_to_run;
     if (ready_to_run_head==NULL) {
       ready_to_run_tail=NULL;
     }
   }
   if (ready_to_run_tail&&SAME_PROC(ready_to_run_tail,current_thread)) {
-    ready_to_run_tail=ready_to_run_tail->prevReadyToRun;
+    ready_to_run_tail=ready_to_run_tail->prev_ready_to_run;
     if (ready_to_run_tail==NULL) {
       ready_to_run_head=NULL;
       
     }
   }
-  if (ready_to_run_head&&ready_to_run_head->nextReadyToRun) {
-    for (Thread* thread=ready_to_run_head->nextReadyToRun;thread!=NULL;thread=thread->nextReadyToRun) {
+  if (ready_to_run_head&&ready_to_run_head->next_ready_to_run) {
+    for (Thread* thread=ready_to_run_head->next_ready_to_run;thread!=NULL;thread=thread->next_ready_to_run) {
       if (SAME_PROC(thread,current_thread)) {
-        thread->prevReadyToRun->nextReadyToRun=thread->nextReadyToRun;
-        if (thread->nextReadyToRun) {
-          thread->nextReadyToRun->prevReadyToRun=thread->prevReadyToRun;
+        thread->prev_ready_to_run->next_ready_to_run=thread->next_ready_to_run;
+        if (thread->next_ready_to_run) {
+          thread->next_ready_to_run->prev_ready_to_run=thread->prev_ready_to_run;
         }
         break;
       }
     }
   }
   unmark_proc_scheduled(current_thread->process->pid);
-  for (Thread* thread=current_thread->process->firstThread;thread!=NULL;thread=thread->nextThreadInProcess) {
+  for (Thread* thread=current_thread->process->first_thread;thread!=NULL;thread=thread->next_thread_in_process) {
     thread->state=THREAD_EXITED;
   }
-  current_thread->process->numThreadsBlocked=current_thread->process->numThreads;
+  current_thread->process->num_threads_blocked=current_thread->process->num_threads;
   num_procs--;
   tasking_yield();
 }
