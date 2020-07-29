@@ -17,7 +17,7 @@
 #define SAME_THREAD(thread1,thread2) (thread1->process->pid==thread2->process->pid&&thread1->tid==thread2->tid) //!< Macro to check whether two threads have the same PID and TID
 pid_t next_pid=0; //!< PID to use for the next created process
 size_t num_procs=0; //!< Number of non-exited processes
-Process* processes[MAX_PROCS]; //!< Array pf processes by PID
+Process processes[MAX_PROCS]; //!< Array pf processes by PID
 char proc_schedule_bmap[MAX_PROCS/8]; //!< Bitmap of what processes are scheduled
 Thread* current_thread; //!< Currently running thread
 static Thread* ready_to_run_head=NULL; //!< Head of the linked list of ready to run threads
@@ -80,10 +80,9 @@ void tasking_create_task(void* eip,void* cr3,char kmode,char param1_exists,void*
   } else {
     param2=NULL;
   }
-  Process* proc;
+  Process* proc=&processes[(pid_t)param2_arg];
   Thread* thread=kmalloc(sizeof(Thread));
   if (isThread) {
-    proc=processes[(pid_t)param2_arg];
     proc->num_threads++;
     thread->cr3=proc->first_thread->cr3;
   } else {
@@ -99,7 +98,6 @@ void tasking_create_task(void* eip,void* cr3,char kmode,char param1_exists,void*
     proc->num_threads=1;
     proc->num_threads_blocked=0;
     proc->first_thread=thread;
-    processes[proc->pid]=proc;
     thread->cr3=cr3;
   }
   thread->process=proc;
@@ -143,6 +141,10 @@ void tasking_create_task(void* eip,void* cr3,char kmode,char param1_exists,void*
 }
 
 void tasking_init() {
+  for (size_t i = 0; i < MAX_PROCS; i++) {
+    processes[i].num_threads=0;
+  }
+  
   tasking_create_task(NULL,get_cr3(),1,0,0,0,0,0);
 }
 
@@ -160,7 +162,7 @@ int* tasking_get_errno_address() {
 
 pid_t tasking_new_thread(void* start,pid_t pid,char param_exists,void* param_arg) {
   tasking_create_task(start,NULL,0,param_exists,param_arg,0,(void*)pid,1);
-  return processes[pid]->first_thread->tid;
+  return processes[pid].first_thread->tid;
 }
 
 /**
@@ -284,10 +286,10 @@ void tasking_block(thread_state newstate) {
 }
 void tasking_unblock(pid_t pid,pid_t tid) {
     serial_printf("Unblocking PID %d TID %d\n",pid,tid);
-    if (!processes[pid]) {
+    if (processes[pid].num_threads==0) {
       serial_printf("PID %d does not exist!\n",pid);
     }
-    Thread* thread=processes[pid]->first_thread;
+    Thread* thread=processes[pid].first_thread;
     for (;thread!=NULL;thread=thread->next_thread_in_process) {
       if (thread->tid==tid) {
         break;
