@@ -82,6 +82,7 @@ $(document).ready(function(){initNavTree('paging_8h.html',''); initResizable(); 
 
 <div class="header">
   <div class="summary">
+<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">paging.h File Reference</div>  </div>
@@ -90,6 +91,11 @@ $(document).ready(function(){initNavTree('paging_8h.html',''); initResizable(); 
 
 <p><a href="paging_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a7e912ae10cea398cf910621105ba481c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a7e912ae10cea398cf910621105ba481c">RUN_IN_ADDRESS_SPACE</a>(addr_space,  codeblock)</td></tr>
+<tr class="separator:a7e912ae10cea398cf910621105ba481c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a2370886c08cc1b84fa1d81fc8022db9b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a2370886c08cc1b84fa1d81fc8022db9b">map_pages</a> (void *virt_addr_ptr, void *phys_addr_ptr, int num_pages, char usr, char wr)</td></tr>
@@ -100,6 +106,8 @@ Functions</h2></td></tr>
 <tr class="separator:a64db1d6c4d8861128d9e6e7f671213d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f831aadf41672c296645a7b0df4a5c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a0f831aadf41672c296645a7b0df4a5c6">alloc_pages_virt</a> (int num_pages, void *addr)</td></tr>
 <tr class="separator:a0f831aadf41672c296645a7b0df4a5c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6acaea424d9bee06bf95ceb299d75a11"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a6acaea424d9bee06bf95ceb299d75a11">dealloc_pages</a> (int num_pages, void *addr)</td></tr>
+<tr class="separator:a6acaea424d9bee06bf95ceb299d75a11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a569adfd13ea3c63741f64108821b1712"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a569adfd13ea3c63741f64108821b1712">paging_init</a> ()</td></tr>
 <tr class="separator:a569adfd13ea3c63741f64108821b1712"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b1cb213f5783b7137f40279db762ffc"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a8b1cb213f5783b7137f40279db762ffc">paging_new_address_space</a> ()</td></tr>
@@ -113,6 +121,48 @@ Functions</h2></td></tr>
 <tr class="memitem:a7554d075a99f52e3303d1ffd90d8c166"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a7554d075a99f52e3303d1ffd90d8c166">get_address_space</a> ()</td></tr>
 <tr class="separator:a7554d075a99f52e3303d1ffd90d8c166"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a7e912ae10cea398cf910621105ba481c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e912ae10cea398cf910621105ba481c">&#9670;&nbsp;</a></span>RUN_IN_ADDRESS_SPACE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RUN_IN_ADDRESS_SPACE</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">addr_space, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">codeblock&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span> { \</div>
+<div class="line">  void* old_address_space=<a class="code" href="paging_8h.html#a7554d075a99f52e3303d1ffd90d8c166">get_address_space</a>(); \</div>
+<div class="line">  load_address_space(addr_space); \</div>
+<div class="line">  codeblock; \</div>
+<div class="line">  load_address_space(old_address_space); \</div>
+<div class="line">} <span class="keywordflow">while</span>(0);</div>
+</div><!-- fragment --><p>Run a block of code in a different address space </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">addr_space</td><td>the address space to use </td></tr>
+    <tr><td class="paramname">codeblock</td><td>the block of code to run </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a64db1d6c4d8861128d9e6e7f671213d8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a64db1d6c4d8861128d9e6e7f671213d8">&#9670;&nbsp;</a></span>alloc_pages()</h2>
@@ -129,7 +179,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Allocate virtual pages &amp; map them to physical memory. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Allocate virtual pages &amp; map them to newly allocated physical memory. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">num_pages</td><td>The number of pages to allocate. </td></tr>
   </table>
@@ -164,10 +214,45 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Allocate virtual pages at a specific address &amp; map them to physical memory. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Allocate virtual pages at a specific address &amp; map them to newly allocated physical memory. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">num_pages</td><td>The number of pages to allocate. </td></tr>
     <tr><td class="paramname">addr</td><td>The adress to start allocation at. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6acaea424d9bee06bf95ceb299d75a11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6acaea424d9bee06bf95ceb299d75a11">&#9670;&nbsp;</a></span>dealloc_pages()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dealloc_pages </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num_pages</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>addr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Deallocate the physical memory for pages and unmap them </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num_pages</td><td>The number of pages to deallocate. </td></tr>
+    <tr><td class="paramname">addr</td><td>The adress to start deallocation at. </td></tr>
   </table>
   </dd>
 </dl>
@@ -395,6 +480,7 @@ Functions</h2></td></tr>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="apaging_8h_html_a7554d075a99f52e3303d1ffd90d8c166"><div class="ttname"><a href="paging_8h.html#a7554d075a99f52e3303d1ffd90d8c166">get_address_space</a></div><div class="ttdeci">void * get_address_space()</div><div class="ttdef"><b>Definition:</b> paging.c:210</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

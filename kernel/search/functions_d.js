@@ -1,14 +1,13 @@
 var searchData=
 [
-  ['task_5finit_311',['task_init',['../tasking__helpers_8h.html#a0dd765564611ce3bf2bd466fe2ca4ae5',1,'tasking_helpers.h']]],
-  ['tasking_5fblock_312',['tasking_block',['../tasking_8c.html#a021c821360fc28b1a509b585f8d21769',1,'tasking_block(thread_state newstate):&#160;tasking.c'],['../tasking_8h.html#a021c821360fc28b1a509b585f8d21769',1,'tasking_block(thread_state newstate):&#160;tasking.c']]],
-  ['tasking_5fcreate_5ftask_313',['tasking_create_task',['../tasking_8c.html#aab3a61933f2bb9b94aee37b3cd078740',1,'tasking_create_task(void *eip, void *address_space, char kmode, char param1_exists, void *param1_arg, char param2_exists, void *param2_arg, char isThread):&#160;tasking.c'],['../tasking_8h.html#aab3a61933f2bb9b94aee37b3cd078740',1,'tasking_create_task(void *eip, void *address_space, char kmode, char param1_exists, void *param1_arg, char param2_exists, void *param2_arg, char isThread):&#160;tasking.c']]],
-  ['tasking_5fexit_314',['tasking_exit',['../tasking_8c.html#acf62dd83316df4b63f4a93587c9b791e',1,'tasking_exit(int code):&#160;tasking.c'],['../tasking_8h.html#acf62dd83316df4b63f4a93587c9b791e',1,'tasking_exit(int code):&#160;tasking.c']]],
-  ['tasking_5fget_5ferrno_5faddress_315',['tasking_get_errno_address',['../tasking_8c.html#a347fac6db01ff796e5dc6d1fc44c2eef',1,'tasking_get_errno_address():&#160;tasking.c'],['../tasking_8h.html#a347fac6db01ff796e5dc6d1fc44c2eef',1,'tasking_get_errno_address():&#160;tasking.c']]],
-  ['tasking_5fget_5fpid_316',['tasking_get_PID',['../tasking_8c.html#a9555a59dc2340ce36ae1a84c984b3af0',1,'tasking_get_PID():&#160;tasking.c'],['../tasking_8h.html#a9555a59dc2340ce36ae1a84c984b3af0',1,'tasking_get_PID():&#160;tasking.c']]],
-  ['tasking_5finit_317',['tasking_init',['../tasking_8c.html#a45f6d4112f15e33ba7a0e356f821d056',1,'tasking_init():&#160;tasking.c'],['../tasking_8h.html#a45f6d4112f15e33ba7a0e356f821d056',1,'tasking_init():&#160;tasking.c']]],
-  ['tasking_5fis_5fprivleged_318',['tasking_is_privleged',['../tasking_8c.html#a47f424f3474f4298f1d6b65eeee5d0f6',1,'tasking_is_privleged():&#160;tasking.c'],['../tasking_8h.html#a47f424f3474f4298f1d6b65eeee5d0f6',1,'tasking_is_privleged():&#160;tasking.c']]],
-  ['tasking_5fnew_5fthread_319',['tasking_new_thread',['../tasking_8c.html#ab4d000931b7ca87b83905b6172471d0e',1,'tasking_new_thread(void *start, pid_t pid, char param_exists, void *param_arg):&#160;tasking.c'],['../tasking_8h.html#ab4d000931b7ca87b83905b6172471d0e',1,'tasking_new_thread(void *start, pid_t pid, char param_exists, void *param_arg):&#160;tasking.c']]],
-  ['tasking_5funblock_320',['tasking_unblock',['../tasking_8c.html#a8daf634972bbe78df522aade52c180bf',1,'tasking_unblock(pid_t pid, pid_t tid):&#160;tasking.c'],['../tasking_8h.html#a8daf634972bbe78df522aade52c180bf',1,'tasking_unblock(pid_t pid, pid_t tid):&#160;tasking.c']]],
-  ['tasking_5fyield_321',['tasking_yield',['../tasking_8c.html#a78aa02f7e342d1a6f76fb2c692086f50',1,'tasking_yield():&#160;tasking.c'],['../tasking_8h.html#a78aa02f7e342d1a6f76fb2c692086f50',1,'tasking_yield():&#160;tasking.c']]]
+  ['serial_5finit_304',['serial_init',['../serial_8c.html#a8b17b137d175d09afe7cb07684f82e5d',1,'serial_init():&#160;serial.c'],['../serial_8h.html#a8b17b137d175d09afe7cb07684f82e5d',1,'serial_init():&#160;serial.c']]],
+  ['serial_5fprintf_305',['serial_printf',['../serial_8h.html#ae4f545d29e1faa30e5b27be12d4286d0',1,'serial_indep.c']]],
+  ['serial_5fputc_306',['serial_putc',['../serial_8c.html#a9c751f48f189bdf68240e476f01ea070',1,'serial_putc(char c):&#160;serial.c'],['../serial_8h.html#a9c751f48f189bdf68240e476f01ea070',1,'serial_putc(char c):&#160;serial.c']]],
+  ['serial_5fwrite_5fstring_307',['serial_write_string',['../serial_8h.html#a33e382fceb1f650af5229aaa40e47600',1,'serial_indep.c']]],
+  ['set_5fbmap_5fbit_308',['set_bmap_bit',['../kmalloc_8c.html#a9374790c8f20fb22e7b04472e67df7b5',1,'set_bmap_bit(size_t index):&#160;kmalloc.c'],['../pmem_8c.html#a11ed75ad6967efb05a974760be595f28',1,'set_bmap_bit(int index):&#160;pmem.c']]],
+  ['set_5fchar_309',['set_char',['../vga__err_8c.html#aa89efa21241581e8ccb810e286a49bcb',1,'vga_err.c']]],
+  ['set_5fentry_310',['set_entry',['../gdt_8c.html#a8ecb0e32b56815d5bd60db521567f471',1,'gdt.c']]],
+  ['setup_5fkstack_311',['setup_kstack',['../tasking__helpers__c_8c.html#a2d68a91a4777142a51990297666cf05a',1,'setup_kstack(Thread *thread, void *param1, void *param2, char kmode, void *eip):&#160;tasking_helpers_c.c'],['../tasking__helpers_8h.html#a2d68a91a4777142a51990297666cf05a',1,'setup_kstack(Thread *thread, void *param1, void *param2, char kmode, void *eip):&#160;tasking_helpers_c.c']]],
+  ['switch_5fto_5fthread_312',['switch_to_thread',['../tasking_8c.html#a92bbbaf5a589e3717ba7f91deaae0071',1,'tasking.c']]],
+  ['switch_5fto_5fthread_5fasm_313',['switch_to_thread_asm',['../tasking__helpers_8h.html#aa90e4e41b72e63004f85e8663d382596',1,'tasking_helpers.h']]]
 ];

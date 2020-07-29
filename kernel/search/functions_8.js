@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['load_5faddress_5fspace_290',['load_address_space',['../paging_8c.html#aee63ef1cb665a5aa68a15ab2461d20cd',1,'load_address_space(void *address_space):&#160;paging.c'],['../paging_8h.html#aee63ef1cb665a5aa68a15ab2461d20cd',1,'load_address_space(void *address_space):&#160;paging.c']]],
-  ['load_5fidt_291',['load_idt',['../idt_8c.html#aacb15cc09678bbe5e09fb652c56e884e',1,'load_idt():&#160;idt.c'],['../idt_8h.html#aacb15cc09678bbe5e09fb652c56e884e',1,'load_idt():&#160;idt.c']]]
+  ['kfree_291',['kfree',['../kmalloc_8c.html#ae99fbcc0b427b9bf726c73960c29efcb',1,'kfree(void *mem):&#160;kmalloc.c'],['../kmalloc_8h.html#ae99fbcc0b427b9bf726c73960c29efcb',1,'kfree(void *mem):&#160;kmalloc.c']]],
+  ['kmalloc_292',['kmalloc',['../kmalloc_8c.html#a5f52d7c56b7d67dc2f96b2e93dfdc7be',1,'kmalloc(size_t size):&#160;kmalloc.c'],['../kmalloc_8h.html#a5f52d7c56b7d67dc2f96b2e93dfdc7be',1,'kmalloc(size_t size):&#160;kmalloc.c']]]
 ];

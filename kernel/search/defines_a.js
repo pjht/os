@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['vga_5fblack_458',['VGA_BLACK',['../vga__err_8c.html#acab7e7029b260dd60c76016ee22e2e1b',1,'vga_err.c']]],
-  ['vga_5fwhite_459',['VGA_WHITE',['../vga__err_8c.html#a060c515545806e281c70e2c6cd7f6273',1,'vga_err.c']]]
+  ['same_5fproc_459',['SAME_PROC',['../tasking_8c.html#ad274a1a236e5a5d3a1be62f9d1f6eeec',1,'tasking.c']]],
+  ['same_5fthread_460',['SAME_THREAD',['../tasking_8c.html#af8b29f74b3134b814dd82f5e36871627',1,'tasking.c']]],
+  ['scratch_5fport_461',['SCRATCH_PORT',['../serial_8c.html#a33869476648347ff4dbf5ea3c5eb32a0',1,'serial.c']]]
 ];

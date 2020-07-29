@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['same_5fproc_455',['SAME_PROC',['../tasking_8c.html#ad274a1a236e5a5d3a1be62f9d1f6eeec',1,'tasking.c']]],
-  ['same_5fthread_456',['SAME_THREAD',['../tasking_8c.html#af8b29f74b3134b814dd82f5e36871627',1,'tasking.c']]],
-  ['scratch_5fport_457',['SCRATCH_PORT',['../serial_8c.html#a33869476648347ff4dbf5ea3c5eb32a0',1,'serial.c']]]
+  ['run_5fin_5faddress_5fspace_458',['RUN_IN_ADDRESS_SPACE',['../paging_8h.html#a7e912ae10cea398cf910621105ba481c',1,'paging.h']]]
 ];
