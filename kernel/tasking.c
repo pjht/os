@@ -59,6 +59,30 @@ static void unmark_proc_scheduled(pid_t index) {
   proc_schedule_bmap[byte]=proc_schedule_bmap[byte]&(~(1<<bit));
 }
 
+/**
+ * Schedules a thread if the thread's prcess does not have a scheduled thread
+ * \param thread The thread to schedule
+*/
+void schedule_thread(Thread* thread) {
+  if(!is_proc_scheduled(thread->process->pid)) {
+    if (ready_to_run_tail) {
+      thread->state=THREAD_READY;
+      ready_to_run_tail->next_ready_to_run=thread;
+      thread->prev_ready_to_run=ready_to_run_tail;
+      ready_to_run_tail=thread;
+      mark_proc_scheduled(thread->process->pid);
+    } else if (current_thread) {
+      thread->state=THREAD_READY;
+      ready_to_run_head=thread;
+      ready_to_run_tail=thread;
+      mark_proc_scheduled(thread->process->pid);
+    } else {
+      thread->state=THREAD_RUNNING;
+      current_thread=thread;
+    }
+  }
+}
+
 void tasking_create_task(void* eip,void* address_space,char kmode,void* param1,void* param2,char isThread) {
   if (next_pid>MAX_PROCS && !isThread) {
     serial_printf("Failed to create a process, as 32k processes have been created already.\n");
@@ -100,24 +124,8 @@ void tasking_create_task(void* eip,void* address_space,char kmode,void* param1,v
   } else {
     thread->next_thread_in_process=NULL;
     thread->prev_thread_in_process=NULL;
-    if (!is_proc_scheduled(proc->pid)) {
-      if (ready_to_run_tail) {
-        thread->state=THREAD_READY;
-        ready_to_run_tail->next_ready_to_run=thread;
-        thread->prev_ready_to_run=ready_to_run_tail;
-        ready_to_run_tail=thread;
-        mark_proc_scheduled(proc->pid);
-      } else if (current_thread) {
-        thread->state=THREAD_READY;
-        ready_to_run_head=thread;
-        ready_to_run_tail=thread;
-        mark_proc_scheduled(proc->pid);
-      } else {
-        thread->state=THREAD_RUNNING;
-        current_thread=thread;
+    schedule_thread(thread);
       }
-    }
-  }
   if (!isThread) {
     num_procs++;
   }
@@ -195,18 +203,9 @@ void switch_to_thread(Thread* thread) {
       }
     }
   }
-  if (current_thread_next_ready && !is_proc_scheduled(current_thread->process->pid)) {
-    // Link the thread onto the list of ready to run threads
-    if (ready_to_run_tail) {
-      current_thread_next_ready->prev_ready_to_run=ready_to_run_tail;
-      ready_to_run_tail->next_ready_to_run=current_thread_next_ready;
-      ready_to_run_tail=current_thread_next_ready;
-    } else {
-      ready_to_run_head=current_thread_next_ready;
-      ready_to_run_tail=current_thread_next_ready;
+  if (current_thread_next_ready) {
+    schedule_thread(current_thread_next_ready);
     }
-    mark_proc_scheduled(current_thread->process->pid);
-  }
   serial_printf("Switching to PID %d TID %d.\n",thread->process->pid,thread->tid);
   switch_to_thread_asm(thread);
 }
@@ -291,18 +290,7 @@ void tasking_unblock(pid_t pid,pid_t tid) {
       return;
     }
     thread->state=THREAD_READY;
-    if (!is_proc_scheduled(thread->process->pid)) {
-    // Link the thread onto the list of ready to run threads
-    if (ready_to_run_tail) {
-      thread->prev_ready_to_run=ready_to_run_tail;
-      ready_to_run_tail->next_thread_in_process=thread;
-      ready_to_run_tail=thread;
-    } else {
-      ready_to_run_head=thread;
-      ready_to_run_tail=thread;
-    }
-    mark_proc_scheduled(thread->process->pid);
-  }
+    schedule_thread(thread);
 }
 
 void tasking_exit(int code) {
