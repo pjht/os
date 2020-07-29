@@ -3,8 +3,8 @@ var searchData=
   ['ceil_11',['ceil',['../math_8h.html#a3ca8802ae559f6823ea7abdb6940aca8',1,'math.c']]],
   ['ceilf_12',['ceilf',['../math_8h.html#aef5cbe4d815dcdddbff7d272308d56ab',1,'math.c']]],
   ['clear_5fbmap_5fbit_13',['clear_bmap_bit',['../stdlib_8c.html#a7728201712dbe9c5f63cf9cfa223bf31',1,'stdlib.c']]],
-  ['copy_5fdata_14',['copy_data',['../memory_8h.html#a024dfc3d841bb20fba6d31b87e2f0d76',1,'memory.c']]],
-  ['createproccr3_15',['createProcCr3',['../tasking_8h.html#a33032794d68c3877e0556a137f6b4046',1,'tasking.c']]],
-  ['createproccr3param_16',['createProcCr3Param',['../tasking_8h.html#a115998e44710a6c6aa0d2f1e8bcd6ee4',1,'tasking.c']]],
+  ['copy_5fdata_14',['copy_data',['../memory_8h.html#a889941922d37e8707ab3ab8b02821599',1,'memory.c']]],
+  ['create_5fproc_15',['create_proc',['../tasking_8h.html#aa256b0ddaad1bb5e6cd6931a71a02186',1,'tasking.c']]],
+  ['create_5fproc_5fparam_16',['create_proc_param',['../tasking_8h.html#aaa6113dd096363f911133825f563f5cc',1,'tasking.c']]],
   ['ctype_2eh_17',['ctype.h',['../ctype_8h.html',1,'']]]
 ];

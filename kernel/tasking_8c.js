@@ -9,7 +9,7 @@ var tasking_8c =
     [ "mark_proc_scheduled", "tasking_8c.html#a3c8c11f9a0587bbfe09e2a348301849a", null ],
     [ "switch_to_thread", "tasking_8c.html#a92bbbaf5a589e3717ba7f91deaae0071", null ],
     [ "tasking_block", "tasking_8c.html#a021c821360fc28b1a509b585f8d21769", null ],
-    [ "tasking_create_task", "tasking_8c.html#a38bc7128c0f55dcb2b4ce0e36cae9c2b", null ],
+    [ "tasking_create_task", "tasking_8c.html#aab3a61933f2bb9b94aee37b3cd078740", null ],
     [ "tasking_exit", "tasking_8c.html#acf62dd83316df4b63f4a93587c9b791e", null ],
     [ "tasking_get_errno_address", "tasking_8c.html#a347fac6db01ff796e5dc6d1fc44c2eef", null ],
     [ "tasking_get_PID", "tasking_8c.html#a9555a59dc2340ce36ae1a84c984b3af0", null ],
@@ -23,7 +23,7 @@ var tasking_8c =
     [ "next_pid", "tasking_8c.html#a54a60f61f4b468b7e6ef164c4b5ba60b", null ],
     [ "num_procs", "tasking_8c.html#a440d57f12c449097a95746dd9198df5d", null ],
     [ "proc_schedule_bmap", "tasking_8c.html#a2f20bcee38d64c49d899e11e09e8ac1c", null ],
-    [ "processes", "tasking_8c.html#a1ecf44f0807ae24e1107f6ebf9dcf50d", null ],
+    [ "processes", "tasking_8c.html#a2056bd87e9f442ca57362f1fde5a6fcb", null ],
     [ "ready_to_run_head", "tasking_8c.html#a9350c5c9949c166a8e832a5bd09ab644", null ],
     [ "ready_to_run_tail", "tasking_8c.html#ae219bf3d5df58ccd05cf59c2fefb5f2a", null ]
 ];

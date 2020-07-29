@@ -92,14 +92,14 @@ $(document).ready(function(){initNavTree('address__spaces_8h.html',''); initResi
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ad84891930b0cf2fe41bf065266d4888f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="address__spaces_8h.html#ad84891930b0cf2fe41bf065266d4888f">address_spaces_copy_data</a> (void *cr3, void *<a class="el" href="kmalloc_8c.html#a735984d41155bc1032e09bece8f8d66d">data</a>, uint32_t size, void *virt_addr)</td></tr>
-<tr class="separator:ad84891930b0cf2fe41bf065266d4888f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8657f554327a5382e0d2190045593d92"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="address__spaces_8h.html#a8657f554327a5382e0d2190045593d92">address_spaces_put_data</a> (void *cr3, void *<a class="el" href="kmalloc_8c.html#a735984d41155bc1032e09bece8f8d66d">data</a>, uint32_t size)</td></tr>
-<tr class="separator:a8657f554327a5382e0d2190045593d92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea8e22306177a4ab8651bcdce59263e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="address__spaces_8h.html#aea8e22306177a4ab8651bcdce59263e9">address_spaces_copy_data</a> (void *address_space, void *<a class="el" href="kmalloc_8c.html#a735984d41155bc1032e09bece8f8d66d">data</a>, uint32_t size, void *virt_addr)</td></tr>
+<tr class="separator:aea8e22306177a4ab8651bcdce59263e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae16eba03dbe64462fee5ea811665b9c3"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="address__spaces_8h.html#ae16eba03dbe64462fee5ea811665b9c3">address_spaces_put_data</a> (void *address_space, void *<a class="el" href="kmalloc_8c.html#a735984d41155bc1032e09bece8f8d66d">data</a>, uint32_t size)</td></tr>
+<tr class="separator:ae16eba03dbe64462fee5ea811665b9c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ad84891930b0cf2fe41bf065266d4888f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad84891930b0cf2fe41bf065266d4888f">&#9670;&nbsp;</a></span>address_spaces_copy_data()</h2>
+<a id="aea8e22306177a4ab8651bcdce59263e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea8e22306177a4ab8651bcdce59263e9">&#9670;&nbsp;</a></span>address_spaces_copy_data()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -108,7 +108,7 @@ Functions</h2></td></tr>
           <td class="memname">void address_spaces_copy_data </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>cr3</em>, </td>
+          <td class="paramname"><em>address_space</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -137,7 +137,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Copy data into an address space at a specified virtual address </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">cr3</td><td>The adress space to copy data to. </td></tr>
+    <tr><td class="paramname">address_space</td><td>The adress space to copy data to. </td></tr>
     <tr><td class="paramname">data</td><td>The data to copy </td></tr>
     <tr><td class="paramname">size</td><td>The size of the data </td></tr>
     <tr><td class="paramname">virt_addr</td><td>The address to copy the data to in the address space </td></tr>
@@ -147,8 +147,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a8657f554327a5382e0d2190045593d92"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8657f554327a5382e0d2190045593d92">&#9670;&nbsp;</a></span>address_spaces_put_data()</h2>
+<a id="ae16eba03dbe64462fee5ea811665b9c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae16eba03dbe64462fee5ea811665b9c3">&#9670;&nbsp;</a></span>address_spaces_put_data()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -157,7 +157,7 @@ Functions</h2></td></tr>
           <td class="memname">void* address_spaces_put_data </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>cr3</em>, </td>
+          <td class="paramname"><em>address_space</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -180,7 +180,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Put data into an address space at an unknown virtual address </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">cr3</td><td>The adress space to copy data to. </td></tr>
+    <tr><td class="paramname">address_space</td><td>The adress space to copy data to. </td></tr>
     <tr><td class="paramname">data</td><td>The data to copy </td></tr>
     <tr><td class="paramname">size</td><td>The size of the data </td></tr>
   </table>

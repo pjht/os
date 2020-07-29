@@ -9,7 +9,7 @@ var tasking_8h =
       [ "THREAD_BLOCKED", "tasking_8h.html#a4b1b32c1fc744438f665f0f1932dd207a4aeda0a1e7e9882ce8b0310833fee46e", null ]
     ] ],
     [ "tasking_block", "tasking_8h.html#a021c821360fc28b1a509b585f8d21769", null ],
-    [ "tasking_create_task", "tasking_8h.html#a38bc7128c0f55dcb2b4ce0e36cae9c2b", null ],
+    [ "tasking_create_task", "tasking_8h.html#aab3a61933f2bb9b94aee37b3cd078740", null ],
     [ "tasking_exit", "tasking_8h.html#acf62dd83316df4b63f4a93587c9b791e", null ],
     [ "tasking_get_errno_address", "tasking_8h.html#a347fac6db01ff796e5dc6d1fc44c2eef", null ],
     [ "tasking_get_PID", "tasking_8h.html#a9555a59dc2340ce36ae1a84c984b3af0", null ],

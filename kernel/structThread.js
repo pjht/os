@@ -1,6 +1,6 @@
 var structThread =
 [
-    [ "cr3", "structThread.html#a3bf6171b97c28a4da05947a74c8ded8b", null ],
+    [ "address_space", "structThread.html#a41198f851a921c04cce111e5d5f4cb0c", null ],
     [ "errno", "structThread.html#acb2fe83a77f2e2eea943869b40e472b0", null ],
     [ "kernel_esp", "structThread.html#a5c7be841d425e4383daccdce34d7aa29", null ],
     [ "kernel_esp_top", "structThread.html#ad587532fcef04437ad95e1cfea76ba2f", null ],

@@ -104,14 +104,14 @@ Functions</h2></td></tr>
 <tr class="separator:a569adfd13ea3c63741f64108821b1712"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b1cb213f5783b7137f40279db762ffc"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a8b1cb213f5783b7137f40279db762ffc">paging_new_address_space</a> ()</td></tr>
 <tr class="separator:a8b1cb213f5783b7137f40279db762ffc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c7ec6ba518ea622a2cf804633708383"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a4c7ec6ba518ea622a2cf804633708383">load_address_space</a> (void *cr3)</td></tr>
-<tr class="separator:a4c7ec6ba518ea622a2cf804633708383"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee63ef1cb665a5aa68a15ab2461d20cd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#aee63ef1cb665a5aa68a15ab2461d20cd">load_address_space</a> (void *address_space)</td></tr>
+<tr class="separator:aee63ef1cb665a5aa68a15ab2461d20cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af473eee5243c70174a1245d70a5c16fa"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#af473eee5243c70174a1245d70a5c16fa">virt_to_phys</a> (void *virt_addr)</td></tr>
 <tr class="separator:af473eee5243c70174a1245d70a5c16fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1675ea0f8e4994b4fbbbe3984ca522b1"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a1675ea0f8e4994b4fbbbe3984ca522b1">find_free_pages</a> (int num_pages)</td></tr>
 <tr class="separator:a1675ea0f8e4994b4fbbbe3984ca522b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d97f4dc5220371b494591ba21484503"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a9d97f4dc5220371b494591ba21484503">get_cr3</a> ()</td></tr>
-<tr class="separator:a9d97f4dc5220371b494591ba21484503"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7554d075a99f52e3303d1ffd90d8c166"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a7554d075a99f52e3303d1ffd90d8c166">get_address_space</a> ()</td></tr>
+<tr class="separator:a7554d075a99f52e3303d1ffd90d8c166"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a64db1d6c4d8861128d9e6e7f671213d8"></a>
@@ -199,14 +199,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a9d97f4dc5220371b494591ba21484503"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9d97f4dc5220371b494591ba21484503">&#9670;&nbsp;</a></span>get_cr3()</h2>
+<a id="a7554d075a99f52e3303d1ffd90d8c166"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7554d075a99f52e3303d1ffd90d8c166">&#9670;&nbsp;</a></span>get_address_space()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void* get_cr3 </td>
+          <td class="memname">void* get_address_space </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -217,8 +217,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a4c7ec6ba518ea622a2cf804633708383"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4c7ec6ba518ea622a2cf804633708383">&#9670;&nbsp;</a></span>load_address_space()</h2>
+<a id="aee63ef1cb665a5aa68a15ab2461d20cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee63ef1cb665a5aa68a15ab2461d20cd">&#9670;&nbsp;</a></span>load_address_space()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -227,14 +227,14 @@ Functions</h2></td></tr>
           <td class="memname">void load_address_space </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>cr3</em></td><td>)</td>
+          <td class="paramname"><em>address_space</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>Load an address space </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">cr3</td><td>The address space to load </td></tr>
+    <tr><td class="paramname">address_space</td><td>The address space to load </td></tr>
   </table>
   </dd>
 </dl>
