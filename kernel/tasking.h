@@ -60,13 +60,11 @@ extern Thread* current_thread;
  * \param eip The start address of the task
  * \param address_space The address space of the task
  * \param kmode Whether the task is a kernel mode task
- * \param param1_exists Whether param1_arg is a valid value
- * \param param1_arg The thread's start function first parameter
- * \param param2_exists Whether param2_arg is a valid value
- * \param param2_arg The thread's start function second parameter/
- * \param isThread Whether we are creating a new process or a thread in a process. If we are creating a theead, param2_arg becomes the PID for the newly created thread, and param2_exists must be 0.
+ * \param param1 The thread's start function first parameter
+ * \param param2 The thread's start function second parameter
+ * \param isThread Whether we are creating a new process or a thread in a process. If we are creating a theead, param2_arg becomes the PID for the newly created thread.
 */
-void tasking_create_task(void* eip,void* address_space,char kmode,char param1_exists,void* param1_arg,char param2_exists,void* param2_arg,char isThread);
+void tasking_create_task(void* eip,void* address_space,char kmode,void* param1,void* param2,char isThread);
 /**
  * Initialize tasking
 */
@@ -90,11 +88,10 @@ int* tasking_get_errno_address();
  * Create a new thread
  * \param start The start address of the task
  * \param pid The PID that gets the new thread
- * \param param_exists Whether param_arg is a valid value
- * \param param_arg The thread's start function parameter
+ * \param param The thread's start function parameter
  * \return the TID of the thread
 */
-pid_t tasking_new_thread(void* start,pid_t pid,char param_exists,void* param_arg);
+pid_t tasking_new_thread(void* start,pid_t pid,void* param);
 
 /**
  * Terminate the current thread

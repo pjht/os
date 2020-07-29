@@ -89,7 +89,7 @@ char load_proc(size_t datapos,char* initrd) {
       }
       copy_data(address_space,ptr,pheader.memsz,(void*)pheader.vaddr);
     }
-    create_proc((void*)header.entry,address_space);
+    create_proc((void*)header.entry,address_space,NULL,NULL);
   }
   return 1;
 }
@@ -122,7 +122,7 @@ char load_proc(size_t datapos,char* initrd) {
 //       }
 //       copy_data(address_space,ptr,pheader.memsz,(void*)pheader.vaddr);
 //     }
-//     create_proc((void*)header.entry,address_space);
+//     create_proc((void*)header.entry,address_space,NULL,NULL);
 //   }
 //   return 1;
 // }

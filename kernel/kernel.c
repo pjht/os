@@ -114,7 +114,7 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
       }
       copy_data(address_space,ptr,pheader.memsz,(void*)pheader.vaddr);
     }
-    create_proc((void*)header.entry,address_space);
+    create_proc((void*)header.entry,address_space,NULL,NULL);
     for (int i=0;i<4;i++) {
       yield();
     }
