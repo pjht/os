@@ -88,19 +88,19 @@ void tasking_create_task(void* eip,void* address_space,char kmode,void* param1,v
     serial_printf("Failed to create a process, as 32k processes have been created already.\n");
     halt(); //Cannot ever create more than 32k processes, as I don't currently reuse PIDs.
   }
-  Process* proc=&processes[(pid_t)param2];
+  pid_t pid=isThread ? (pid_t)param2 : next_pid;
+  Process* proc=&processes[pid];
   Thread* thread=kmalloc(sizeof(Thread));
   if (isThread) {
     proc->num_threads++;
     thread->address_space=proc->first_thread->address_space;
   } else {
-    proc=kmalloc(sizeof(Process));
     if (current_thread) {
       proc->priv=current_thread->process->priv;
     } else {
       proc->priv=1;
     }
-    proc->pid=next_pid;
+    proc->pid=pid;
     next_pid++;
     proc->next_tid=0;
     proc->num_threads=1;
