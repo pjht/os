@@ -12,14 +12,14 @@ void yield() {
   "::"b"(0));
 }
 
-void createProc(void* start,void* address_space) {
+void create_proc(void* start,void* address_space) {
   asm volatile("  \
     mov $" QU(SYSCALL_CREATEPROC) ", %%eax; \
     int $80; \
   "::"b"(start),"d"(0),"c"(address_space));
 }
 
-void createProcParam(void* start,void* address_space,void* param1,void* param2) {
+void create_proc_param(void* start,void* address_space,void* param1,void* param2) {
   asm volatile("  \
     mov $" QU(SYSCALL_CREATEPROC) ", %%eax; \
     int $80; \
@@ -36,14 +36,14 @@ __attribute__((noreturn)) void exit(int code) {
 }
 
 
-void blockThread(thread_state state) {
+void block_thread(thread_state state) {
   asm volatile("  \
     mov $" QU(SYSCALL_BLOCK) ", %%eax; \
     int $80; \
   "::"b"(state));
 }
 
-void unblockThread(pid_t pid,pid_t tid) {
+void unblock_thread(pid_t pid,pid_t tid) {
   asm volatile("  \
     mov $" QU(SYSCALL_UNBLOCK) ", %%eax; \
     int $80; \

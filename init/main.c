@@ -89,7 +89,7 @@ char load_proc(size_t datapos,char* initrd) {
       }
       copy_data(address_space,ptr,pheader.memsz,(void*)pheader.vaddr);
     }
-    createProc((void*)header.entry,address_space);
+    create_proc((void*)header.entry,address_space);
   }
   return 1;
 }
@@ -122,7 +122,7 @@ char load_proc(size_t datapos,char* initrd) {
 //       }
 //       copy_data(address_space,ptr,pheader.memsz,(void*)pheader.vaddr);
 //     }
-//     createProc((void*)header.entry,address_space);
+//     create_proc((void*)header.entry,address_space);
 //   }
 //   return 1;
 // }
@@ -136,7 +136,7 @@ int main() {
   serial_print("IN INIT\n");
   pthread_t thread;
   pthread_create(&thread,NULL,thread_func,NULL);
-  blockThread(THREAD_BLOCKED);
+  block_thread(THREAD_BLOCKED);
   for (int i=0;i<5;i++) {
     serial_print("YIELDING\n");
     yield();

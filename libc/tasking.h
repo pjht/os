@@ -31,7 +31,7 @@ void yield();
  * \param start The start function of the process
  * \param address_space The address space of the process
 */
-void createProc(void* start,void* address_space);
+void create_proc(void* start,void* address_space);
 /**
  * Create a process with 2 arguments
  * \param start The start function of the process
@@ -39,18 +39,18 @@ void createProc(void* start,void* address_space);
  * \param param1 The first parameter of the process
  * \param param2 The second parameter of the process
 */
-void createProcParam(void* start,void* address_space,void* param1,void* param2);
+void create_proc_param(void* start,void* address_space,void* param1,void* param2);
 /**
  * Block the current thread
  * \param state The state to block it with
 */
-void blockThread(thread_state state);
+void block_thread(thread_state state);
 /**
  * Unblock a thread in a process
  * \param pid The PID of the thread's process
  * \param tid The TID of the thread
 */
-void unblockThread(pid_t pid,pid_t tid);
+void unblock_thread(pid_t pid,pid_t tid);
 
 
 #endif
