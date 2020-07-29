@@ -164,7 +164,7 @@ void* paging_new_address_space() {
 }
 
 void load_address_space(void* address_space) {
-  asm volatile("movl %0, %%eax; movl %%eax, %%cr3;":"=m"(cr3)::"%eax");
+  asm volatile("movl %0, %%eax; movl %%eax, %%cr3;":"=m"(address_space)::"%eax");
 }
 
 void unmap_pages(void* start_virt,int num_pages) {
@@ -209,6 +209,6 @@ void paging_init() {
 
 void* get_address_space() {
   void* address_space;
-  asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(cr3)::"%eax");
+  asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(address_space)::"%eax");
   return address_space;
 }
