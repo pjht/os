@@ -54,9 +54,7 @@ static int new_kstack() {
 }
 
 void setup_kstack(Thread* thread,void* param1,void* param2,char kmode,void* eip) {
-  void* old_address_space=get_address_space();
   size_t kstack_num=new_kstack();
-  load_address_space(thread->address_space);
   if (kmode) {
     size_t top_idx=(1024*(kstack_num+1));
     thread->kernel_esp=((void*)(&kstacks[top_idx-5]));
@@ -66,13 +64,15 @@ void setup_kstack(Thread* thread,void* param1,void* param2,char kmode,void* eip)
     size_t top_idx=(1024*(kstack_num+1));
     thread->kernel_esp=((void*)(&kstacks[top_idx-7]));
     thread->kernel_esp_top=thread->kernel_esp;
-    void** user_stack=(void**)(((char*)alloc_pages(2))+0x2000);
-    user_stack-=2;
-    user_stack[0]=param1;
-    user_stack[1]=param2;
+    void** user_stack;
+    RUN_IN_ADDRESS_SPACE(thread->address_space,{
+      user_stack=(void**)(((char*)alloc_pages(2))+0x2000);
+      user_stack-=2;
+      user_stack[0]=param1;
+      user_stack[1]=param2;
+    });
     kstacks[top_idx-3]=(void*)task_init;
     kstacks[top_idx-2]=(void*)user_stack;
     kstacks[top_idx-1]=(void*)eip;
   }
-  load_address_space(old_address_space);
 }

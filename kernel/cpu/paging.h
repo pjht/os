@@ -5,6 +5,20 @@
 #ifndef PAGING_H
 #define PAGING_H
 
+
+/**
+ * Run a block of code in a different address space
+ * \param addr_space the address space to use
+ * \param codeblock the block of code to run
+*/
+#define RUN_IN_ADDRESS_SPACE(addr_space,codeblock) do { \
+  void* old_address_space=get_address_space(); \
+  load_address_space(addr_space); \
+  codeblock; \
+  load_address_space(old_address_space); \
+} while(0);
+
+
 /**
  * Map virtual pages to physical frames.
  * \param virt_addr_ptr The start of the virtual range to map.
@@ -21,17 +35,24 @@ void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,ch
 */
 void unmap_pages(void* start_virt,int num_pages);
 /**
- * Allocate virtual pages & map them to physical memory.
+ * Allocate virtual pages & map them to newly allocated physical memory.
  * \param num_pages The number of pages to allocate.
  * \return a pointer to the allocated pages.
 */
 void* alloc_pages(int num_pages);
 /**
- * Allocate virtual pages at a specific address & map them to physical memory.
+ * Allocate virtual pages at a specific address & map them to newly allocated physical memory.
  * \param num_pages The number of pages to allocate.
  * \param addr The adress to start allocation at.
 */
 void alloc_pages_virt(int num_pages,void* addr);
+/**
+ * Deallocate the physical memory for pages and unmap them
+ * \param num_pages The number of pages to deallocate.
+ * \param addr The adress to start deallocation at.
+*/
+void dealloc_pages(int num_pages,void* addr);
+
 /**
  * Initialize paging
 */
