@@ -43,9 +43,9 @@ void paging_init();
 void* paging_new_address_space();
 /**
  * Load an address space
- * \param cr3 The address space to load
+ * \param address_space The address space to load
 */
-void load_address_space(void* cr3);
+void load_address_space(void* address_space);
 /**
  * Convert a virtual address to a physical one.
  * \param virt_addr The virtual address to convert
@@ -63,6 +63,6 @@ void* find_free_pages(int num_pages);
  * Get the current address space
  * \return a pointer to the current address space in physical memory.
 */
-void* get_cr3();
+void* get_address_space();
 
 #endif

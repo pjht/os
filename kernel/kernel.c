@@ -94,7 +94,7 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
   if (header.magic!=ELF_MAGIC) {
     vga_write_string("[INFO] Invalid magic number for prog.elf\n");
   } else {
-    void* cr3=new_address_space();
+    void* address_space=new_address_space();
     for (int i=0;i<header.pheader_ent_nm;i++) {
       elf_pheader pheader;
       pos=(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos;
@@ -112,9 +112,9 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
           pos++;
         }
       }
-      copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
+      copy_data(address_space,ptr,pheader.memsz,(void*)pheader.vaddr);
     }
-    createProcCr3((void*)header.entry,cr3);
+    createProc((void*)header.entry,address_space);
     for (int i=0;i<4;i++) {
       yield();
     }

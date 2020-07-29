@@ -22,27 +22,27 @@ void alloc_memory_virt(int num_pages,void* addr) {
 }
 
 void* new_address_space() {
-  void* cr3;
+  void* address_space;
   asm volatile("  \
     mov $" QU(SYSCALL_NEW_ADDR_SPACE) ", %%eax; \
     int $80; \
-  ":"=b"(cr3));
-  return cr3;
+  ":"=b"(address_space));
+  return address_space;
 }
 
-void copy_data(void* cr3, void* data,size_t size,void* virt_addr) {
+void copy_data(void* address_space, void* data,size_t size,void* virt_addr) {
   asm volatile("  \
     mov $" QU(SYSCALL_ADDR_SPACES_COPY_DATA) ", %%eax; \
     int $80; \
-  "::"b"(cr3),"c"(data),"d"(size),"S"(virt_addr));
+  "::"b"(address_space),"c"(data),"d"(size),"S"(virt_addr));
 }
 
-void* put_data(void* cr3, void* data,size_t size) {
+void* put_data(void* address_space, void* data,size_t size) {
   void* virt_addr;
   asm volatile("  \
     mov $" QU(SYSCALL_ADDR_SPACES_COPY_DATA) ", %%eax; \
     int $80; \
-  ":"=b"(virt_addr):"b"(cr3),"c"(data),"d"(size),"S"(NULL));
+  ":"=b"(virt_addr):"b"(address_space),"c"(data),"d"(size),"S"(NULL));
   return virt_addr;
 }
 

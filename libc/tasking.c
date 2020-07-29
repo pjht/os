@@ -12,18 +12,18 @@ void yield() {
   "::"b"(0));
 }
 
-void createProcCr3(void* start,void* cr3) {
+void createProc(void* start,void* address_space) {
   asm volatile("  \
     mov $" QU(SYSCALL_CREATEPROC) ", %%eax; \
     int $80; \
-  "::"b"(start),"d"(0),"c"(cr3));
+  "::"b"(start),"d"(0),"c"(address_space));
 }
 
-void createProcCr3Param(void* start,void* cr3,void* param1,void* param2) {
+void createProcParam(void* start,void* address_space,void* param1,void* param2) {
   asm volatile("  \
     mov $" QU(SYSCALL_CREATEPROC) ", %%eax; \
     int $80; \
-  "::"b"(start),"c"(cr3),"d"(1),"S"(param1),"D"(param2));
+  "::"b"(start),"c"(address_space),"d"(1),"S"(param1),"D"(param2));
 }
 
 __attribute__((noreturn)) void exit(int code) {

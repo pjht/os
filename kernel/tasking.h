@@ -42,7 +42,7 @@ typedef struct Process {
 typedef struct Thread {
   void* kernel_esp; //!< The thread's kernel stack.
   void* kernel_esp_top; //!< The top of the thread's kernel stack.
-  void* cr3; //!< The address space of this thread. (it is in here and not in the process to simplify the task switch asembly)
+  void* address_space; //!< The address space of this thread. (it is in here and not in the process to simplify the task switch asembly)
   pid_t tid; //!< The TID of this thread.
   thread_state state; //!< The state of this thread. (running,ready to run,blocked,etc.)
   int errno; //!< The errno value for this thread.
@@ -58,7 +58,7 @@ extern Thread* current_thread;
 /**
  * Create a task
  * \param eip The start address of the task
- * \param cr3 The address space of the task
+ * \param address_space The address space of the task
  * \param kmode Whether the task is a kernel mode task
  * \param param1_exists Whether param1_arg is a valid value
  * \param param1_arg The thread's start function first parameter
@@ -66,7 +66,7 @@ extern Thread* current_thread;
  * \param param2_arg The thread's start function second parameter/
  * \param isThread Whether we are creating a new process or a thread in a process. If we are creating a theead, param2_arg becomes the PID for the newly created thread, and param2_exists must be 0.
 */
-void tasking_create_task(void* eip,void* cr3,char kmode,char param1_exists,void* param1_arg,char param2_exists,void* param2_arg,char isThread);
+void tasking_create_task(void* eip,void* address_space,char kmode,char param1_exists,void* param1_arg,char param2_exists,void* param2_arg,char isThread);
 /**
  * Initialize tasking
 */

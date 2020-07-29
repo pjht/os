@@ -69,7 +69,7 @@ char load_proc(size_t datapos,char* initrd) {
   if (header.magic!=ELF_MAGIC) {
     return 0;
   } else {
-    void* cr3=new_address_space();
+    void* address_space=new_address_space();
     for (int i=0;i<header.pheader_ent_nm;i++) {
       elf_pheader pheader;
       pos=(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos;
@@ -87,9 +87,9 @@ char load_proc(size_t datapos,char* initrd) {
           pos++;
         }
       }
-      copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
+      copy_data(address_space,ptr,pheader.memsz,(void*)pheader.vaddr);
     }
-    createProcCr3((void*)header.entry,cr3);
+    createProc((void*)header.entry,address_space);
   }
   return 1;
 }
@@ -104,7 +104,7 @@ char load_proc(size_t datapos,char* initrd) {
 //     serial_print("Bad magic number\n");
 //     return 0;
 //   } else {
-//     void* cr3=new_address_space();
+//     void* address_space=new_address_space();
 //     for (int i=0;i<header.pheader_ent_nm;i++) {
 //       elf_pheader pheader;
 //       fseek(initrd,(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos,SEEK_SET);
@@ -120,9 +120,9 @@ char load_proc(size_t datapos,char* initrd) {
 //         fseek(initrd,pheader.offset+datapos,SEEK_SET);
 //         fread(ptr,sizeof(char),pheader.filesz,initrd);
 //       }
-//       copy_data(cr3,ptr,pheader.memsz,(void*)pheader.vaddr);
+//       copy_data(address_space,ptr,pheader.memsz,(void*)pheader.vaddr);
 //     }
-//     createProcCr3((void*)header.entry,cr3);
+//     createProc((void*)header.entry,address_space);
 //   }
 //   return 1;
 // }

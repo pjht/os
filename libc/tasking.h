@@ -29,17 +29,17 @@ void yield();
 /**
  * Create a process
  * \param start The start function of the process
- * \param cr3 The address space of the process
+ * \param address_space The address space of the process
 */
-void createProcCr3(void* start,void* cr3);
+void createProc(void* start,void* address_space);
 /**
  * Create a process with 2 arguments
  * \param start The start function of the process
- * \param cr3 The address space of the process
+ * \param address_space The address space of the process
  * \param param1 The first parameter of the process
  * \param param2 The second parameter of the process
 */
-void createProcCr3Param(void* start,void* cr3,void* param1,void* param2);
+void createProcParam(void* start,void* address_space,void* param1,void* param2);
 /**
  * Block the current thread
  * \param state The state to block it with

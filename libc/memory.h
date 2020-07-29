@@ -31,21 +31,21 @@ void* new_address_space();
 
 /**
  * Copy data into an address space at a specified virtual address
- * \param cr3 The adress space to copy data to.
+ * \param address_space The adress space to copy data to.
  * \param data The data to copy
  * \param size The size of the data
  * \param virt_addr The address to copy the data to in the address space 
 */
-void copy_data(void* cr3, void* data,size_t size,void* virt_addr);
+void copy_data(void* address_space, void* data,size_t size,void* virt_addr);
 
 /**
  * Put data into an address space at an unknown virtual address
- * \param cr3 The adress space to copy data to.
+ * \param address_space The adress space to copy data to.
  * \param data The data to copy
  * \param size The size of the data
  * \return The address that the data was copied to.
 */
-void* put_data(void* cr3, void* data,size_t size);
+void* put_data(void* address_space, void* data,size_t size);
 
 /**
  * Map physical pages into virtual memory

@@ -59,7 +59,7 @@ static void unmark_proc_scheduled(pid_t index) {
   proc_schedule_bmap[byte]=proc_schedule_bmap[byte]&(~(1<<bit));
 }
 
-void tasking_create_task(void* eip,void* cr3,char kmode,char param1_exists,void* param1_arg,char param2_exists,void* param2_arg,char isThread) {
+void tasking_create_task(void* eip,void* address_space,char kmode,char param1_exists,void* param1_arg,char param2_exists,void* param2_arg,char isThread) {
   if (next_pid>MAX_PROCS && !isThread) {
     serial_printf("Failed to create a process, as 32k processes have been created already.\n");
     halt(); //Cannot ever create more than 32k processes, as I don't currently reuse PIDs.
@@ -84,7 +84,7 @@ void tasking_create_task(void* eip,void* cr3,char kmode,char param1_exists,void*
   Thread* thread=kmalloc(sizeof(Thread));
   if (isThread) {
     proc->num_threads++;
-    thread->cr3=proc->first_thread->cr3;
+    thread->address_space=proc->first_thread->address_space;
   } else {
     proc=kmalloc(sizeof(Process));
     if (current_thread) {
@@ -98,7 +98,7 @@ void tasking_create_task(void* eip,void* cr3,char kmode,char param1_exists,void*
     proc->num_threads=1;
     proc->num_threads_blocked=0;
     proc->first_thread=thread;
-    thread->cr3=cr3;
+    thread->address_space=address_space;
   }
   thread->process=proc;
   thread->errno=0;
@@ -145,7 +145,7 @@ void tasking_init() {
     processes[i].num_threads=0;
   }
   
-  tasking_create_task(NULL,get_cr3(),1,0,0,0,0,0);
+  tasking_create_task(NULL,get_address_space(),1,0,0,0,0,0);
 }
 
 char tasking_is_privleged() {
