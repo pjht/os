@@ -11,28 +11,28 @@
 #include <stdlib.h>
 
 /**
- * \page pg_struct_entry Format of a paging structure entry
- * The format of a page table/directiry entry is as following: <br>
- * Bits 31-11 is the physical frame number the entry points to. <br>
- * Bits 11-9 are availible for use by the OS. <br>
- * Bit 8 is ignored. <br>
- * Bit 7 is the page size in page directories, and must be 0 in page tables. If set to 1 in a page directory, it indicates 4MB pages. <br>
- * Bit 6 is the dirty bit in page tables, and must be 0 in page directories. In page tabes, it is set to 1 by the CPU when the page is written to. <br>
- * Bit 5 will be set to 1 by the CPU when the page is accessed. <br>
- * Bit 4 indicates whether the page has it's cache disabled. <br>
- * Bit 3 indictates whether write-through caching (when it is 1), or write-back caching, (when it is 0) is enabled. <br>
- * Bit 2 indictaes whether user mode code can access the page. <br>
- * Bit 1 indicates whether the page is writable. <br>
- * Bit 0 indicates whether the entry is present. If it is 0, the CU ignores the other 31 bits of the entry. <br>
- * Privlege bits in the entries are ANDed together, so the most restrictive privlege between the page directory and the page table wins.
+ * Represents an entry in a page table/directory. 
+ * \note Privlege bits in the page directory and page table entries for a page are ANDed together, so the most restrictive privlege between the page directory and the page table wins.
 */
+typedef struct {
+  int pres:1; //!< Whether the page is present
+  int wr:1; //!< Whether the page is writeable
+  int usr:1; //!< Whether the page is accessible by user mode
+  int cachetype:1; //!< Cache type for the page. Write-through caching when 1, write-back caching when 0.
+  int cachedisable:1; //!< Whether caching is disabled
+  int accessed:1; //!< Whether the page has been accessed
+  int dirty:1; //!< Whether the page is dirty (has been written to)
+  int sz:1; //!< Page size
+  int osavail:4; //!< Availible for OS use
+  int pgno:20; //!< Physical page number this page maps to
+} pg_struct_entry;
 
-static uint32_t page_directory[1024] __attribute__((aligned(4096))); //!< The kernel process's page directory
-static uint32_t kern_page_tables[NUM_KERN_FRAMES] __attribute__((aligned(4096))); //!< The page tables where the kernel binary is mapped in
-static uint32_t kstack_page_tables[218*1024] __attribute__((aligned(4096))); //!< Page tables for thread kernel stacks
-static uint32_t kmalloc_page_tables[4*1024] __attribute__((aligned(4096))); //!< Page tables for the kmalloc heap
-static uint32_t* pagdirmap=(uint32_t*)0xFFFFF000; //!< Pointer to the page directory entries in the recursive mapping
-static uint32_t* page_table_map=(uint32_t*)0xFFC00000; //!< Pointer to the page table entries in the recursive mapping
+static pg_struct_entry page_directory[1024] __attribute__((aligned(4096))); //!< The kernel process's page directory
+static pg_struct_entry kern_page_tables[NUM_KERN_FRAMES] __attribute__((aligned(4096))); //!< The page tables where the kernel binary is mapped in
+static pg_struct_entry kstack_page_tables[218*1024] __attribute__((aligned(4096))); //!< Page tables for thread kernel stacks
+static pg_struct_entry kmalloc_page_tables[4*1024] __attribute__((aligned(4096))); //!< Page tables for the kmalloc heap
+static pg_struct_entry* pagdirmap=(pg_struct_entry*)0xFFFFF000; //!< Pointer to the page directory entries in the recursive mapping
+static pg_struct_entry* page_table_map=(pg_struct_entry*)0xFFC00000; //!< Pointer to the page table entries in the recursive mapping
 /**
  * Checks whether a page is present
  * \param page The page number to check
@@ -41,10 +41,10 @@ static uint32_t* page_table_map=(uint32_t*)0xFFC00000; //!< Pointer to the page 
 static char is_page_present(size_t page) {
    int table=page>>10;
    page=page&0x3FF;
-   if ((pagdirmap[table]&0x1)==0) {
+   if (!pagdirmap[table].pres) {
      return 0;
    }
-   return page_table_map[page+1024*table]&0x1;
+   return page_table_map[page+1024*table].pres;
 }
 
 void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,char wr) {
@@ -53,16 +53,18 @@ void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,ch
   int dir_entry=(virt_addr&0xFFC00000)>>22;
   int table_entry=(virt_addr&0x3FF000)>>12;
   for (int i=0;i<num_pages;i++) {
-    if (!(pagdirmap[dir_entry]&0x1)) {
-      int flags=1;
-      flags=flags|((wr&1)<<1);
-      flags=flags|((usr&1)<<2);
-      pagdirmap[dir_entry]=(uint32_t)pmem_alloc(1)|flags;
+    if (!pagdirmap[dir_entry].pres) {
+      pg_struct_entry* entry=&pagdirmap[dir_entry];
+      entry->pgno=(uint32_t)pmem_alloc(1)>>12;
+      entry->pres=1;
+      entry->usr=usr;
+      entry->wr=wr;
     }
-    int flags=1;
-    flags=flags|((wr&1)<<1);
-    flags=flags|((usr&1)<<2);
-    page_table_map[table_entry+1024*dir_entry]=phys_addr|flags;
+    pg_struct_entry* entry=&page_table_map[table_entry+1024*dir_entry];
+    entry->pgno=phys_addr>>12;
+    entry->pres=1;
+    entry->usr=usr;
+    entry->wr=wr;
     table_entry++;
     if (table_entry==1024) {
       table_entry=0;
@@ -131,10 +133,10 @@ void* virt_to_phys(void* virt_addr_arg) {
   if (!is_page_present(virt_addr>>12)) return NULL;
   int dir_idx=(virt_addr&0xFFC00000)>>22;
   int tbl_idx=(virt_addr&0x3FFC00)>>12;
-  if ((pagdirmap[dir_idx]&0x1)==0) {
+  if (!pagdirmap[dir_idx].pres) {
     return 0;
   }
-  return (void*)((page_table_map[tbl_idx+1024*dir_idx]&0xFFFFFC00)+offset);
+  return (void*)(((page_table_map[tbl_idx+1024*dir_idx].pgno)<<12)+offset);
 }
 
 
@@ -153,12 +155,15 @@ static void invl_page(void* addr) {
 
 void* paging_new_address_space() {
   void* dir=pmem_alloc(1);
-  uint32_t* freepg=find_free_pages(1);
+  pg_struct_entry* freepg=find_free_pages(1);
   map_pages(freepg,dir,1,0,1);
   for (size_t i=0;i<1024;i++) {
     freepg[i]=page_directory[i];
   }
-  freepg[1023]=((uint32_t)dir)|0x3;
+  pg_struct_entry* entry=&freepg[1023];
+  entry->pres=1;
+  entry->wr=1;
+  entry->pgno=(uint32_t)dir>>12;
   unmap_pages(freepg,1);
   return dir;
 }
@@ -172,8 +177,9 @@ void unmap_pages(void* start_virt,int num_pages) {
   int dir_entry=(virt_addr&0xFFC00000)>>22;
   int table_entry=(virt_addr&0x3FF000)>>12;
   for (int i=0;i<=num_pages;i++) {
-    if (page_table_map[dir_entry]&0x1) {
-      page_table_map[table_entry+1024*dir_entry]=0;
+    if (page_table_map[dir_entry].pres) {
+      pg_struct_entry* entry=&page_table_map[table_entry+1024*dir_entry];
+      entry->pres=0;
       invl_page(start_virt+(i*1024));
       table_entry++;
       if (table_entry==1024) {
@@ -186,24 +192,40 @@ void unmap_pages(void* start_virt,int num_pages) {
 
 void paging_init() {
   for (size_t i=0;i<NUM_KERN_FRAMES;i++) {
-    kern_page_tables[i]=(i<<12)|0x3;
+    pg_struct_entry* entry=&kern_page_tables[i];
+    entry->pres=1;
+    entry->wr=1;
+    entry->pgno=i;
   }
   for (size_t i=0;i<218*1024;i++) {
-    kstack_page_tables[i]=0;
+    pg_struct_entry* entry=&kstack_page_tables[i];
+    entry->pres=0;
   }
   for (size_t i=0;i<4*1024;i++) {
-    kmalloc_page_tables[i]=(uint32_t)pmem_alloc(1)|0x3;
+    pg_struct_entry* entry=&kmalloc_page_tables[i];
+    entry->pres=1;
+    entry->wr=1;
+    entry->pgno=(uint32_t)pmem_alloc(1)>>12;
   }
   for (size_t i=0;i<NUM_KERN_FRAMES/1024;i++) {
     uint32_t entry_virt=(uint32_t)&(kern_page_tables[i*1024]);
-    page_directory[i+768]=(entry_virt-0xC0000000)|0x3;
+    pg_struct_entry* entry=&page_directory[i+768];
+    entry->pres=1;
+    entry->wr=1;
+    entry->pgno=((uint32_t)entry_virt-0xC0000000)>>12;
   }
-  page_directory[985]=(uint32_t)(pmem_alloc(1024))|0x83;
+  // page_directory[985]=(uint32_t)(pmem_alloc(1024))|0x83;
   for (size_t i=0;i<4;i++) {
     uint32_t entry_virt=(uint32_t)&(kmalloc_page_tables[i*1024]);
-    page_directory[i+1018]=(entry_virt-0xC0000000)|0x3;
+    pg_struct_entry* entry=&page_directory[i+1018];
+    entry->pres=1;
+    entry->wr=1;
+    entry->pgno=((uint32_t)entry_virt-0xC0000000)>>12;
   }
-  page_directory[1023]=((uint32_t)page_directory-0xC0000000)|0x3;
+  pg_struct_entry* entry=&page_directory[1023];
+  entry->pres=1;
+  entry->wr=1;
+  entry->pgno=((uint32_t)page_directory-0xC0000000)>>12;
   load_address_space((uint32_t*)((uint32_t)page_directory-0xC0000000));
 }
 
@@ -211,4 +233,9 @@ void* get_address_space() {
   void* address_space;
   asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(address_space)::"%eax");
   return address_space;
+}
+
+void dealloc_pages(int num_pages,void* addr) {
+  pmem_free((uint32_t)virt_to_phys(addr)>>12,num_pages);
+  unmap_pages(addr,num_pages);
 }
