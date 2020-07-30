@@ -4,7 +4,6 @@ var searchData=
   ['ceilf_12',['ceilf',['../math_8h.html#aef5cbe4d815dcdddbff7d272308d56ab',1,'math.c']]],
   ['clear_5fbmap_5fbit_13',['clear_bmap_bit',['../stdlib_8c.html#a7728201712dbe9c5f63cf9cfa223bf31',1,'stdlib.c']]],
   ['copy_5fdata_14',['copy_data',['../memory_8h.html#a889941922d37e8707ab3ab8b02821599',1,'memory.c']]],
-  ['create_5fproc_15',['create_proc',['../tasking_8h.html#aa256b0ddaad1bb5e6cd6931a71a02186',1,'tasking.c']]],
-  ['create_5fproc_5fparam_16',['create_proc_param',['../tasking_8h.html#aaa6113dd096363f911133825f563f5cc',1,'tasking.c']]],
-  ['ctype_2eh_17',['ctype.h',['../ctype_8h.html',1,'']]]
+  ['create_5fproc_15',['create_proc',['../tasking_8h.html#a9096cd6cda1c7bf1817f68e2801e866b',1,'tasking.c']]],
+  ['ctype_2eh_16',['ctype.h',['../ctype_8h.html',1,'']]]
 ];

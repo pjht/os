@@ -4,6 +4,7 @@ var annotated_dup =
     [ "gdt_entry", "structgdt__entry.html", "structgdt__entry" ],
     [ "idt_gate_t", "structidt__gate__t.html", "structidt__gate__t" ],
     [ "idt_register_t", "structidt__register__t.html", "structidt__register__t" ],
+    [ "pg_struct_entry", "structpg__struct__entry.html", "structpg__struct__entry" ],
     [ "Process", "structProcess.html", "structProcess" ],
     [ "registers_t", "structregisters__t.html", "structregisters__t" ],
     [ "RPCFuncInfo", "structRPCFuncInfo.html", "structRPCFuncInfo" ],

@@ -25,7 +25,6 @@
 var NAVTREE =
 [
   [ "MyOS Kernel", "index.html", [
-    [ "Format of a paging structure entry", "pg_struct_entry.html", null ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
       [ "Data Structure Index", "classes.html", null ],
@@ -52,7 +51,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "address__spaces_8h.html",
-"structtss__entry.html#aaa4ebeb4215f6eea685b57d1da7e2092"
+"structtss__entry.html#a4400082798259c7ad78fe4ee38f3291e"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

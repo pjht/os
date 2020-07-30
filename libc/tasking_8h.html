@@ -106,10 +106,8 @@ Enumerations</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a58c8b2ad0ea491a6642e5e1cbd358c89"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#a58c8b2ad0ea491a6642e5e1cbd358c89">yield</a> ()</td></tr>
 <tr class="separator:a58c8b2ad0ea491a6642e5e1cbd358c89"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa256b0ddaad1bb5e6cd6931a71a02186"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#aa256b0ddaad1bb5e6cd6931a71a02186">create_proc</a> (void *start, void *address_space)</td></tr>
-<tr class="separator:aa256b0ddaad1bb5e6cd6931a71a02186"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa6113dd096363f911133825f563f5cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#aaa6113dd096363f911133825f563f5cc">create_proc_param</a> (void *start, void *address_space, void *param1, void *param2)</td></tr>
-<tr class="separator:aaa6113dd096363f911133825f563f5cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9096cd6cda1c7bf1817f68e2801e866b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#a9096cd6cda1c7bf1817f68e2801e866b">create_proc</a> (void *start, void *address_space, void *param1, void *param2)</td></tr>
+<tr class="separator:a9096cd6cda1c7bf1817f68e2801e866b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd5e459c713d0c137166c9a55409b224"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#afd5e459c713d0c137166c9a55409b224">block_thread</a> (<a class="el" href="tasking_8h.html#a4b1b32c1fc744438f665f0f1932dd207">thread_state</a> state)</td></tr>
 <tr class="separator:afd5e459c713d0c137166c9a55409b224"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a008779a4224d51ad434bccded6e2a7fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#a008779a4224d51ad434bccded6e2a7fb">unblock_thread</a> (pid_t pid, pid_t tid)</td></tr>
@@ -166,49 +164,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aa256b0ddaad1bb5e6cd6931a71a02186"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa256b0ddaad1bb5e6cd6931a71a02186">&#9670;&nbsp;</a></span>create_proc()</h2>
+<a id="a9096cd6cda1c7bf1817f68e2801e866b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9096cd6cda1c7bf1817f68e2801e866b">&#9670;&nbsp;</a></span>create_proc()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void create_proc </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>start</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>address_space</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Create a process </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">start</td><td>The start function of the process </td></tr>
-    <tr><td class="paramname">address_space</td><td>The address space of the process </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="aaa6113dd096363f911133825f563f5cc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaa6113dd096363f911133825f563f5cc">&#9670;&nbsp;</a></span>create_proc_param()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void create_proc_param </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>start</em>, </td>
@@ -238,7 +201,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Create a process with 2 arguments </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Create a process </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">start</td><td>The start function of the process </td></tr>
     <tr><td class="paramname">address_space</td><td>The address space of the process </td></tr>

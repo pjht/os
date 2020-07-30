@@ -96,6 +96,7 @@ $(document).ready(function(){initNavTree('tasking_8c.html',''); initResizable();
 <code>#include &quot;<a class="el" href="kmalloc_8h_source.html">kmalloc.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="tasking_8h_source.html">tasking.h</a>&quot;</code><br />
 <code>#include &lt;sys/types.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
@@ -128,8 +129,10 @@ Functions</h2></td></tr>
 <tr class="separator:a3c8c11f9a0587bbfe09e2a348301849a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3a9873876af082690bffdb92292c7d6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#ad3a9873876af082690bffdb92292c7d6">unmark_proc_scheduled</a> (pid_t index)</td></tr>
 <tr class="separator:ad3a9873876af082690bffdb92292c7d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab3a61933f2bb9b94aee37b3cd078740"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#aab3a61933f2bb9b94aee37b3cd078740">tasking_create_task</a> (void *eip, void *address_space, char kmode, char param1_exists, void *param1_arg, char param2_exists, void *param2_arg, char isThread)</td></tr>
-<tr class="separator:aab3a61933f2bb9b94aee37b3cd078740"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2aa9c7df01f34c332d0357417bca9359"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a2aa9c7df01f34c332d0357417bca9359">schedule_thread</a> (<a class="el" href="structThread.html">Thread</a> *thread)</td></tr>
+<tr class="separator:a2aa9c7df01f34c332d0357417bca9359"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac90817d992a64d95d80e4505343ed13c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#ac90817d992a64d95d80e4505343ed13c">tasking_create_task</a> (void *eip, void *address_space, char kmode, void *param1, void *param2, char isThread)</td></tr>
+<tr class="separator:ac90817d992a64d95d80e4505343ed13c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45f6d4112f15e33ba7a0e356f821d056"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a45f6d4112f15e33ba7a0e356f821d056">tasking_init</a> ()</td></tr>
 <tr class="separator:a45f6d4112f15e33ba7a0e356f821d056"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47f424f3474f4298f1d6b65eeee5d0f6"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a47f424f3474f4298f1d6b65eeee5d0f6">tasking_is_privleged</a> ()</td></tr>
@@ -138,18 +141,37 @@ Functions</h2></td></tr>
 <tr class="separator:a9555a59dc2340ce36ae1a84c984b3af0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a347fac6db01ff796e5dc6d1fc44c2eef"><td class="memItemLeft" align="right" valign="top">int *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a347fac6db01ff796e5dc6d1fc44c2eef">tasking_get_errno_address</a> ()</td></tr>
 <tr class="separator:a347fac6db01ff796e5dc6d1fc44c2eef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4d000931b7ca87b83905b6172471d0e"><td class="memItemLeft" align="right" valign="top">pid_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#ab4d000931b7ca87b83905b6172471d0e">tasking_new_thread</a> (void *start, pid_t pid, char param_exists, void *param_arg)</td></tr>
-<tr class="separator:ab4d000931b7ca87b83905b6172471d0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a911d2c94f4a15da6dbbf9fdccdda7e"><td class="memItemLeft" align="right" valign="top">pid_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a8a911d2c94f4a15da6dbbf9fdccdda7e">tasking_new_thread</a> (void *start, pid_t pid, void *param)</td></tr>
+<tr class="separator:a8a911d2c94f4a15da6dbbf9fdccdda7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8054e242e219d682141e4acfef861e93"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structThread.html">Thread</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a8054e242e219d682141e4acfef861e93">get_next_ready_thread</a> (<a class="el" href="structThread.html">Thread</a> *thread, <a class="el" href="structThread.html">Thread</a> *thread_to_skip)</td></tr>
+<tr class="separator:a8054e242e219d682141e4acfef861e93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92bbbaf5a589e3717ba7f91deaae0071"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a92bbbaf5a589e3717ba7f91deaae0071">switch_to_thread</a> (<a class="el" href="structThread.html">Thread</a> *thread)</td></tr>
 <tr class="separator:a92bbbaf5a589e3717ba7f91deaae0071"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78aa02f7e342d1a6f76fb2c692086f50"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a78aa02f7e342d1a6f76fb2c692086f50">tasking_yield</a> ()</td></tr>
 <tr class="separator:a78aa02f7e342d1a6f76fb2c692086f50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a021c821360fc28b1a509b585f8d21769"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a021c821360fc28b1a509b585f8d21769">tasking_block</a> (<a class="el" href="tasking_8h.html#a4b1b32c1fc744438f665f0f1932dd207">thread_state</a> newstate)</td></tr>
 <tr class="separator:a021c821360fc28b1a509b585f8d21769"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ff7ab6dd99a247d27e5d3b1d9d45556"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structThread.html">Thread</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a2ff7ab6dd99a247d27e5d3b1d9d45556">get_thread</a> (pid_t pid, pid_t tid)</td></tr>
+<tr class="separator:a2ff7ab6dd99a247d27e5d3b1d9d45556"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8daf634972bbe78df522aade52c180bf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a8daf634972bbe78df522aade52c180bf">tasking_unblock</a> (pid_t pid, pid_t tid)</td></tr>
 <tr class="separator:a8daf634972bbe78df522aade52c180bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf62dd83316df4b63f4a93587c9b791e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#acf62dd83316df4b63f4a93587c9b791e">tasking_exit</a> (int code)</td></tr>
 <tr class="separator:acf62dd83316df4b63f4a93587c9b791e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85f3e86dc7ddee108196d0557e307f9a"><td class="memItemLeft" align="right" valign="top"><a id="a85f3e86dc7ddee108196d0557e307f9a"></a>
+void *&#160;</td><td class="memItemRight" valign="bottom"><b>tasking_get_address_space</b> (pid_t pid)</td></tr>
+<tr class="separator:a85f3e86dc7ddee108196d0557e307f9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad04e43c483d045987f614582a4203082"><td class="memItemLeft" align="right" valign="top"><a id="ad04e43c483d045987f614582a4203082"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>tasking_set_rpc_calling_thread</b> (pid_t pid, pid_t tid)</td></tr>
+<tr class="separator:ad04e43c483d045987f614582a4203082"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25a4a19651c904d1611592f57d255c13"><td class="memItemLeft" align="right" valign="top"><a id="a25a4a19651c904d1611592f57d255c13"></a>
+pid_t&#160;</td><td class="memItemRight" valign="bottom"><b>tasking_get_rpc_calling_thread</b> (pid_t *tid)</td></tr>
+<tr class="separator:a25a4a19651c904d1611592f57d255c13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb458c9afaae981717f509dd3fe27123"><td class="memItemLeft" align="right" valign="top"><a id="adb458c9afaae981717f509dd3fe27123"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>tasking_set_rpc_ret_buf</b> (void *buf)</td></tr>
+<tr class="separator:adb458c9afaae981717f509dd3fe27123"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a475df75594db94effc24fcbe1e726f3e"><td class="memItemLeft" align="right" valign="top"><a id="a475df75594db94effc24fcbe1e726f3e"></a>
+void *&#160;</td><td class="memItemRight" valign="bottom"><b>tasking_get_rpc_ret_buf</b> ()</td></tr>
+<tr class="separator:a475df75594db94effc24fcbe1e726f3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -183,6 +205,94 @@ static <a class="el" href="structThread.html">Thread</a> *&#160;</td><td class="
 <tr class="separator:ae219bf3d5df58ccd05cf59c2fefb5f2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a8054e242e219d682141e4acfef861e93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8054e242e219d682141e4acfef861e93">&#9670;&nbsp;</a></span>get_next_ready_thread()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="structThread.html">Thread</a>* get_next_ready_thread </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structThread.html">Thread</a> *&#160;</td>
+          <td class="paramname"><em>thread</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structThread.html">Thread</a> *&#160;</td>
+          <td class="paramname"><em>thread_to_skip</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get the next ready thread in a list of threads, starting at the specified thread's next thread </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">thread</td><td>The start thread </td></tr>
+    <tr><td class="paramname">thread_to_skip</td><td>A thread to skip even if it's ready </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the next ready thread </dd></dl>
+
+</div>
+</div>
+<a id="a2ff7ab6dd99a247d27e5d3b1d9d45556"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ff7ab6dd99a247d27e5d3b1d9d45556">&#9670;&nbsp;</a></span>get_thread()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="structThread.html">Thread</a>* get_thread </td>
+          <td>(</td>
+          <td class="paramtype">pid_t&#160;</td>
+          <td class="paramname"><em>pid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">pid_t&#160;</td>
+          <td class="paramname"><em>tid</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get a thread </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pid</td><td>The PID of the thread </td></tr>
+    <tr><td class="paramname">tid</td><td>The TID of the thread </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the thread wih the specified PID and TID </dd></dl>
+
+</div>
+</div>
 <a id="a4fe00345b6be4d48d67c8d07112fd3a1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4fe00345b6be4d48d67c8d07112fd3a1">&#9670;&nbsp;</a></span>is_proc_scheduled()</h2>
 
@@ -248,6 +358,30 @@ static <a class="el" href="structThread.html">Thread</a> *&#160;</td><td class="
 
 </div>
 </div>
+<a id="a2aa9c7df01f34c332d0357417bca9359"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2aa9c7df01f34c332d0357417bca9359">&#9670;&nbsp;</a></span>schedule_thread()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void schedule_thread </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structThread.html">Thread</a> *&#160;</td>
+          <td class="paramname"><em>thread</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Schedules a thread if the thread's prcess does not have a scheduled thread </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">thread</td><td>The thread to schedule </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a92bbbaf5a589e3717ba7f91deaae0071"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a92bbbaf5a589e3717ba7f91deaae0071">&#9670;&nbsp;</a></span>switch_to_thread()</h2>
 
@@ -296,8 +430,8 @@ static <a class="el" href="structThread.html">Thread</a> *&#160;</td><td class="
 
 </div>
 </div>
-<a id="aab3a61933f2bb9b94aee37b3cd078740"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aab3a61933f2bb9b94aee37b3cd078740">&#9670;&nbsp;</a></span>tasking_create_task()</h2>
+<a id="ac90817d992a64d95d80e4505343ed13c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac90817d992a64d95d80e4505343ed13c">&#9670;&nbsp;</a></span>tasking_create_task()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -323,26 +457,14 @@ static <a class="el" href="structThread.html">Thread</a> *&#160;</td><td class="
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char&#160;</td>
-          <td class="paramname"><em>param1_exists</em>, </td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>param1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>param1_arg</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">char&#160;</td>
-          <td class="paramname"><em>param2_exists</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>param2_arg</em>, </td>
+          <td class="paramname"><em>param2</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -362,11 +484,9 @@ static <a class="el" href="structThread.html">Thread</a> *&#160;</td><td class="
     <tr><td class="paramname">eip</td><td>The start address of the task </td></tr>
     <tr><td class="paramname">address_space</td><td>The address space of the task </td></tr>
     <tr><td class="paramname">kmode</td><td>Whether the task is a kernel mode task </td></tr>
-    <tr><td class="paramname">param1_exists</td><td>Whether param1_arg is a valid value </td></tr>
-    <tr><td class="paramname">param1_arg</td><td>The thread's start function first parameter </td></tr>
-    <tr><td class="paramname">param2_exists</td><td>Whether param2_arg is a valid value </td></tr>
-    <tr><td class="paramname">param2_arg</td><td>The thread's start function second parameter/ </td></tr>
-    <tr><td class="paramname">isThread</td><td>Whether we are creating a new process or a thread in a process. If we are creating a theead, param2_arg becomes the PID for the newly created thread, and param2_exists must be 0. </td></tr>
+    <tr><td class="paramname">param1</td><td>The thread's start function first parameter </td></tr>
+    <tr><td class="paramname">param2</td><td>The thread's start function second parameter </td></tr>
+    <tr><td class="paramname">isThread</td><td>Whether we are creating a new process or a thread in a process. If we are creating a theead, param2_arg becomes the PID for the newly created thread. </td></tr>
   </table>
   </dd>
 </dl>
@@ -470,8 +590,8 @@ static <a class="el" href="structThread.html">Thread</a> *&#160;</td><td class="
 
 </div>
 </div>
-<a id="ab4d000931b7ca87b83905b6172471d0e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab4d000931b7ca87b83905b6172471d0e">&#9670;&nbsp;</a></span>tasking_new_thread()</h2>
+<a id="a8a911d2c94f4a15da6dbbf9fdccdda7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a911d2c94f4a15da6dbbf9fdccdda7e">&#9670;&nbsp;</a></span>tasking_new_thread()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -491,14 +611,8 @@ static <a class="el" href="structThread.html">Thread</a> *&#160;</td><td class="
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char&#160;</td>
-          <td class="paramname"><em>param_exists</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>param_arg</em>&#160;</td>
+          <td class="paramname"><em>param</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -511,8 +625,7 @@ static <a class="el" href="structThread.html">Thread</a> *&#160;</td><td class="
   <table class="params">
     <tr><td class="paramname">start</td><td>The start address of the task </td></tr>
     <tr><td class="paramname">pid</td><td>The PID that gets the new thread </td></tr>
-    <tr><td class="paramname">param_exists</td><td>Whether param_arg is a valid value </td></tr>
-    <tr><td class="paramname">param_arg</td><td>The thread's start function parameter </td></tr>
+    <tr><td class="paramname">param</td><td>The thread's start function parameter </td></tr>
   </table>
   </dd>
 </dl>

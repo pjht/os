@@ -82,6 +82,7 @@ $(document).ready(function(){initNavTree('paging_8c.html',''); initResizable(); 
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
@@ -96,6 +97,11 @@ $(document).ready(function(){initNavTree('paging_8c.html',''); initResizable(); 
 <code>#include &lt;stdint.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpg__struct__entry.html">pg_struct_entry</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a7fb8d280bc19b061f91b82733932c94f"><td class="memItemLeft" align="right" valign="top">static char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a7fb8d280bc19b061f91b82733932c94f">is_page_present</a> (size_t page)</td></tr>
@@ -122,33 +128,35 @@ Functions</h2></td></tr>
 <tr class="separator:a569adfd13ea3c63741f64108821b1712"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7554d075a99f52e3303d1ffd90d8c166"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a7554d075a99f52e3303d1ffd90d8c166">get_address_space</a> ()</td></tr>
 <tr class="separator:a7554d075a99f52e3303d1ffd90d8c166"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6acaea424d9bee06bf95ceb299d75a11"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a6acaea424d9bee06bf95ceb299d75a11">dealloc_pages</a> (int num_pages, void *addr)</td></tr>
+<tr class="separator:a6acaea424d9bee06bf95ceb299d75a11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:af7ba1ea666217e6ce8c16b16217b4ed4"><td class="memItemLeft" align="right" valign="top"><a id="af7ba1ea666217e6ce8c16b16217b4ed4"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#af7ba1ea666217e6ce8c16b16217b4ed4">page_directory</a> [1024]</td></tr>
-<tr class="memdesc:af7ba1ea666217e6ce8c16b16217b4ed4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The kernel process's page directory. <br /></td></tr>
-<tr class="separator:af7ba1ea666217e6ce8c16b16217b4ed4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a178fdbc06e3c09fc67a90becd7b04cf3"><td class="memItemLeft" align="right" valign="top"><a id="a178fdbc06e3c09fc67a90becd7b04cf3"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a178fdbc06e3c09fc67a90becd7b04cf3">kern_page_tables</a> [NUM_KERN_FRAMES]</td></tr>
-<tr class="memdesc:a178fdbc06e3c09fc67a90becd7b04cf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The page tables where the kernel binary is mapped in. <br /></td></tr>
-<tr class="separator:a178fdbc06e3c09fc67a90becd7b04cf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6914db49a71a383cd9ec79f2c2fcf2f0"><td class="memItemLeft" align="right" valign="top"><a id="a6914db49a71a383cd9ec79f2c2fcf2f0"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a6914db49a71a383cd9ec79f2c2fcf2f0">kstack_page_tables</a> [218 *1024]</td></tr>
-<tr class="memdesc:a6914db49a71a383cd9ec79f2c2fcf2f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Page tables for thread kernel stacks. <br /></td></tr>
-<tr class="separator:a6914db49a71a383cd9ec79f2c2fcf2f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3316ce221e6b85c0af74aeacd4daf87"><td class="memItemLeft" align="right" valign="top"><a id="ab3316ce221e6b85c0af74aeacd4daf87"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#ab3316ce221e6b85c0af74aeacd4daf87">kmalloc_page_tables</a> [4 *1024]</td></tr>
-<tr class="memdesc:ab3316ce221e6b85c0af74aeacd4daf87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Page tables for the kmalloc heap. <br /></td></tr>
-<tr class="separator:ab3316ce221e6b85c0af74aeacd4daf87"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d02d59abc01ecbc4abe432d0280f712"><td class="memItemLeft" align="right" valign="top"><a id="a3d02d59abc01ecbc4abe432d0280f712"></a>
-static uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a3d02d59abc01ecbc4abe432d0280f712">pagdirmap</a> =(uint32_t*)0xFFFFF000</td></tr>
-<tr class="memdesc:a3d02d59abc01ecbc4abe432d0280f712"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the page directory entries in the recursive mapping. <br /></td></tr>
-<tr class="separator:a3d02d59abc01ecbc4abe432d0280f712"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad931785935264e2f614bb96a96e92f5"><td class="memItemLeft" align="right" valign="top"><a id="aad931785935264e2f614bb96a96e92f5"></a>
-static uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#aad931785935264e2f614bb96a96e92f5">page_table_map</a> =(uint32_t*)0xFFC00000</td></tr>
-<tr class="memdesc:aad931785935264e2f614bb96a96e92f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the page table entries in the recursive mapping. <br /></td></tr>
-<tr class="separator:aad931785935264e2f614bb96a96e92f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fe26a02cdadc98e2deb18ea3862c813"><td class="memItemLeft" align="right" valign="top"><a id="a9fe26a02cdadc98e2deb18ea3862c813"></a>
+static <a class="el" href="structpg__struct__entry.html">pg_struct_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a9fe26a02cdadc98e2deb18ea3862c813">page_directory</a> [1024]</td></tr>
+<tr class="memdesc:a9fe26a02cdadc98e2deb18ea3862c813"><td class="mdescLeft">&#160;</td><td class="mdescRight">The kernel process's page directory. <br /></td></tr>
+<tr class="separator:a9fe26a02cdadc98e2deb18ea3862c813"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98670d5ebec84e70de69dde9a247304c"><td class="memItemLeft" align="right" valign="top"><a id="a98670d5ebec84e70de69dde9a247304c"></a>
+static <a class="el" href="structpg__struct__entry.html">pg_struct_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a98670d5ebec84e70de69dde9a247304c">kern_page_tables</a> [NUM_KERN_FRAMES]</td></tr>
+<tr class="memdesc:a98670d5ebec84e70de69dde9a247304c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The page tables where the kernel binary is mapped in. <br /></td></tr>
+<tr class="separator:a98670d5ebec84e70de69dde9a247304c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ef171b143c62a15b8f632ff06b06795"><td class="memItemLeft" align="right" valign="top"><a id="a6ef171b143c62a15b8f632ff06b06795"></a>
+static <a class="el" href="structpg__struct__entry.html">pg_struct_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a6ef171b143c62a15b8f632ff06b06795">kstack_page_tables</a> [218 *1024]</td></tr>
+<tr class="memdesc:a6ef171b143c62a15b8f632ff06b06795"><td class="mdescLeft">&#160;</td><td class="mdescRight">Page tables for thread kernel stacks. <br /></td></tr>
+<tr class="separator:a6ef171b143c62a15b8f632ff06b06795"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5bb44d01ce436047dece3cb3cd589bc"><td class="memItemLeft" align="right" valign="top"><a id="af5bb44d01ce436047dece3cb3cd589bc"></a>
+static <a class="el" href="structpg__struct__entry.html">pg_struct_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#af5bb44d01ce436047dece3cb3cd589bc">kmalloc_page_tables</a> [4 *1024]</td></tr>
+<tr class="memdesc:af5bb44d01ce436047dece3cb3cd589bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Page tables for the kmalloc heap. <br /></td></tr>
+<tr class="separator:af5bb44d01ce436047dece3cb3cd589bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a279cfd77cb8461801dceb90ac39bed76"><td class="memItemLeft" align="right" valign="top"><a id="a279cfd77cb8461801dceb90ac39bed76"></a>
+static <a class="el" href="structpg__struct__entry.html">pg_struct_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a279cfd77cb8461801dceb90ac39bed76">pagdirmap</a> =(<a class="el" href="structpg__struct__entry.html">pg_struct_entry</a>*)0xFFFFF000</td></tr>
+<tr class="memdesc:a279cfd77cb8461801dceb90ac39bed76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the page directory entries in the recursive mapping. <br /></td></tr>
+<tr class="separator:a279cfd77cb8461801dceb90ac39bed76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbd791d7bd73da84723b77373c041a88"><td class="memItemLeft" align="right" valign="top"><a id="adbd791d7bd73da84723b77373c041a88"></a>
+static <a class="el" href="structpg__struct__entry.html">pg_struct_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#adbd791d7bd73da84723b77373c041a88">page_table_map</a> =(<a class="el" href="structpg__struct__entry.html">pg_struct_entry</a>*)0xFFC00000</td></tr>
+<tr class="memdesc:adbd791d7bd73da84723b77373c041a88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the page table entries in the recursive mapping. <br /></td></tr>
+<tr class="separator:adbd791d7bd73da84723b77373c041a88"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a64db1d6c4d8861128d9e6e7f671213d8"></a>
@@ -205,6 +213,41 @@ static uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="e
   <table class="params">
     <tr><td class="paramname">num_pages</td><td>The number of pages to allocate. </td></tr>
     <tr><td class="paramname">addr</td><td>The adress to start allocation at. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6acaea424d9bee06bf95ceb299d75a11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6acaea424d9bee06bf95ceb299d75a11">&#9670;&nbsp;</a></span>dealloc_pages()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dealloc_pages </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num_pages</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>addr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Deallocate the physical memory for pages and unmap them </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num_pages</td><td>The number of pages to deallocate. </td></tr>
+    <tr><td class="paramname">addr</td><td>The adress to start deallocation at. </td></tr>
   </table>
   </dd>
 </dl>
