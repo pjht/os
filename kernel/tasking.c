@@ -342,24 +342,3 @@ void* tasking_get_address_space(pid_t pid) {
   return processes[pid].first_thread->address_space;
 }
 
-void tasking_set_rpc_calling_thread(pid_t pid,pid_t tid) {
-  Thread* thread=get_thread(pid,tid);
-  thread->rpc_calling_pid=current_thread->process->pid;
-  thread->rpc_calling_tid=current_thread->tid;
-}
-
-pid_t tasking_get_rpc_calling_thread(pid_t* tid) {
-  *tid=current_thread->rpc_calling_tid;
-  return current_thread->rpc_calling_pid;
-} 
-
-void tasking_set_rpc_ret_buf(void* buf) {
-  pid_t tid;
-  pid_t pid=tasking_get_rpc_calling_thread(&tid);
-  Thread* thread=get_thread(pid,tid);
-  thread->rpc_ret_buf=buf;
-}
-
-void* tasking_get_rpc_ret_buf() {
-  return current_thread->rpc_ret_buf;
-}
