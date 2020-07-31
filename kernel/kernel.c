@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <tasking.h>
+#include "timer/timer.h"
 
 /**
  * REspresents a TAR file header
@@ -66,6 +67,7 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
   asm volatile("sti");
   tasking_init();
   vga_init((char*)0xC00B8000);
+  timer_init(1000);
   read_initrd(tags);
   int pos=0;
   size_t datapos;
@@ -115,13 +117,14 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
       copy_data(address_space,ptr,pheader.memsz,(void*)pheader.vaddr);
     }
     create_proc((void*)header.entry,address_space,NULL,NULL);
-    for (int i=0;i<4;i++) {
-      yield();
-    }
-    unblock_thread(1,0);
-    for (int i=0;i<4;i++) {
-      yield();
-    }
+    // for (int i=0;i<4;i++) {
+    //   yield();
+    // }
+    // unblock_thread(1,0);
+    // for (int i=0;i<4;i++) {
+    //   yield();
+    // }
+    // for (;;);
     exit(0);
   }
 }

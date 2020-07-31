@@ -294,7 +294,7 @@ void irq_handler(registers_t* r) {
     port_byte_out(0x20,0x20); /* master */
     /* Handle the interrupt in a more modular way */
     if (irq_handlers[r->int_no-32] != NULL) {
-        isr_t handler = irq_handlers[r->int_no];
+        isr_t handler = irq_handlers[r->int_no-32];
         handler(r);
     }
 }

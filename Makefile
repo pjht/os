@@ -1,6 +1,7 @@
 PLAT=i386
-C_SOURCES = $(wildcard kernel/*.c kernel/cpu/$(PLAT)/*.c kernel/cpu/*.c) 
-C_HEADERS = $(wildcard kernel/*.h kernel/cpu/$(PLAT)/*.h kernel/cpu/*.h) 
+TIMER_TYPE=$(shell cat psinfo/$(PLAT)/timer_type.txt)
+C_SOURCES = $(wildcard kernel/*.c kernel/cpu/$(PLAT)/*.c kernel/cpu/*.c kernel/timer/$(TIMER_TYPE)/*.c) 
+C_HEADERS = $(wildcard kernel/*.h kernel/cpu/$(PLAT)/*.h kernel/cpu/*.h kernel/timer/$(TIMER_TYPE)/*.h) 
 ASM = $(wildcard kernel/cpu/$(PLAT)/*.asm)
 S_ASM = $(wildcard kernel/cpu/$(PLAT)/*.s)
 LIBC_SOURCES = $(wildcard libc/*.c libc/*/*.c)
