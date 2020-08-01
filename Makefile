@@ -15,7 +15,6 @@ AS = $(shell cat psinfo/$(PLAT)/as.txt)
 AR = $(shell cat psinfo/$(PLAT)/ar.txt)
 NASM = $(shell cat psinfo/$(PLAT)/nasm.txt)
 EMU = $(shell cat psinfo/$(PLAT)/emu.txt)
-GDB = $(shell cat psinfo/$(PLAT)/gdb.txt)
 CFLAGS =  -Isysroot/usr/include -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
 QFLAGS =  -hda ext2.img -m 2G -boot d -cdrom os.iso -serial file:serout #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
 CWD = $(shell pwd)
@@ -29,10 +28,10 @@ run: os.iso
 
 debug: os.iso kernel/kernel.elf
 	@$(EMU) -s $(QFLAGS) &
-	@$(GDB)
+	gdb
 	#gdbgui -g i386-elf-gdb --project $(CWD)
 
-os.iso: kernel/kernel.elf init sysroot/usr/share/man # vfs devfs initrd vga_drv initrd_drv pci
+os.iso: kernel/kernel.elf init rpctest sysroot/usr/share/man # vfs devfs initrd vga_drv initrd_drv pci
 	@cp kernel/kernel.elf sysroot/boot
 	@cd initrd; tar -f ../sysroot/boot/initrd.tar -c *
 	@grub-mkrescue -o $@ sysroot >/dev/null 2>/dev/null
@@ -43,6 +42,10 @@ crts: kernel/crt0.o
 init: crts libc
 	@cd $@ && make
 	@cp $@/$@ initrd/$@
+
+rpctest: crts libc
+	@cd $@ && make
+	@cp $@/$@ initrd/$@	
 
 vfs: crts libc
 	@cd $@ && make
