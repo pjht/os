@@ -115,8 +115,7 @@ Functions</h2></td></tr>
 <tr class="separator:a26e65460b81ea0f98525b78008ffc68a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b873206647239e8d86cb97a81b9e390"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pmem_8c.html#a8b873206647239e8d86cb97a81b9e390">pmem_alloc</a> (int num_pages)</td></tr>
 <tr class="separator:a8b873206647239e8d86cb97a81b9e390"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c39d363ae2c8f18ada3e9919075e9d3"><td class="memItemLeft" align="right" valign="top"><a id="a6c39d363ae2c8f18ada3e9919075e9d3"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>pmem_free</b> (void *start, int num_pages)</td></tr>
+<tr class="memitem:a6c39d363ae2c8f18ada3e9919075e9d3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pmem_8c.html#a6c39d363ae2c8f18ada3e9919075e9d3">pmem_free</a> (void *start, int num_pages)</td></tr>
 <tr class="separator:a6c39d363ae2c8f18ada3e9919075e9d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
@@ -214,6 +213,41 @@ static char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the physical address of the allocated frames </dd></dl>
+
+</div>
+</div>
+<a id="a6c39d363ae2c8f18ada3e9919075e9d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c39d363ae2c8f18ada3e9919075e9d3">&#9670;&nbsp;</a></span>pmem_free()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void pmem_free </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>start</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num_pages</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Free allocated physical frames </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">start</td><td>The address to start freeing at. </td></tr>
+    <tr><td class="paramname">num_pages</td><td>The number of frames to free </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

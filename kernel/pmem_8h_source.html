@@ -94,13 +94,13 @@ $(document).ready(function(){initNavTree('pmem_8h_source.html',''); initResizabl
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keywordtype">void</span> <a class="code" href="pmem_8h.html#a26e65460b81ea0f98525b78008ffc68a">pmem_init</a>(<span class="keyword">struct</span> multiboot_boot_header_tag* tags);</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keywordtype">void</span>* <a class="code" href="pmem_8h.html#a8b873206647239e8d86cb97a81b9e390">pmem_alloc</a>(<span class="keywordtype">int</span> num_pages);</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="pmem_8h.html#ad72813b130d1345d54584a6083e5488e">   27</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="pmem_8h.html#ad72813b130d1345d54584a6083e5488e">pmem_free</a>(<span class="keywordtype">int</span> start,<span class="keywordtype">int</span> num_pages);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keywordtype">void</span> <a class="code" href="pmem_8h.html#a6c39d363ae2c8f18ada3e9919075e9d3">pmem_free</a>(<span class="keywordtype">void</span>* start,<span class="keywordtype">int</span> num_pages);</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="apmem_8h_html_a8b873206647239e8d86cb97a81b9e390"><div class="ttname"><a href="pmem_8h.html#a8b873206647239e8d86cb97a81b9e390">pmem_alloc</a></div><div class="ttdeci">void * pmem_alloc(int num_pages)</div><div class="ttdef"><b>Definition:</b> pmem.c:87</div></div>
-<div class="ttc" id="apmem_8h_html_ad72813b130d1345d54584a6083e5488e"><div class="ttname"><a href="pmem_8h.html#ad72813b130d1345d54584a6083e5488e">pmem_free</a></div><div class="ttdeci">void pmem_free(int start, int num_pages)</div></div>
+<div class="ttc" id="apmem_8h_html_a6c39d363ae2c8f18ada3e9919075e9d3"><div class="ttname"><a href="pmem_8h.html#a6c39d363ae2c8f18ada3e9919075e9d3">pmem_free</a></div><div class="ttdeci">void pmem_free(void *start, int num_pages)</div><div class="ttdef"><b>Definition:</b> pmem.c:135</div></div>
 <div class="ttc" id="apmem_8h_html_a26e65460b81ea0f98525b78008ffc68a"><div class="ttname"><a href="pmem_8h.html#a26e65460b81ea0f98525b78008ffc68a">pmem_init</a></div><div class="ttdeci">void pmem_init(struct multiboot_boot_header_tag *tags)</div><div class="ttdef"><b>Definition:</b> pmem.c:48</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

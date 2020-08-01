@@ -13,7 +13,7 @@ var searchData=
   ['pmem_2ec_157',['pmem.c',['../pmem_8c.html',1,'']]],
   ['pmem_2eh_158',['pmem.h',['../pmem_8h.html',1,'']]],
   ['pmem_5falloc_159',['pmem_alloc',['../pmem_8c.html#a8b873206647239e8d86cb97a81b9e390',1,'pmem_alloc(int num_pages):&#160;pmem.c'],['../pmem_8h.html#a8b873206647239e8d86cb97a81b9e390',1,'pmem_alloc(int num_pages):&#160;pmem.c']]],
-  ['pmem_5ffree_160',['pmem_free',['../pmem_8h.html#ad72813b130d1345d54584a6083e5488e',1,'pmem.h']]],
+  ['pmem_5ffree_160',['pmem_free',['../pmem_8c.html#a6c39d363ae2c8f18ada3e9919075e9d3',1,'pmem_free(void *start, int num_pages):&#160;pmem.c'],['../pmem_8h.html#a6c39d363ae2c8f18ada3e9919075e9d3',1,'pmem_free(void *start, int num_pages):&#160;pmem.c']]],
   ['pmem_5finit_161',['pmem_init',['../pmem_8c.html#a26e65460b81ea0f98525b78008ffc68a',1,'pmem_init(struct multiboot_boot_header_tag *tags):&#160;pmem.c'],['../pmem_8h.html#a26e65460b81ea0f98525b78008ffc68a',1,'pmem_init(struct multiboot_boot_header_tag *tags):&#160;pmem.c']]],
   ['pres_162',['pres',['../structpg__struct__entry.html#a6e42c92441dd05ad59c97d50db12aad8',1,'pg_struct_entry']]],
   ['prev_5fready_5fto_5frun_163',['prev_ready_to_run',['../structThread.html#a446b54c14f79942f79e2e78cf10b2f22',1,'Thread']]],

@@ -11,6 +11,7 @@ var tasking_8h =
     [ "tasking_block", "tasking_8h.html#a021c821360fc28b1a509b585f8d21769", null ],
     [ "tasking_create_task", "tasking_8h.html#ac90817d992a64d95d80e4505343ed13c", null ],
     [ "tasking_exit", "tasking_8h.html#acf62dd83316df4b63f4a93587c9b791e", null ],
+    [ "tasking_get_address_space", "tasking_8h.html#a85f3e86dc7ddee108196d0557e307f9a", null ],
     [ "tasking_get_errno_address", "tasking_8h.html#a347fac6db01ff796e5dc6d1fc44c2eef", null ],
     [ "tasking_get_PID", "tasking_8h.html#a9555a59dc2340ce36ae1a84c984b3af0", null ],
     [ "tasking_init", "tasking_8h.html#a45f6d4112f15e33ba7a0e356f821d056", null ],
