@@ -115,5 +115,11 @@ void tasking_unblock(pid_t pid,pid_t tid);
  * Yield to the next ready thread in any process
 */
 void tasking_yield();
+/**
+ * Get the address_space of a process
+ * \param pid the PID of the process
+ * \return the address_space of the process
+*/
+void* tasking_get_address_space(pid_t pid);
 
 #endif
