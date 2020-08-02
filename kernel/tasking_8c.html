@@ -139,6 +139,8 @@ Functions</h2></td></tr>
 <tr class="separator:a47f424f3474f4298f1d6b65eeee5d0f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9555a59dc2340ce36ae1a84c984b3af0"><td class="memItemLeft" align="right" valign="top">pid_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a9555a59dc2340ce36ae1a84c984b3af0">tasking_get_PID</a> ()</td></tr>
 <tr class="separator:a9555a59dc2340ce36ae1a84c984b3af0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a579bdf6585f7b466257320a1ad51429a"><td class="memItemLeft" align="right" valign="top">pid_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a579bdf6585f7b466257320a1ad51429a">tasking_get_TID</a> ()</td></tr>
+<tr class="separator:a579bdf6585f7b466257320a1ad51429a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a347fac6db01ff796e5dc6d1fc44c2eef"><td class="memItemLeft" align="right" valign="top">int *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a347fac6db01ff796e5dc6d1fc44c2eef">tasking_get_errno_address</a> ()</td></tr>
 <tr class="separator:a347fac6db01ff796e5dc6d1fc44c2eef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a911d2c94f4a15da6dbbf9fdccdda7e"><td class="memItemLeft" align="right" valign="top">pid_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a8a911d2c94f4a15da6dbbf9fdccdda7e">tasking_new_thread</a> (void *start, pid_t pid, void *param)</td></tr>
@@ -159,6 +161,18 @@ Functions</h2></td></tr>
 <tr class="separator:acf62dd83316df4b63f4a93587c9b791e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85f3e86dc7ddee108196d0557e307f9a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a85f3e86dc7ddee108196d0557e307f9a">tasking_get_address_space</a> (pid_t pid)</td></tr>
 <tr class="separator:a85f3e86dc7ddee108196d0557e307f9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad04e43c483d045987f614582a4203082"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#ad04e43c483d045987f614582a4203082">tasking_set_rpc_calling_thread</a> (pid_t pid, pid_t tid)</td></tr>
+<tr class="separator:ad04e43c483d045987f614582a4203082"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25a4a19651c904d1611592f57d255c13"><td class="memItemLeft" align="right" valign="top">pid_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a25a4a19651c904d1611592f57d255c13">tasking_get_rpc_calling_thread</a> (pid_t *tid)</td></tr>
+<tr class="separator:a25a4a19651c904d1611592f57d255c13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb458c9afaae981717f509dd3fe27123"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#adb458c9afaae981717f509dd3fe27123">tasking_set_rpc_ret_buf</a> (void *buf)</td></tr>
+<tr class="separator:adb458c9afaae981717f509dd3fe27123"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a475df75594db94effc24fcbe1e726f3e"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#a475df75594db94effc24fcbe1e726f3e">tasking_get_rpc_ret_buf</a> ()</td></tr>
+<tr class="separator:a475df75594db94effc24fcbe1e726f3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6ae5d8a6f880c32173f67ce8164f8f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#ad6ae5d8a6f880c32173f67ce8164f8f5">tasking_thread_exit</a> ()</td></tr>
+<tr class="separator:ad6ae5d8a6f880c32173f67ce8164f8f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc5aaab63d5bde8a7e35e57605ab4e1d"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8c.html#afc5aaab63d5bde8a7e35e57605ab4e1d">tasking_check_proc_exists</a> (pid_t pid)</td></tr>
+<tr class="separator:afc5aaab63d5bde8a7e35e57605ab4e1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -417,6 +431,31 @@ static <a class="el" href="structThread.html">Thread</a> *&#160;</td><td class="
 
 </div>
 </div>
+<a id="afc5aaab63d5bde8a7e35e57605ab4e1d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc5aaab63d5bde8a7e35e57605ab4e1d">&#9670;&nbsp;</a></span>tasking_check_proc_exists()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char tasking_check_proc_exists </td>
+          <td>(</td>
+          <td class="paramtype">pid_t&#160;</td>
+          <td class="paramname"><em>pid</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Check if a process exists </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pid</td><td>The param of the process to check </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether the process exists </dd></dl>
+
+</div>
+</div>
 <a id="ac90817d992a64d95d80e4505343ed13c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac90817d992a64d95d80e4505343ed13c">&#9670;&nbsp;</a></span>tasking_create_task()</h2>
 
@@ -566,6 +605,68 @@ static <a class="el" href="structThread.html">Thread</a> *&#160;</td><td class="
 
 </div>
 </div>
+<a id="a25a4a19651c904d1611592f57d255c13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25a4a19651c904d1611592f57d255c13">&#9670;&nbsp;</a></span>tasking_get_rpc_calling_thread()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">pid_t tasking_get_rpc_calling_thread </td>
+          <td>(</td>
+          <td class="paramtype">pid_t *&#160;</td>
+          <td class="paramname"><em>tid</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the RPC calling thread for the current thread </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tid</td><td>A pointer to a pid_t to store the return TID </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the return PID </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This is only applicable for an RPC handler thread </dd></dl>
+
+</div>
+</div>
+<a id="a475df75594db94effc24fcbe1e726f3e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a475df75594db94effc24fcbe1e726f3e">&#9670;&nbsp;</a></span>tasking_get_rpc_ret_buf()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* tasking_get_rpc_ret_buf </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the RPC return buffer for the current thread </p><dl class="section return"><dt>Returns</dt><dd>the return buffer </dd></dl>
+
+</div>
+</div>
+<a id="a579bdf6585f7b466257320a1ad51429a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a579bdf6585f7b466257320a1ad51429a">&#9670;&nbsp;</a></span>tasking_get_TID()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">pid_t tasking_get_TID </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the TID of the current thread. </p><dl class="section return"><dt>Returns</dt><dd>The current thread's TID </dd></dl>
+
+</div>
+</div>
 <a id="a45f6d4112f15e33ba7a0e356f821d056"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a45f6d4112f15e33ba7a0e356f821d056">&#9670;&nbsp;</a></span>tasking_init()</h2>
 
@@ -642,6 +743,83 @@ static <a class="el" href="structThread.html">Thread</a> *&#160;</td><td class="
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the TID of the thread </dd></dl>
+
+</div>
+</div>
+<a id="ad04e43c483d045987f614582a4203082"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad04e43c483d045987f614582a4203082">&#9670;&nbsp;</a></span>tasking_set_rpc_calling_thread()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void tasking_set_rpc_calling_thread </td>
+          <td>(</td>
+          <td class="paramtype">pid_t&#160;</td>
+          <td class="paramname"><em>pid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">pid_t&#160;</td>
+          <td class="paramname"><em>tid</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Set the RPC calling thread for an RPC handler thread to the current threasd </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pid</td><td>The PID of the handler thread </td></tr>
+    <tr><td class="paramname">tid</td><td>The TID of the handler thread </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="adb458c9afaae981717f509dd3fe27123"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb458c9afaae981717f509dd3fe27123">&#9670;&nbsp;</a></span>tasking_set_rpc_ret_buf()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void tasking_set_rpc_ret_buf </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>buf</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Set the RPC return buffer for the calling thread </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">buf</td><td>The return buffer </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad6ae5d8a6f880c32173f67ce8164f8f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad6ae5d8a6f880c32173f67ce8164f8f5">&#9670;&nbsp;</a></span>tasking_thread_exit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void tasking_thread_exit </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Terminate the current thread </p>
 
 </div>
 </div>

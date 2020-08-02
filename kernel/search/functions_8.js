@@ -1,5 +1,11 @@
 var searchData=
 [
-  ['kfree_314',['kfree',['../kmalloc_8c.html#ae99fbcc0b427b9bf726c73960c29efcb',1,'kfree(void *mem):&#160;kmalloc.c'],['../kmalloc_8h.html#ae99fbcc0b427b9bf726c73960c29efcb',1,'kfree(void *mem):&#160;kmalloc.c']]],
-  ['kmalloc_315',['kmalloc',['../kmalloc_8c.html#a5f52d7c56b7d67dc2f96b2e93dfdc7be',1,'kmalloc(size_t size):&#160;kmalloc.c'],['../kmalloc_8h.html#a5f52d7c56b7d67dc2f96b2e93dfdc7be',1,'kmalloc(size_t size):&#160;kmalloc.c']]]
+  ['kernel_5fget_5fnum_5frpc_5ffuncs_350',['kernel_get_num_rpc_funcs',['../rpc_8c.html#acff994c080b0e6c8b1c660a0dd4af773',1,'kernel_get_num_rpc_funcs(pid_t pid):&#160;rpc.c'],['../rpc_8h.html#acff994c080b0e6c8b1c660a0dd4af773',1,'kernel_get_num_rpc_funcs(pid_t pid):&#160;rpc.c']]],
+  ['kernel_5frpc_5fcall_351',['kernel_rpc_call',['../rpc_8c.html#a3ac7976d394a26bba6522a4e909cfe77',1,'kernel_rpc_call(pid_t pid, char *name, void *buf, size_t size):&#160;rpc.c'],['../rpc_8h.html#a3ac7976d394a26bba6522a4e909cfe77',1,'kernel_rpc_call(pid_t pid, char *name, void *buf, size_t size):&#160;rpc.c']]],
+  ['kernel_5frpc_5fdeallocate_5fbuf_352',['kernel_rpc_deallocate_buf',['../rpc_8c.html#aaaaaf872d3b77af2dd93fdbb97f5f68e',1,'kernel_rpc_deallocate_buf(void *buf, size_t size):&#160;rpc.c'],['../rpc_8h.html#aaaaaf872d3b77af2dd93fdbb97f5f68e',1,'kernel_rpc_deallocate_buf(void *buf, size_t size):&#160;rpc.c']]],
+  ['kernel_5frpc_5fmark_5fas_5finit_353',['kernel_rpc_mark_as_init',['../rpc_8c.html#a20588e9084f6b8f78b60980e3e0ae481',1,'kernel_rpc_mark_as_init():&#160;rpc.c'],['../rpc_8h.html#a20588e9084f6b8f78b60980e3e0ae481',1,'kernel_rpc_mark_as_init():&#160;rpc.c']]],
+  ['kernel_5frpc_5fregister_5ffunc_354',['kernel_rpc_register_func',['../rpc_8c.html#a113d2ed47245cf53ea3f3813466982b5',1,'kernel_rpc_register_func(char *name, rpc_func code):&#160;rpc.c'],['../rpc_8h.html#a113d2ed47245cf53ea3f3813466982b5',1,'kernel_rpc_register_func(char *name, rpc_func code):&#160;rpc.c']]],
+  ['kernel_5frpc_5freturn_355',['kernel_rpc_return',['../rpc_8c.html#aeb324d12d21fdfccb80fd958755f8861',1,'kernel_rpc_return(void *buf, size_t size):&#160;rpc.c'],['../rpc_8h.html#aeb324d12d21fdfccb80fd958755f8861',1,'kernel_rpc_return(void *buf, size_t size):&#160;rpc.c']]],
+  ['kfree_356',['kfree',['../kmalloc_8c.html#ae99fbcc0b427b9bf726c73960c29efcb',1,'kfree(void *mem):&#160;kmalloc.c'],['../kmalloc_8h.html#ae99fbcc0b427b9bf726c73960c29efcb',1,'kfree(void *mem):&#160;kmalloc.c']]],
+  ['kmalloc_357',['kmalloc',['../kmalloc_8c.html#a5f52d7c56b7d67dc2f96b2e93dfdc7be',1,'kmalloc(size_t size):&#160;kmalloc.c'],['../kmalloc_8h.html#a5f52d7c56b7d67dc2f96b2e93dfdc7be',1,'kmalloc(size_t size):&#160;kmalloc.c']]]
 ];

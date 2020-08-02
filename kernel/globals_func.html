@@ -118,6 +118,9 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 : <a class="el" href="kmalloc_8c.html#a5ecbd230a1da28644f56c5af47904855">kmalloc.c</a>
 , <a class="el" href="pmem_8c.html#ab5b67f20de16b28be3a3d7a6bd81c65b">pmem.c</a>
 </li>
+<li>clear_init()
+: <a class="el" href="rpc_8c.html#a7ec2cef5f8d21f0619667dc89ace164c">rpc.c</a>
+</li>
 <li>configure()
 : <a class="el" href="serial_8c.html#af048fb49b855f8c5b78534b90cde6ffb">serial.c</a>
 </li>
@@ -184,6 +187,9 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>irq_handler()
 : <a class="el" href="isr_8c.html#a2127468804d6c8a288db9388f8f5d684">isr.c</a>
 </li>
+<li>is_init()
+: <a class="el" href="rpc_8c.html#a30a8fe19747a7dca5014c451e8713478">rpc.c</a>
+</li>
 <li>is_kstack_allocated()
 : <a class="el" href="tasking__helpers__c_8c.html#ad0b18511b18e15f6fe983d69ef962559">tasking_helpers_c.c</a>
 </li>
@@ -208,6 +214,30 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 
 
 <h3><a id="index_k"></a>- k -</h3><ul>
+<li>kernel_get_num_rpc_funcs()
+: <a class="el" href="rpc_8c.html#acff994c080b0e6c8b1c660a0dd4af773">rpc.c</a>
+, <a class="el" href="rpc_8h.html#acff994c080b0e6c8b1c660a0dd4af773">rpc.h</a>
+</li>
+<li>kernel_rpc_call()
+: <a class="el" href="rpc_8c.html#a3ac7976d394a26bba6522a4e909cfe77">rpc.c</a>
+, <a class="el" href="rpc_8h.html#a3ac7976d394a26bba6522a4e909cfe77">rpc.h</a>
+</li>
+<li>kernel_rpc_deallocate_buf()
+: <a class="el" href="rpc_8c.html#aaaaaf872d3b77af2dd93fdbb97f5f68e">rpc.c</a>
+, <a class="el" href="rpc_8h.html#aaaaaf872d3b77af2dd93fdbb97f5f68e">rpc.h</a>
+</li>
+<li>kernel_rpc_mark_as_init()
+: <a class="el" href="rpc_8c.html#a20588e9084f6b8f78b60980e3e0ae481">rpc.c</a>
+, <a class="el" href="rpc_8h.html#a20588e9084f6b8f78b60980e3e0ae481">rpc.h</a>
+</li>
+<li>kernel_rpc_register_func()
+: <a class="el" href="rpc_8c.html#a113d2ed47245cf53ea3f3813466982b5">rpc.c</a>
+, <a class="el" href="rpc_8h.html#a113d2ed47245cf53ea3f3813466982b5">rpc.h</a>
+</li>
+<li>kernel_rpc_return()
+: <a class="el" href="rpc_8c.html#aeb324d12d21fdfccb80fd958755f8861">rpc.c</a>
+, <a class="el" href="rpc_8h.html#aeb324d12d21fdfccb80fd958755f8861">rpc.h</a>
+</li>
 <li>kfree()
 : <a class="el" href="kmalloc_8c.html#ae99fbcc0b427b9bf726c73960c29efcb">kmalloc.c</a>
 , <a class="el" href="kmalloc_8h.html#ae99fbcc0b427b9bf726c73960c29efcb">kmalloc.h</a>
@@ -235,6 +265,9 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>map_pages()
 : <a class="el" href="paging_8c.html#a2370886c08cc1b84fa1d81fc8022db9b">paging.c</a>
 , <a class="el" href="paging_8h.html#a2370886c08cc1b84fa1d81fc8022db9b">paging.h</a>
+</li>
+<li>mark_init()
+: <a class="el" href="rpc_8c.html#a0fd52d0a8b0f522602e35d85992d257b">rpc.c</a>
 </li>
 <li>mark_kstack_allocated()
 : <a class="el" href="tasking__helpers__c_8c.html#ac190e8293f01180f04c1797d3a91a8d8">tasking_helpers_c.c</a>
@@ -325,6 +358,10 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 : <a class="el" href="tasking_8c.html#a021c821360fc28b1a509b585f8d21769">tasking.c</a>
 , <a class="el" href="tasking_8h.html#a021c821360fc28b1a509b585f8d21769">tasking.h</a>
 </li>
+<li>tasking_check_proc_exists()
+: <a class="el" href="tasking_8c.html#afc5aaab63d5bde8a7e35e57605ab4e1d">tasking.c</a>
+, <a class="el" href="tasking_8h.html#afc5aaab63d5bde8a7e35e57605ab4e1d">tasking.h</a>
+</li>
 <li>tasking_create_task()
 : <a class="el" href="tasking_8c.html#ac90817d992a64d95d80e4505343ed13c">tasking.c</a>
 , <a class="el" href="tasking_8h.html#ac90817d992a64d95d80e4505343ed13c">tasking.h</a>
@@ -345,6 +382,18 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 : <a class="el" href="tasking_8c.html#a9555a59dc2340ce36ae1a84c984b3af0">tasking.c</a>
 , <a class="el" href="tasking_8h.html#a9555a59dc2340ce36ae1a84c984b3af0">tasking.h</a>
 </li>
+<li>tasking_get_rpc_calling_thread()
+: <a class="el" href="tasking_8c.html#a25a4a19651c904d1611592f57d255c13">tasking.c</a>
+, <a class="el" href="tasking_8h.html#a25a4a19651c904d1611592f57d255c13">tasking.h</a>
+</li>
+<li>tasking_get_rpc_ret_buf()
+: <a class="el" href="tasking_8c.html#a475df75594db94effc24fcbe1e726f3e">tasking.c</a>
+, <a class="el" href="tasking_8h.html#a475df75594db94effc24fcbe1e726f3e">tasking.h</a>
+</li>
+<li>tasking_get_TID()
+: <a class="el" href="tasking_8c.html#a579bdf6585f7b466257320a1ad51429a">tasking.c</a>
+, <a class="el" href="tasking_8h.html#a579bdf6585f7b466257320a1ad51429a">tasking.h</a>
+</li>
 <li>tasking_init()
 : <a class="el" href="tasking_8c.html#a45f6d4112f15e33ba7a0e356f821d056">tasking.c</a>
 , <a class="el" href="tasking_8h.html#a45f6d4112f15e33ba7a0e356f821d056">tasking.h</a>
@@ -356,6 +405,18 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>tasking_new_thread()
 : <a class="el" href="tasking_8c.html#a8a911d2c94f4a15da6dbbf9fdccdda7e">tasking.c</a>
 , <a class="el" href="tasking_8h.html#a8a911d2c94f4a15da6dbbf9fdccdda7e">tasking.h</a>
+</li>
+<li>tasking_set_rpc_calling_thread()
+: <a class="el" href="tasking_8c.html#ad04e43c483d045987f614582a4203082">tasking.c</a>
+, <a class="el" href="tasking_8h.html#ad04e43c483d045987f614582a4203082">tasking.h</a>
+</li>
+<li>tasking_set_rpc_ret_buf()
+: <a class="el" href="tasking_8c.html#adb458c9afaae981717f509dd3fe27123">tasking.c</a>
+, <a class="el" href="tasking_8h.html#adb458c9afaae981717f509dd3fe27123">tasking.h</a>
+</li>
+<li>tasking_thread_exit()
+: <a class="el" href="tasking_8c.html#ad6ae5d8a6f880c32173f67ce8164f8f5">tasking.c</a>
+, <a class="el" href="tasking_8h.html#ad6ae5d8a6f880c32173f67ce8164f8f5">tasking.h</a>
 </li>
 <li>tasking_unblock()
 : <a class="el" href="tasking_8c.html#a8daf634972bbe78df522aade52c180bf">tasking.c</a>

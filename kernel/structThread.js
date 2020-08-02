@@ -9,6 +9,9 @@ var structThread =
     [ "prev_ready_to_run", "structThread.html#a446b54c14f79942f79e2e78cf10b2f22", null ],
     [ "prev_thread_in_process", "structThread.html#adfbbeb19a2571fa9c650ea9755aa2da7", null ],
     [ "process", "structThread.html#a13b09b855703f94e0431cb650ce50161", null ],
+    [ "rpc_calling_pid", "structThread.html#aab394669e40cdcfb7eb8ca80a2bf76c2", null ],
+    [ "rpc_calling_tid", "structThread.html#a89fab8cc0a3761eb4166c46fd49fa7af", null ],
+    [ "rpc_ret_buf", "structThread.html#a2bfbd768e1c964e4a5479deab077bf43", null ],
     [ "state", "structThread.html#a05ff1695379212103807ae341e995344", null ],
     [ "tid", "structThread.html#a85915c03a5847d0f7c08660c8181a74e", null ]
 ];

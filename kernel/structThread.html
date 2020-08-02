@@ -136,6 +136,18 @@ struct <a class="el" href="structThread.html">Thread</a> *&#160;</td><td class="
 <a class="el" href="structProcess.html">Process</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structThread.html#a13b09b855703f94e0431cb650ce50161">process</a></td></tr>
 <tr class="memdesc:a13b09b855703f94e0431cb650ce50161"><td class="mdescLeft">&#160;</td><td class="mdescRight">The thread's process. <br /></td></tr>
 <tr class="separator:a13b09b855703f94e0431cb650ce50161"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab394669e40cdcfb7eb8ca80a2bf76c2"><td class="memItemLeft" align="right" valign="top"><a id="aab394669e40cdcfb7eb8ca80a2bf76c2"></a>
+pid_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structThread.html#aab394669e40cdcfb7eb8ca80a2bf76c2">rpc_calling_pid</a></td></tr>
+<tr class="memdesc:aab394669e40cdcfb7eb8ca80a2bf76c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The PID of the thread that called this RPC (only used for RPC handler threads) <br /></td></tr>
+<tr class="separator:aab394669e40cdcfb7eb8ca80a2bf76c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89fab8cc0a3761eb4166c46fd49fa7af"><td class="memItemLeft" align="right" valign="top"><a id="a89fab8cc0a3761eb4166c46fd49fa7af"></a>
+pid_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structThread.html#a89fab8cc0a3761eb4166c46fd49fa7af">rpc_calling_tid</a></td></tr>
+<tr class="memdesc:a89fab8cc0a3761eb4166c46fd49fa7af"><td class="mdescLeft">&#160;</td><td class="mdescRight">The TID of the thread that called this RPC (only used for RPC handler threads) <br /></td></tr>
+<tr class="separator:a89fab8cc0a3761eb4166c46fd49fa7af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bfbd768e1c964e4a5479deab077bf43"><td class="memItemLeft" align="right" valign="top"><a id="a2bfbd768e1c964e4a5479deab077bf43"></a>
+void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structThread.html#a2bfbd768e1c964e4a5479deab077bf43">rpc_ret_buf</a></td></tr>
+<tr class="memdesc:a2bfbd768e1c964e4a5479deab077bf43"><td class="mdescLeft">&#160;</td><td class="mdescRight">The return buffer of the RPC call that the thread made. <br /></td></tr>
+<tr class="separator:a2bfbd768e1c964e4a5479deab077bf43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents a thread of a process </p>

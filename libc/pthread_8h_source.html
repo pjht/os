@@ -97,12 +97,16 @@ $(document).ready(function(){initNavTree('pthread_8h_source.html',''); initResiz
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keywordtype">int</span> <a class="code" href="pthread_8h.html#a091adcef6201bebbf231763328c15286">pthread_create</a>(<a class="code" href="pthread_8h.html#ac8d6e30207ba9eba0dfa84dd51299656">pthread_t</a> *restrict thread,</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;       <span class="keyword">const</span> <a class="code" href="pthread_8h.html#a1d1f320a0fd5ba55ac57042ddb32dbea">pthread_attr_t</a> *restrict attr,</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;       <span class="keywordtype">void</span> *(*start_routine)(<span class="keywordtype">void</span>*), <span class="keywordtype">void</span> *restrict arg);</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keywordtype">void</span> <a class="code" href="pthread_8h.html#a090bdc13141e76205fab4cb3c5fab0e4">pthread_exit</a>(<span class="keywordtype">void</span> *value_ptr);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="apthread_8h_html_a091adcef6201bebbf231763328c15286"><div class="ttname"><a href="pthread_8h.html#a091adcef6201bebbf231763328c15286">pthread_create</a></div><div class="ttdeci">int pthread_create(pthread_t *restrict thread, const pthread_attr_t *restrict attr, void *(*start_routine)(void *), void *restrict arg)</div><div class="ttdef"><b>Definition:</b> pthread.c:8</div></div>
 <div class="ttc" id="apthread_8h_html_a1d1f320a0fd5ba55ac57042ddb32dbea"><div class="ttname"><a href="pthread_8h.html#a1d1f320a0fd5ba55ac57042ddb32dbea">pthread_attr_t</a></div><div class="ttdeci">int pthread_attr_t</div><div class="ttdoc">Created as dummy.</div><div class="ttdef"><b>Definition:</b> pthread.h:11</div></div>
 <div class="ttc" id="apthread_8h_html_ac8d6e30207ba9eba0dfa84dd51299656"><div class="ttname"><a href="pthread_8h.html#ac8d6e30207ba9eba0dfa84dd51299656">pthread_t</a></div><div class="ttdeci">pid_t pthread_t</div><div class="ttdoc">Represents a thread.</div><div class="ttdef"><b>Definition:</b> pthread.h:10</div></div>
+<div class="ttc" id="apthread_8h_html_a090bdc13141e76205fab4cb3c5fab0e4"><div class="ttname"><a href="pthread_8h.html#a090bdc13141e76205fab4cb3c5fab0e4">pthread_exit</a></div><div class="ttdeci">void pthread_exit(void *value_ptr)</div><div class="ttdef"><b>Definition:</b> pthread.c:19</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

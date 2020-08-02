@@ -107,6 +107,8 @@ typedef int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 Functions</h2></td></tr>
 <tr class="memitem:a091adcef6201bebbf231763328c15286"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pthread_8h.html#a091adcef6201bebbf231763328c15286">pthread_create</a> (<a class="el" href="pthread_8h.html#ac8d6e30207ba9eba0dfa84dd51299656">pthread_t</a> *restrict thread, const <a class="el" href="pthread_8h.html#a1d1f320a0fd5ba55ac57042ddb32dbea">pthread_attr_t</a> *restrict attr, void *(*start_routine)(void *), void *restrict arg)</td></tr>
 <tr class="separator:a091adcef6201bebbf231763328c15286"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a090bdc13141e76205fab4cb3c5fab0e4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pthread_8h.html#a090bdc13141e76205fab4cb3c5fab0e4">pthread_exit</a> (void *value_ptr)</td></tr>
+<tr class="separator:a090bdc13141e76205fab4cb3c5fab0e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a091adcef6201bebbf231763328c15286"></a>
@@ -156,6 +158,30 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 if creation was sucsessful, 1 otherwise </dd></dl>
+
+</div>
+</div>
+<a id="a090bdc13141e76205fab4cb3c5fab0e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a090bdc13141e76205fab4cb3c5fab0e4">&#9670;&nbsp;</a></span>pthread_exit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void pthread_exit </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>value_ptr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Terminate the current thread </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">value_ptr</td><td>A pointer that when other threads in the process join on the current thread, they will recieve. (not implemented) </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

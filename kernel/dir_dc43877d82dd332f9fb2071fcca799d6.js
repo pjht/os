@@ -8,9 +8,8 @@ var dir_dc43877d82dd332f9fb2071fcca799d6 =
     [ "kmalloc.h", "kmalloc_8h.html", "kmalloc_8h" ],
     [ "pmem.c", "pmem_8c.html", "pmem_8c" ],
     [ "pmem.h", "pmem_8h.html", "pmem_8h" ],
-    [ "rpc.h", "rpc_8h.html", [
-      [ "RPCFuncInfo", "structRPCFuncInfo.html", "structRPCFuncInfo" ]
-    ] ],
+    [ "rpc.c", "rpc_8c.html", "rpc_8c" ],
+    [ "rpc.h", "rpc_8h.html", "rpc_8h" ],
     [ "tasking.c", "tasking_8c.html", "tasking_8c" ],
     [ "tasking.h", "tasking_8h.html", "tasking_8h" ],
     [ "timer_handler.c", "timer__handler_8c.html", "timer__handler_8c" ],
