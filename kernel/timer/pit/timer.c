@@ -20,7 +20,7 @@ void timer_init(int freq) {
     serial_printf("Setting PIT to %dHz using divisor of %d\n",freq,div);
   }
   isr_register_handler(0,timer_handler);
-  port_byte_out(0x43,(div>>8)&0xFF);
-  port_byte_out(0x40,div&0xFF);
-  port_byte_out(0x40,0x2E);
+  port_byte_out(0x43,0b00110110); // Set timer 0 to lobyte/hibyte access, and mode 3 (square wave generator)
+  port_byte_out(0x40,div&0xFF); 
+  port_byte_out(0x40,(div>>8)&0xFF);
 }
