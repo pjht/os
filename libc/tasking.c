@@ -42,3 +42,12 @@ void unblock_thread(pid_t pid,pid_t tid) {
     int $80; \
   "::"b"(pid),"c"(tid));
 }
+
+char check_proc_exists(pid_t pid) {
+  char exists;
+  asm volatile("  \
+    mov $" QU(SYSCALL_CHECK_PROC_EXISTS) ", %%eax; \
+    int $80; \
+  ":"=c"(exists):"b"(pid));
+  return exists;
+}

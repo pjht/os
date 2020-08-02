@@ -180,7 +180,7 @@ void unmap_pages(void* start_virt,int num_pages) {
     if (page_table_map[dir_entry].pres) {
       pg_struct_entry* entry=&page_table_map[table_entry+1024*dir_entry];
       entry->pres=0;
-      invl_page(start_virt+(i*1024));
+      invl_page(start_virt+(i*4096));
       table_entry++;
       if (table_entry==1024) {
         dir_entry++;

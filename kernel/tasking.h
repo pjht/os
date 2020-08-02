@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include <sys/types.h>
+#include "rpc.h"
 
 #ifndef TASKING_H
 
@@ -17,7 +18,9 @@ typedef enum thread_state {
   THREAD_RUNNING, //!< The state of a running thread
   THREAD_READY,  //!< The state of a ready to run thread
   THREAD_EXITED,  //!< The state of an exited thread
-  THREAD_BLOCKED  //!< The state of a generically blocked thread
+  THREAD_BLOCKED,  //!< The state of a generically blocked thread
+  THREAD_WAITING_FOR_RPC, //!< The state of a thread waiting for an RPC call to return
+  THREAD_WAITING_FOR_RPC_INIT //!< The state of a thread waiting for a process to fully initilaize it's RPC functions
 } thread_state;
 
 #endif
@@ -51,6 +54,9 @@ typedef struct Thread {
   struct Thread* next_ready_to_run; //!< If the thread is in the ready to run list, this is the next ready to run thread. (potentially in a different process)
   struct Thread* prev_ready_to_run; //!< If the thread is in the ready to run list, this is the previous ready to run thread. (potentially in a different process)
   Process* process; //!< The thread's process.
+  pid_t rpc_calling_pid; //!< The PID of the thread that called this RPC (only used for RPC handler threads)
+  pid_t rpc_calling_tid; //!< The TID of the thread that called this RPC (only used for RPC handler threads)
+  void* rpc_ret_buf; //!< The return buffer of the RPC call that the thread made
 } Thread;
 
 extern Thread* current_thread;
@@ -79,6 +85,11 @@ char tasking_is_privleged();
  * \return The current thread's PID
 */
 pid_t tasking_get_PID();
+/** 
+ * Get the TID of the current thread.
+ * \return The current thread's TID
+*/
+pid_t tasking_get_TID();
 /** 
  * Get the adddress of errno for the current thread
  * \return The address of errno
@@ -121,5 +132,43 @@ void tasking_yield();
  * \return the address_space of the process
 */
 void* tasking_get_address_space(pid_t pid);
+
+/**
+ * Set the RPC calling thread for an RPC handler thread to the current threasd
+ * \param pid The PID of the handler thread
+ * \param tid The TID of the handler thread
+*/
+void tasking_set_rpc_calling_thread(pid_t pid,pid_t tid);
+
+/**
+ * Get the RPC calling thread for the current thread
+ * \param tid A pointer to a pid_t to store the return TID
+ * \return the return PID
+ * \note This is only applicable for an RPC handler thread
+*/
+pid_t tasking_get_rpc_calling_thread(pid_t* tid);
+/** 
+ * Set the RPC return buffer for the calling thread
+ * \param buf The return buffer
+*/
+void tasking_set_rpc_ret_buf(void* buf);
+
+/** 
+ * Get the RPC return buffer for the current thread
+ * \return the return buffer
+*/
+void* tasking_get_rpc_ret_buf();
+
+/** 
+ * Terminate the current thread
+*/
+void tasking_thread_exit();
+
+/**
+ * Check if a process exists
+ * \param pid The param of the process to check
+ * \return Whether the process exists
+*/
+char tasking_check_proc_exists(pid_t pid);
 
 #endif

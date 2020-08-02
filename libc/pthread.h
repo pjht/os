@@ -21,4 +21,11 @@ typedef int pthread_attr_t; //!< Created as dummy
 int pthread_create(pthread_t *restrict thread,
        const pthread_attr_t *restrict attr,
        void *(*start_routine)(void*), void *restrict arg);
+
+/**
+ * Terminate the current thread 
+ * \param value_ptr A pointer that when other threads in the process join on the current thread, they will recieve. (not implemented)
+*/
+void pthread_exit(void *value_ptr);
+
 #endif

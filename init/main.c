@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <tasking.h>
+#include <rpc.h>
 
 typedef struct {
   char filename[100];
@@ -128,21 +129,31 @@ char load_proc(size_t datapos,char* initrd) {
 // }
 
 void* thread_func(void* arg) {
-  for (;;) yield();
+  for (;;);
   return NULL;
 }
 
 int main() {
   serial_print("IN INIT\n");
-  pthread_t thread;
-  pthread_create(&thread,NULL,thread_func,NULL);
-  block_thread(THREAD_BLOCKED);
-  for (int i=0;i<5;i++) {
-    serial_print("YIELDING\n");
-    yield();
-    serial_print("YIELDED\n");
-  }
-  serial_print("EXITING\n");
+  long size=initrd_sz();
+  char* initrd=malloc(size);
+  initrd_get(initrd);
+  size_t datapos=find_loc("rpctest",initrd);
+  load_proc(datapos,initrd);
+  void* retbuf=rpc_call(2,"rpctestfunc","Buffer test\n",strlen("Buffer test\n")+1);
+  serial_print(retbuf);
+  rpc_deallocate_buf(retbuf,strlen(retbuf)+1);
+  serial_print(retbuf);
+  // yield();
+  // pthread_t thread;
+  // pthread_create(&thread,NULL,thread_func,NULL);
+  // blockThread(THREAD_BLOCKED);
+  // for (int i=0;i<5;i++) {
+  //   serial_print("YIELDING\n");
+  //   yield();
+  //   serial_print("YIELDED\n");
+  // }
+  // serial_print("EXITING\n");
   exit(0);
   // long size=initrd_sz();
   // char* initrd=malloc(size);

@@ -67,7 +67,7 @@ void kmain(struct multiboot_boot_header_tag* hdr) {
   asm volatile("sti");
   tasking_init();
   vga_init((char*)0xC00B8000);
-  timer_init(1000);
+  timer_init(100);
   read_initrd(tags);
   int pos=0;
   size_t datapos;

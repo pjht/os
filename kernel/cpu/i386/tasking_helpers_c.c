@@ -68,8 +68,8 @@ void setup_kstack(Thread* thread,void* param1,void* param2,char kmode,void* eip)
     RUN_IN_ADDRESS_SPACE(thread->address_space,{
       user_stack=(void**)(((char*)alloc_pages(2))+0x2000);
       user_stack-=2;
-      user_stack[0]=param1;
-      user_stack[1]=param2;
+      user_stack[0]=param2;
+      user_stack[1]=param1;
     });
     kstacks[top_idx-3]=(void*)task_init;
     kstacks[top_idx-2]=(void*)user_stack;

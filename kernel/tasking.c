@@ -99,7 +99,7 @@ void tasking_create_task(void* eip,void* address_space,char kmode,void* param1,v
   thread->prev_ready_to_run=NULL;
   thread->next_ready_to_run=NULL;
   thread->prev_thread_in_process=NULL;
-  
+  thread->state=THREAD_READY;
   if (isThread) {
     thread->address_space=proc->first_thread->address_space;
     thread->next_thread_in_process=proc->first_thread;
@@ -131,6 +131,10 @@ char tasking_is_privleged() {
 
 pid_t tasking_get_PID() {
   return current_thread->process->pid;
+}
+
+pid_t tasking_get_TID() {
+  return current_thread->tid;
 }
 
 int* tasking_get_errno_address() {
@@ -194,26 +198,28 @@ void switch_to_thread(Thread* thread) {
   Thread* current_thread_next_ready=get_next_ready_thread(current_thread,thread);
   if (!current_thread_next_ready) {
     //This process is fully blocked, try the process of the thread we're yielding to
-    Thread* current_thread_next_ready=get_next_ready_thread(thread,thread);
+    current_thread_next_ready=get_next_ready_thread(thread,thread);
   }
-  if (current_thread_next_ready) {
+  if (current_thread_next_ready) {  
     schedule_thread(current_thread_next_ready);
   }
+  thread->state=THREAD_RUNNING;
   serial_printf("Switching to PID %d TID %d.\n",thread->process->pid,thread->tid);
   switch_to_thread_asm(thread);
 }
 
 void tasking_yield() {
-  serial_printf("Attempting to yield\n");
   if (ready_to_run_head) {
     serial_printf("Attempting to switch to PID %d TID %d\n",ready_to_run_head->process->pid,ready_to_run_head->tid);
     switch_to_thread(ready_to_run_head);
   } else {
     if (NUM_UNBLOCKED_THREADS(current_thread->process)>1) {
+      // Thread* thread=get_next_ready_thread(current_thread,current_thread);
+      // schedule_thread(thread);
+      // yield();
       serial_printf("The ready to run list is empty, and the current process has other unblocked threads? This is an invalid state! Halting!\n");
       halt();
     } else if (NUM_UNBLOCKED_THREADS(current_thread->process)==1) {
-      serial_printf("Yield failed, no other ready processes\n");
       return;
     } else {
       if (num_procs==0) {
@@ -259,6 +265,9 @@ void tasking_block(thread_state newstate) {
       thread->state=newstate;
     }
   }
+  current_thread->process->num_threads_blocked++;
+  unmark_proc_scheduled(current_thread->process->pid);
+  tasking_yield();
 }
 
 /**
@@ -300,6 +309,7 @@ void tasking_unblock(pid_t pid,pid_t tid) {
       return;
     }
     thread->state=THREAD_READY;
+    thread->process->num_threads_blocked--;
     schedule_thread(thread);
 }
 
@@ -342,3 +352,45 @@ void* tasking_get_address_space(pid_t pid) {
   return processes[pid].first_thread->address_space;
 }
 
+void tasking_set_rpc_calling_thread(pid_t pid,pid_t tid) {
+  Thread* thread=get_thread(pid,tid);
+  thread->rpc_calling_pid=current_thread->process->pid;
+  thread->rpc_calling_tid=current_thread->tid;
+}
+
+pid_t tasking_get_rpc_calling_thread(pid_t* tid) {
+  *tid=current_thread->rpc_calling_tid;
+  return current_thread->rpc_calling_pid;
+} 
+
+void tasking_set_rpc_ret_buf(void* buf) {
+  pid_t tid;
+  pid_t pid=tasking_get_rpc_calling_thread(&tid);
+  Thread* thread=get_thread(pid,tid);
+  thread->rpc_ret_buf=buf;
+}
+
+void* tasking_get_rpc_ret_buf() {
+  return current_thread->rpc_ret_buf;
+}
+
+void tasking_thread_exit() {
+  tasking_block(THREAD_EXITED);
+}
+
+char tasking_check_proc_exists(pid_t pid) {
+  if (processes[pid].num_threads==0) {
+    return 0;
+  }
+  char num_exited_threads=0;
+  for (Thread* thread=processes[pid].first_thread;thread!=NULL;thread=thread->next_thread_in_process) {
+    if (thread->state==THREAD_EXITED) {
+      num_exited_threads++;
+    }
+  }
+  if ((num_exited_threads=processes[pid].num_threads)&&kernel_get_num_rpc_funcs(pid)==0) {
+    return 0;
+  } else {
+    return 1;
+  }
+}

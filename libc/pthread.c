@@ -15,3 +15,9 @@ int pthread_create(pthread_t *restrict thread, const pthread_attr_t *restrict at
   "::"b"(start_routine),"c"(thread),"d"(arg));
   return 0;
 }
+
+void pthread_exit(void *value_ptr) {
+  asm volatile("  \
+    mov $" QU(SYSCALL_THREAD_EXIT) ", %eax; \
+    int $80;");
+}

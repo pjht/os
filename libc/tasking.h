@@ -46,5 +46,11 @@ void block_thread(thread_state state);
 */
 void unblock_thread(pid_t pid,pid_t tid);
 
+/**
+ * Check if a process exists
+ * \param pid The param of the process to check
+ * \return Whether the process exists
+*/
+char check_proc_exists(pid_t pid);
 
 #endif

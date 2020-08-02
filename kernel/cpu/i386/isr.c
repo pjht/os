@@ -9,6 +9,7 @@
 #include "../isr.h"
 #include "../paging.h"
 #include "../serial.h"
+//#include "../../rpc.h"
 #include "gdt.h"
 #include "idt.h"
 #include "isr.h"
@@ -248,6 +249,7 @@ void isr_handler(registers_t* r) {
         } else {
           r->ebx=(uint32_t)address_spaces_put_data((void*)r->ebx,(void*)r->ecx,r->edx);
         }
+        serial_printf("sycall done\n");
         break;
       case SYSCALL_SERIAL_PRINT:
         serial_write_string((char*)r->ebx);
@@ -267,6 +269,27 @@ void isr_handler(registers_t* r) {
         }
       }
       break;
+      case SYSCALL_THREAD_EXIT:
+        tasking_thread_exit();
+        break;
+      case SYSCALL_CALL_RPC:
+        r->edi=(uint32_t)kernel_rpc_call((pid_t)r->ebx,(char*)r->ecx,(void*)r->edx,(size_t)r->esi);
+        break;
+      case SYSCALL_REGISTER_RPC:
+        kernel_rpc_register_func((char*)r->ebx,(rpc_func)r->ecx);
+        break;
+      case SYSCALL_DEALLOCTATE_RPC_RET:
+        kernel_rpc_deallocate_buf((void*)r->ebx,(size_t)r->ecx);
+        break;
+      case SYSCALL_RPC_RET:
+        kernel_rpc_return((void*)r->ebx,(size_t)r->ecx);
+        break;
+      case SYSCALL_CHECK_PROC_EXISTS:
+        r->ecx=tasking_check_proc_exists((pid_t)r->ebx);
+        break;
+      case SYSCALL_RPC_MARK_AS_INIT:
+        kernel_rpc_mark_as_init();
+        break;
       default:
         break;
       } 
