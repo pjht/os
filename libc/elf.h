@@ -1,3 +1,4 @@
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 #ifndef ELF_H
 #define ELF_H
 #define ELF_MAGIC 0x464c457f
@@ -39,4 +40,5 @@ typedef struct  {
 } __attribute__((packed)) elf_pheader;
 
 
+#endif
 #endif
