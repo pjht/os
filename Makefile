@@ -24,7 +24,10 @@ CWD = $(shell pwd)
 all: os.iso
 
 run: os.iso
-	@$(EMU) $(QFLAGS) -monitor stdio
+	rm -f serout
+	touch serout
+	@$(EMU) $(QFLAGS) &
+	tail -f serout
 
 debug: os.iso kernel/kernel.elf
 	@$(EMU) -s $(QFLAGS) &
