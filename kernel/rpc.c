@@ -95,7 +95,7 @@ void* kernel_rpc_call(pid_t pid,char* name,void* buf,size_t size) {
     unmap_pages(virtaddr,(size/PAGE_SZ)+1);
     RUN_IN_ADDRESS_SPACE(tasking_get_address_space(pid),{
       virtaddr=find_free_pages((size/PAGE_SZ)+1);
-      map_pages(virtaddr,physaddr,(size/PAGE_SZ)+1,0,1);
+      map_pages(virtaddr,physaddr,(size/PAGE_SZ)+1,1,1);
     });
   }
   pid_t tid=tasking_new_thread(func->code,pid,virtaddr);
