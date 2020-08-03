@@ -147,10 +147,10 @@ void isr_handler(registers_t* r) {
       serial_write_string("PAGE FAULT\n");
       void* addr;
       asm("movl %%cr2,%0": "=r"(addr));
-      // serial_write_string("In PID ");
+      serial_write_string("In PID ");
       char str[11];
-      // int_to_ascii(getPID(),str);
-      // serial_write_string(str);
+      int_to_ascii(tasking_get_PID(),str);
+      serial_write_string(str);
       serial_write_string(" and address ");
       str[0]='\0';
       hex_to_ascii(r->eip,str);
