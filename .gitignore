@@ -23,3 +23,5 @@ sysroot/usr/include/*
 sysroot/boot/initrd.tar
 !sysroot/usr/include/.gitkeep
 !sysroot/usr/share/man/.gitkeep
+pci/pci
+initrd_drv/initrd_drv
