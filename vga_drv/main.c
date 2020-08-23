@@ -2,6 +2,8 @@
 #include <serdes.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <dbg.h>
 #include "vga.h"
 
 void write(void* args) {
@@ -9,9 +11,9 @@ void write(void* args) {
   start_deserialize(args,&state);
   deserialize_ptr(&state);
   size_t size=deserialize_int(&state);
-  int pos=deserialize_int(&state);
+  deserialize_int(&state);
   char* buf=deserialize_ary(size,&state);
-  rpc_deallocate_buf(args,state.buf);
+  rpc_deallocate_buf(args,state.sizeorpos);
   vga_write_string(buf);
   state.buf=NULL;
   state.sizeorpos=0;
@@ -24,11 +26,11 @@ void write(void* args) {
 int main() {
   vga_init();
   rpc_register_func("write",&write);
-  rpc_mark_as_init();
   serdes_state state={0};
   serialize_str("vga",&state);
   serialize_int(getpid(),&state);
   rpc_call(3,"register_dev",state.buf,state.sizeorpos);
   free(state.buf);
   serial_print("VGA driver initialized\n");
+  rpc_mark_as_init();
 }

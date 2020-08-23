@@ -5,17 +5,18 @@
 #include <string.h>
 #include <pthread.h>
 #include <serdes.h>
+#include <unistd.h>
 
 char* initrd;
 long initrd_size;
 
-void read(char* args) {
+void read(void* args) {
   serdes_state state;
   start_deserialize(args,&state);
   deserialize_ptr(&state);
   size_t size=deserialize_int(&state);
   int pos=deserialize_int(&state);
-  rpc_deallocate_buf(args,state.buf);
+  rpc_deallocate_buf(args,state.sizeorpos);
   long max_data=initrd_size-pos;
   if (size>max_data) {
     serial_print("Reading too much data from initrd\n");
@@ -52,13 +53,13 @@ int main() {
   initrd=malloc(initrd_size);
   initrd_get(initrd);
   rpc_register_func("read",&read);
-  rpc_mark_as_init();
   serdes_state state={0};
   serialize_str("initrd",&state);
   serialize_int(getpid(),&state);
   rpc_call(3,"register_dev",state.buf,state.sizeorpos);
   free(state.buf);
   serial_print("Initrd driver initialized\n");
+  rpc_mark_as_init();
 }
 
 // #include <dbg.h>

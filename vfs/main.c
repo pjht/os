@@ -30,7 +30,7 @@ static int vfsstrcmp(const char* s1,const char* s2) {
 mount_point* mount_point_list=NULL;
 fs_type* fs_type_list=NULL;
 
-void vfs_mount(char* args) {
+void vfs_mount(void* args) {
   serdes_state state;
   start_deserialize(args,&state);
   char* type=deserialize_str(&state);
@@ -39,7 +39,6 @@ void vfs_mount(char* args) {
   rpc_deallocate_buf(args,state.sizeorpos);
   fs_type* fstype=fs_type_list;
   pid_t fs_pid=0;
-  size_t mntpnt_len=0;
   for (;fstype!=NULL;fstype=fstype->next) {
     if (vfsstrcmp(type,fstype->name)==0) {
       fs_pid=fstype->fs_pid;
@@ -74,7 +73,7 @@ void vfs_mount(char* args) {
   pthread_exit(NULL);
 }
 
-void vfs_register_fs(char* args) {
+void vfs_register_fs(void* args) {
   serdes_state state;
   start_deserialize(args,&state);
   char* name=deserialize_str(&state);
@@ -89,11 +88,9 @@ void vfs_register_fs(char* args) {
   pthread_exit(NULL);
 }
 
-void open(char* args) {
+void open(void* args) {
   serdes_state state;
   start_deserialize(args,&state);
-  pid_t pid=deserialize_int(&state);
-  int perms=deserialize_int(&state);
   char* path=deserialize_str(&state);
   rpc_deallocate_buf(args,state.sizeorpos);
   mount_point* mnt=mount_point_list;

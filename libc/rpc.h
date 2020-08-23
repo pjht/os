@@ -4,7 +4,7 @@
 #include <sys/types.h>
 #include <stddef.h>
 
-typedef void* (*rpc_func)(void*); //!< Type of an RPC function
+typedef void (*rpc_func)(void*); //!< Type of an RPC function
 
 /**
  * Call an RPC function

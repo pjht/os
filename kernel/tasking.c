@@ -157,7 +157,7 @@ pid_t tasking_new_thread(void* start,pid_t pid,void* param) {
 */
 static Thread* get_next_ready_thread(Thread* thread,Thread* thread_to_skip) {
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  #define HELPER \ 
+  #define HELPER \
   while (thread&&(thread->state!=THREAD_READY||SAME_THREAD(thread,thread_to_skip))) { \
     thread=thread->next_thread_in_process; \
   }

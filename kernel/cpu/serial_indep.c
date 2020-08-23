@@ -1,6 +1,7 @@
 #include "serial.h"
 #include <stdint.h>
 #include <stdarg.h>
+#include <string.h>
 
 void serial_write_string(const char* s) {
   for (int i=0;s[i]!='\0';i++) {

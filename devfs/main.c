@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 
 int num_devs;
 int max_devs;
@@ -79,8 +80,8 @@ int main() {
   rpc_register_func("mount",&devfs_mount);
   rpc_register_func("open",&open);
   rpc_register_func("register_dev",&register_dev);
-  rpc_mark_as_init();
   register_fs("devfs",getpid());
   serial_print("Initialized devfs\n");
+  rpc_mark_as_init();
 }
 

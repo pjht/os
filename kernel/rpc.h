@@ -7,7 +7,7 @@
 
 #include <stddef.h>
 
-typedef void* (*rpc_func)(void*); //!< Type of an RPC function
+typedef void (*rpc_func)(void*); //!< Type of an RPC function
 
 /**
  * Represents an RPC fumctiom with name 

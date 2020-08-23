@@ -12,6 +12,7 @@
 #include "kmalloc.h"
 #include <string.h>
 #include "cpu/serial.h"
+#include "cpu/halt.h"
 
 /**
  * Represents a thread waiting for a process to finish RPC init
@@ -38,15 +39,15 @@ static void mark_init(pid_t pid) {
   process_ready_bmap[byte]=process_ready_bmap[byte]|(1<<bit);
 }
 
-/**
- * Mark a process as not ready to accept RPC calls
- * \param pid The pid to mark
-*/
-static void clear_init(pid_t pid) {
-  size_t byte=pid/8;
-  size_t bit=pid%8;
-  process_ready_bmap[byte]=process_ready_bmap[byte]&(~(1<<bit));
-}
+// /**
+//  * Mark a process as not ready to accept RPC calls
+//  * \param pid The pid to mark
+// */
+// static void clear_init(pid_t pid) {
+//   size_t byte=pid/8;
+//   size_t bit=pid%8;
+//   process_ready_bmap[byte]=process_ready_bmap[byte]&(~(1<<bit));
+// }
 
 char kernel_rpc_is_init(pid_t pid) {
   size_t byte=pid/8;

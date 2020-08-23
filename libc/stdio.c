@@ -23,14 +23,12 @@ void __stdio_init() {
 
 FILE* fopen(char* filename,char* mode) {
   serdes_state state={0};
-  serialize_int(1,&state);
-  serialize_int(0,&state);
   serialize_str(filename,&state);
   void* retval=rpc_call(2,"open",state.buf,state.sizeorpos);
   free(state.buf);
   start_deserialize(retval,&state);
   int err=deserialize_int(&state);
-  void* fs_data=deserialize_int(&state);
+  void* fs_data=deserialize_ptr(&state);
   pid_t fs_pid=deserialize_int(&state);
   rpc_deallocate_buf(retval,state.sizeorpos);
   if (err) {
@@ -144,7 +142,7 @@ size_t fwrite(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
 
 void register_fs(const char* name,pid_t pid) {
   serdes_state state={0};
-  serialize_str(name,&state);
+  serialize_str((char*)name,&state);
   serialize_int(pid,&state);
   rpc_call(2,"register_fs",state.buf,state.sizeorpos);
 }
@@ -257,4 +255,5 @@ int fseek(FILE* stream,long offset,int origin) {
   default:
     break;
   }
+  return 0;
 }

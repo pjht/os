@@ -236,6 +236,6 @@ void* get_address_space() {
 }
 
 void dealloc_pages(int num_pages,void* addr) {
-  pmem_free((uint32_t)virt_to_phys(addr)>>12,num_pages);
+  pmem_free((void*)((uint32_t)virt_to_phys(addr)>>12),num_pages);
   unmap_pages(addr,num_pages);
 }
