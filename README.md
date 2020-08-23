@@ -8,7 +8,9 @@ It currently supports:
 3. Interrupts.
 4. The PIT, used to do preemption.
 5. The serial port, used as an output for logs. (driver in kernel, will eventually be moved out)
-6. RPC for IPC
+6. RPC as the IPC mechanism
+7. A working VFS and devfs
+8. VGA text mode
 
 ## Building (on Linux or Mac)
 
