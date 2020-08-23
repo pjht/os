@@ -1,453 +1,260 @@
-// #include <dbg.h>
-// #include <ipc/vfs.h>
-// #include <limits.h>
+/**
+ * \file
+*/
+
 #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include <tasking.h>
-// #include <unistd.h>
+#include <serdes.h>
+#include <rpc.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <string.h>
+#include <dbg.h>
 
-// #define VFS_PID 2
+FILE* stdin=NULL; //!< Standard input
+FILE* stdout=NULL; //!< Standard output
+FILE* stderr=NULL; //!< Standard error
 
-
-// static uint32_t box;
-// static uint32_t vfs_box;
-FILE* __stdio_stdin;
-FILE* __stdio_stdout;
-FILE* __stdio_stderr;
-
-
+/** 
+ * Initialize stdio.
+ * Must not be called by user code.
+*/
 void __stdio_init() {
-//   char name[256];
-//   strcpy(name,"stdio");
-//   int name_end_index=strlen(name);
-//   char* name_end=&name[name_end_index];
-//   int_to_ascii(getpid(),name_end);
-//   box=mailbox_new(16,name);
-//   __stdio_stdin=malloc(sizeof(FILE*));
-//   *__stdio_stdin=0;
-//   __stdio_stdout=malloc(sizeof(FILE*));
-//   *__stdio_stdout=1;
-//   __stdio_stderr=malloc(sizeof(FILE*));
-//   *__stdio_stderr=2;
-//   vfs_box=mailbox_find_by_name("vfs");
-//   if (vfs_box==0) {
-//     serial_print("Cannot find VFS box\n");
-//   }
 }
 
-// static vfs_message* make_msg(vfs_message_type type,const char* mode,const char* path, int fd, int data) {
-//   vfs_message* msg_data=malloc(sizeof(vfs_message));
-//   msg_data->type=type;
-//   msg_data->id=0;
-//   msg_data->fd=fd;
-//   msg_data->data=data;
-//   msg_data->in_progress=0;
-//   msg_data->orig_mbox=box;
-//   if (mode!=NULL) {
-//     strcpy(&msg_data->mode[0],mode);
-//   }
-//   if (path!=NULL) {
-//     strcpy(&msg_data->path[0],path);
-//   }
-//   return msg_data;
-// }
+FILE* fopen(char* filename,char* mode) {
+  serdes_state state={0};
+  serialize_int(1,&state);
+  serialize_int(0,&state);
+  serialize_str(filename,&state);
+  void* retval=rpc_call(2,"open",state.buf,state.sizeorpos);
+  free(state.buf);
+  start_deserialize(retval,&state);
+  int err=deserialize_int(&state);
+  void* fs_data=deserialize_int(&state);
+  pid_t fs_pid=deserialize_int(&state);
+  rpc_deallocate_buf(retval,state.sizeorpos);
+  if (err) {
+    return NULL;
+  } else {
+    FILE* file=malloc(sizeof(FILE));
+    file->fs_pid=fs_pid;
+    file->fs_data=fs_data;
+    file->pos=0;
+    return file;
+  }
+}
 
-// FILE* fopen(char* filename,char* mode) {
-//   if (vfs_box==0) {
-//     serial_print("The VFS box has not been found\n");
-//     return NULL;
-//   }
-//   if (strlen(filename)>4096 || strlen(mode)>10) {
-//     return NULL;
-//   }
-//   vfs_message* msg_data=make_msg(VFS_OPEN,mode,filename,0,0);
-//   Message msg;
-//   msg.from=box;
-//   msg.to=vfs_box;
-//   msg.msg=msg_data;
-//   msg.size=sizeof(vfs_message);
-//   mailbox_send_msg(&msg);
-//   yieldToPID(VFS_PID);
-//   mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   while (msg.from==0) {
-//     yieldToPID(VFS_PID);
-//     mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   }
-//   vfs_message* vfs_msg=(vfs_message*)msg.msg;
-//   if (vfs_msg->flags) {
-//     free(msg.msg);
-//     return NULL;
-//   } else {
-//     FILE* file=malloc(sizeof(FILE));
-//     *file=vfs_msg->fd; //We're using pointers to FILE even though it's an int so we can expand to a struct if needed
-//     free(msg.msg);
-//     return file;
-//   }
-// }
+/**
+ * Writes a character to a file
+ * \param c The character to write
+ * \param stream The stream to write to
+ * \returns the written character, or EOF on failure
+*/
+int putc(int c, FILE* stream) __attribute__ ((alias ("fputc")));
 
-// int putc(int c, FILE* stream) __attribute__ ((alias ("fputc")));
+int fputc(int c, FILE* stream) {
+  char str[]={c,'\0'};
+  if (fputs(str,stream)==0) {
+    return EOF;
+  } else {
+    return c;
+  }
+  return EOF;
+}
 
-// int fputc(int c, FILE* stream) {
-//   if (vfs_box==0) {
-//     serial_print("The VFS box has not been found\n");
-//     return EOF;
-//   }
-//   char str[]={c,'\0'};
-//   if (fputs(str,stream)==0) {
-//     return c;
-//   } else {
-//     return EOF;
-//   }
-//   return EOF;
-// }
+/**
+ * Gets a character from a file
+ * \param stream The file to read from
+ * \returns the read character, or EOF if the read fails
+*/
+int getc(FILE* stream) __attribute__ ((alias ("fgetc"))); 
 
-// int getc(FILE* stream) __attribute__ ((alias ("fgetc")));
+int fgetc(FILE* stream) {
+  char c[2];
+  if (fgets(&c[0],1,stream)==NULL) {
+    return EOF;
+  } else {
+    return c[0];
+  }
+  return EOF;
+}
 
-// int fgetc(FILE* stream) {
-//   if (vfs_box==0) {
-//     serial_print("The VFS box has not been found\n");
-//     return EOF;
-//   }
-//   char c[2];
-//   if (fgets(&c[0],1,stream)==NULL) {
-//     return EOF;
-//   } else {
-//     return c[0];
-//   }
-//   return EOF;
-// }
+char* gets(char* s) {
+  return fgets(s,INT_MAX,stdin);
+}
 
-// char* gets(char* s) {
-//   return fgets(s,INT_MAX,stdin);
-// }
+char* fgets(char* str,int count,FILE* stream) {
+  fread(str,1,count,stream);
+  return str;
+}
 
-// char* fgets(char* str,int count,FILE* stream) {
-//   if (vfs_box==0) {
-//     serial_print("The VFS box has not been found\n");
-//     return NULL;
-//   }
-//   vfs_message* msg_data=make_msg(VFS_GETS,NULL,NULL,*stream,count);
-//   Message msg;
-//   msg.from=box;
-//   msg.to=vfs_box;
-//   msg.msg=msg_data;
-//   msg.size=sizeof(vfs_message);
-//   mailbox_send_msg(&msg);
-//   yieldToPID(VFS_PID);
-//   mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   while (msg.from==0) {
-//     yieldToPID(VFS_PID);
-//     mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   }
-//   vfs_message* vfs_msg=(vfs_message*)msg.msg;
-//   if (vfs_msg->flags) {
-//     free(vfs_msg);
-//     return NULL;
-//   } else {
-//     msg.msg=str;
-//     mailbox_get_msg(box,&msg,count);
-//     while (msg.from==0) {
-//       yieldToPID(VFS_PID);
-//       mailbox_get_msg(box,&msg,count);
-//     }
-//     str[vfs_msg->data]='\0';
-//     free(vfs_msg);
-//     return str;
-//   }
-//   free(vfs_msg);
-//   return NULL;
-// }
+size_t fread(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
+  serdes_state state={0};
+  serialize_ptr(stream->fs_data,&state);
+  serialize_int(size*count,&state);
+  serialize_int(stream->pos,&state);
+  void* retbuf=rpc_call(stream->fs_pid,"read",state.buf,state.sizeorpos);
+  free(state.buf);
+  state.buf=NULL;
+  state.sizeorpos=0;
+  start_deserialize(retbuf,&state);
+  int bytes_read=deserialize_int(&state);
+  if (bytes_read) {
+    void* ary=deserialize_ary(bytes_read,&state);
+    memcpy(buffer_ptr,ary,size*count);
+  }
+  rpc_deallocate_buf(retbuf,state.sizeorpos);
+  stream->pos+=bytes_read;
+  return bytes_read;
+}
 
-// size_t fread(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
-//   if (vfs_box==0) {
-//     serial_print("The VFS box has not been found\n");
-//     return 0;
-//   }
-//   char* buffer=(char*)buffer_ptr;
-//   size_t bytes=size*count;
-//   vfs_message* msg_data=make_msg(VFS_GETS,NULL,NULL,*stream,bytes);
-//   Message msg;
-//   msg.from=box;
-//   msg.to=vfs_box;
-//   msg.msg=msg_data;
-//   msg.size=sizeof(vfs_message);
-//   mailbox_send_msg(&msg);
-//   yieldToPID(VFS_PID);
-//   mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   while (msg.from==0) {
-//     yieldToPID(VFS_PID);
-//     mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   }
-//   vfs_message* vfs_msg=(vfs_message*)msg.msg;
-//   if (vfs_msg->flags) {
-//     free(vfs_msg);
-//     return 0;
-//   } else {
-//     msg.msg=buffer;
-//     mailbox_get_msg(box,&msg,bytes);
-//     while (msg.from==0) {
-//       yieldToPID(VFS_PID);
-//       mailbox_get_msg(box,&msg,bytes);
-//     }
-//     free(vfs_msg);
-//     return count;
-//   }
-//   free(vfs_msg);
-//   return 0;
-// }
+int puts(const char *s) {
+  char* str=malloc(sizeof(char)*(strlen(s)+2));
+  strcpy(str,s);
+  str[strlen(s)]='\n';
+  str[strlen(s)+1]='\0';
+  int code=fputs(str,stdout);
+  free(str);
+  return code;
+}
 
-// int puts(const char *s) {
-//   char* str=malloc(sizeof(char)*(strlen(s)+2));
-//   strcpy(str,s);
-//   str[strlen(s)]='\n';
-//   str[strlen(s)+1]='\0';
-//   serial_print(str);
-//   int code=fputs(str,stdout);
-//   free(str);
-//   return code;
-// }
+int fputs(const char* s, FILE* stream) {
+  size_t retval=fwrite((void*)s,strlen(s),1,stream);
+  if (retval==0) {
+    return 0;
+  } else {
+    return EOF;
+  }
+}
 
-// int fputs(const char* s, FILE* stream) {
-//   if (vfs_box==0) {
-//     serial_print("The VFS box has not been found\n");
-//     return EOF;
-//   }
-//   vfs_message* msg_data=make_msg(VFS_PUTS,NULL,NULL,*stream,strlen(s));
-//   Message msg;
-//   msg.from=box;
-//   msg.to=vfs_box;
-//   msg.msg=msg_data;
-//   msg.size=sizeof(vfs_message);
-//   mailbox_send_msg(&msg);
-//   msg.msg=(char*)s;
-//   msg.size=strlen(s);
-//   mailbox_send_msg(&msg);
-//   yieldToPID(VFS_PID);
-//   msg.msg=msg_data;
-//   mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   while (msg.from==0) {
-//     yieldToPID(VFS_PID);
-//     mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   }
-//   vfs_message* vfs_msg=(vfs_message*)msg.msg;
-//   if (vfs_msg->flags) {
-//     free(msg.msg);
-//     return EOF;
-//   } else {
-//     free(msg.msg);
-//     return 0;
-//   }
-//   free(msg.msg);
-//   return EOF;
-// }
+size_t fwrite(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
+  serdes_state state={0};
+  serialize_ptr(stream->fs_data,&state);
+  serialize_int(size*count,&state);
+  serialize_int(stream->pos,&state);
+  serialize_ary(buffer_ptr,size*count,&state);
+  void* retbuf=rpc_call(stream->fs_pid,"write",state.buf,state.sizeorpos);
+  free(state.buf);
+  start_deserialize(retbuf,&state);
+  int bytes_wrote=deserialize_int(&state);
+  rpc_deallocate_buf(retbuf,state.sizeorpos);
+  stream->pos+=bytes_wrote;
+  return bytes_wrote;
+}
 
-// size_t fwrite(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
-//   if (vfs_box==0) {
-//     serial_print("The VFS box has not been found\n");
-//     return 0;
-//   }
-//   char* buffer=(char*)buffer_ptr;
-//   size_t bytes=size*count;
-//   vfs_message* msg_data=make_msg(VFS_PUTS,NULL,NULL,*stream,bytes);
-//   Message msg;
-//   msg.from=box;
-//   msg.to=vfs_box;
-//   msg.msg=msg_data;
-//   msg.size=sizeof(vfs_message);
-//   mailbox_send_msg(&msg);
-//   msg.msg=buffer;
-//   msg.size=bytes;
-//   mailbox_send_msg(&msg);
-//   yieldToPID(VFS_PID);
-//   msg.msg=msg_data;
-//   mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   while (msg.from==0) {
-//     yieldToPID(VFS_PID);
-//     mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   }
-//   vfs_message* vfs_msg=(vfs_message*)msg.msg;
-//   if (vfs_msg->flags) {
-//     free(msg.msg);
-//     return 0;
-//   } else {
-//     free(msg.msg);
-//     return count;
-//   }
-//   free(msg.msg);
-//   return 0;
-// }
+void register_fs(const char* name,pid_t pid) {
+  serdes_state state={0};
+  serialize_str(name,&state);
+  serialize_int(pid,&state);
+  rpc_call(2,"register_fs",state.buf,state.sizeorpos);
+}
 
-// void register_fs(const char* name,uint32_t mbox) {
-//   if (vfs_box==0) {
-//     serial_print("The VFS box has not been found\n");
-//     return;
-//   }
-//   vfs_message* msg_data=make_msg(VFS_REGISTER_FS,name,NULL,mbox,0);
-//   Message msg;
-//   msg.from=box;
-//   msg.to=vfs_box;
-//   msg.msg=msg_data;
-//   msg.size=sizeof(vfs_message);
-//   mailbox_send_msg(&msg);
-//   free(msg.msg);
-//   yieldToPID(VFS_PID);
-//   msg.msg=malloc(sizeof(vfs_message));
-//   mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   while (msg.from==0) {
-//     yieldToPID(VFS_PID);
-//     mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   }
-//   free(msg.msg);
-// }
+int mount(char* file,char* type,char* path) {
+  serdes_state state={0};
+  serialize_str(type,&state);
+  serialize_str(file,&state);
+  serialize_str(path,&state);
+  int* err=rpc_call(2,"mount",state.buf,state.sizeorpos);
+  return *err;
+}
 
-// void mount(char* file,char* type,char* path) {
-//   if (vfs_box==0) {
-//     serial_print("The VFS box has not been found\n");
-//     return;
-//   }
-//   vfs_message* msg_data=make_msg(VFS_MOUNT,type,path,0,strlen(file)+1);
-//   Message msg;
-//   msg.from=box;
-//   msg.to=vfs_box;
-//   msg.msg=msg_data;
-//   msg.size=sizeof(vfs_message);
-//   mailbox_send_msg(&msg);
-//   msg.msg=file;
-//   msg.size=strlen(file)+1;
-//   mailbox_send_msg(&msg);
-//   yieldToPID(VFS_PID);
-//   msg.msg=msg_data;
-//   mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   while (msg.from==0) {
-//     yieldToPID(VFS_PID);
-//     mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   }
-//   free(msg.msg);
-// }
+int vfprintf(FILE* stream,const char* format,va_list arg) {
+  int c;
+	for(;*format!='\0';format++) {
+    if(*format!='%') {
+  		c=fputc(*format,stream);
+      continue;
+  	}
+    format++;
+		switch(*format) {
+			case 'c': {
+        int i=va_arg(arg,int);
+				c=fputc(i,stream);
+        if (c==EOF) {
+          return EOF;
+        }
+				break;
+      }
+			case 'd': {
+        int i=va_arg(arg,int); 		//Fetch Decimal/Integer argument
+				if(i<0) {
+					i=-i;
+					fputc('-',stream);
+				}
+        char str[11];
+        int_to_ascii(i,str);
+				c=fputs(str,stream);
+        if (c==EOF) {
+          return EOF;
+        }
+				break;
+      }
+			// case 'o': {
+      //   int i=va_arg(arg,unsigned int); //Fetch Octal representation
+			// 	puts(convert(i,8));
+			// 	break;
+      // }
+			case 's': {
+        char* s=va_arg(arg,char*);
+				c=fputs(s,stream);
+        if (c==EOF) {
+          return EOF;
+        }
+				break;
+      }
+			case 'x': {
+        unsigned int i=va_arg(arg, unsigned int);
+        char str[11];
+        str[0]='\0';
+        hex_to_ascii(i,str);
+				c=fputs(str,stream);
+        if (c==EOF) {
+          return EOF;
+        }
+				break;
+      }
+		}
+	}
+  return 1;
+}
 
-// int vfprintf(FILE* stream,const char* format,va_list arg) {
-//   if (vfs_box==0) {
-//     serial_print("The VFS box has not been found\n");
-//     return EOF;
-//   }
-//   int c;
-// 	for(;*format!='\0';format++) {
-//     if(*format!='%') {
-//   		c=fputc(*format,stream);
-//       if (c==EOF) {
-//         return EOF;
-//       }
-//       continue;
-//   	}
-//     format++;
-// 		switch(*format) {
-// 			case 'c': {
-//         int i=va_arg(arg,int);
-// 				c=fputc(i,stream);
-//         if (c==EOF) {
-//           return EOF;
-//         }
-// 				break;
-//       }
-// 			case 'd': {
-//         int i=va_arg(arg,int); 		//Fetch Decimal/Integer argument
-// 				if(i<0) {
-// 					i=-i;
-// 					fputc('-',stream);
-// 				}
-//         char str[11];
-//         int_to_ascii(i,str);
-// 				c=fputs(str,stream);
-//         if (c==EOF) {
-//           return EOF;
-//         }
-// 				break;
-//       }
-// 			// case 'o': {
-//       //   int i=va_arg(arg,unsigned int); //Fetch Octal representation
-// 			// 	puts(convert(i,8));
-// 			// 	break;
-//       // }
-// 			case 's': {
-//         char* s=va_arg(arg,char*);
-// 				c=fputs(s,stream);
-//         if (c==EOF) {
-//           return EOF;
-//         }
-// 				break;
-//       }
-// 			case 'x': {
-//         unsigned int i=va_arg(arg, unsigned int);
-//         char str[11];
-//         str[0]='\0';
-//         hex_to_ascii(i,str);
-// 				c=fputs(str,stream);
-//         if (c==EOF) {
-//           return EOF;
-//         }
-// 				break;
-//       }
-// 		}
-// 	}
-//   return 1;
-// }
+int fprintf(FILE* stream,const char* format,...) {
+  va_list arg;
+  int code;
+  va_start(arg,format);
+  code=vfprintf(stream,format,arg);
+  va_end(arg);
+  if (code) {
+    return strlen(format);
+  } else {
+    return EOF;
+  }
+}
 
-// int fprintf(FILE* stream,const char* format,...) {
-//   va_list arg;
-//   int code;
-//   va_start(arg,format);
-//   code=vfprintf(stream,format,arg);
-//   va_end(arg);
-//   if (code) {
-//     return strlen(format);
-//   } else {
-//     return EOF;
-//   }
-// }
+int printf(const char* format,...) {
+  va_list arg;
+  int code;
+  va_start(arg,format);
+  code=vfprintf(stdout,format,arg);
+  va_end(arg);
+  if (code) {
+    return strlen(format);
+  } else {
+    return EOF;
+  }
+}
 
-// int printf(const char* format,...) {
-//   va_list arg;
-//   int code;
-//   va_start(arg,format);
-//   code=vfprintf(stdout,format,arg);
-//   va_end(arg);
-//   if (code) {
-//     return strlen(format);
-//   } else {
-//     return EOF;
-//   }
-// }
-
-// int fseek(FILE* stream,long offset,int origin) {
-//   if (vfs_box==0) {
-//     serial_print("The VFS box has not been found\n");
-//     return -1;
-//   }
-//   vfs_message* msg_data=make_msg(VFS_SEEK,NULL,NULL,*stream,origin);
-//   msg_data->pos=offset;
-//   Message msg;
-//   msg.from=box;
-//   msg.to=vfs_box;
-//   msg.msg=msg_data;
-//   msg.size=sizeof(vfs_message);
-//   mailbox_send_msg(&msg);
-//   yieldToPID(VFS_PID);
-//   mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   while (msg.from==0) {
-//     yieldToPID(VFS_PID);
-//     mailbox_get_msg(box,&msg,sizeof(vfs_message));
-//   }
-//   vfs_message* vfs_msg=(vfs_message*)msg.msg;
-//   if (vfs_msg->flags) {
-//     free(vfs_msg);
-//     return -1;
-//   } else {
-//     free(vfs_msg);
-//     return 0;
-//   }
-// }
-
-// void rescan_vfs() {
-//   vfs_box=mailbox_find_by_name("vfs");
-// }
+int fseek(FILE* stream,long offset,int origin) {
+  switch (origin) {
+  case SEEK_SET:
+    stream->pos=offset;
+    break;
+  case SEEK_CUR:
+    stream->pos+=offset;
+    break;
+  case SEEK_END:
+    break;
+  default:
+    break;
+  }
+}

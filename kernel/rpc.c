@@ -62,6 +62,7 @@ static char is_init(pid_t pid) {
 }
 
 void* kernel_rpc_call(pid_t pid,char* name,void* buf,size_t size) {
+  //serial_printf("PID %d calling %s on PID %d\n",tasking_get_PID(),name,pid);
   if (is_init(pid)==0) {
     rpc_waiting_thread* waiting_thread=kmalloc(sizeof(rpc_waiting_thread));
     if (waiting_thread==NULL) {

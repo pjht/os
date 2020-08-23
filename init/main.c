@@ -8,6 +8,7 @@
 #include <string.h>
 #include <tasking.h>
 #include <rpc.h>
+#include <serdes.h>
 
 typedef struct {
   char filename[100];
@@ -57,11 +58,6 @@ char load_proc(size_t datapos,char* initrd) {
   int pos=0;
   elf_header header;
   pos=datapos;
-  char str[256];
-  int_to_ascii(pos,str);
-  serial_print("POS:");
-  serial_print(str);
-  serial_print("\n");
   char* hdr_ptr=(char*)&header;
   for (size_t i=0;i<sizeof(elf_header);i++) {
     hdr_ptr[i]=initrd[pos];
@@ -95,101 +91,73 @@ char load_proc(size_t datapos,char* initrd) {
   return 1;
 }
 
-// char load_proc_devfs(size_t datapos) {
-//   serial_print("load_proc_devfs\n");
-//   FILE* initrd=fopen("/dev/initrd","r");
-//   elf_header header;
-//   fseek(initrd,datapos,SEEK_SET);
-//   fread(&header,sizeof(elf_header),1,initrd);
-//   if (header.magic!=ELF_MAGIC) {
-//     serial_print("Bad magic number\n");
-//     return 0;
-//   } else {
-//     void* address_space=new_address_space();
-//     for (int i=0;i<header.pheader_ent_nm;i++) {
-//       elf_pheader pheader;
-//       fseek(initrd,(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos,SEEK_SET);
-//       fread(&pheader,sizeof(elf_pheader),1,initrd);
-//       serial_print("pheader.memsz=");
-//       char str[256];
-//       hex_to_ascii(pheader.memsz,str);
-//       serial_print(str);
-//       serial_print("\n");
-//       char* ptr=alloc_memory(((pheader.memsz)/4096)+1);
-//       memset(ptr,0,pheader.memsz);
-//       if (pheader.filesz>0) {
-//         fseek(initrd,pheader.offset+datapos,SEEK_SET);
-//         fread(ptr,sizeof(char),pheader.filesz,initrd);
-//       }
-//       copy_data(address_space,ptr,pheader.memsz,(void*)pheader.vaddr);
-//     }
-//     create_proc((void*)header.entry,address_space,NULL,NULL);
-//   }
-//   return 1;
-// }
-
-void* thread_func(void* arg) {
-  for (;;);
-  return NULL;
+char load_proc_devfs(size_t datapos) {
+  serial_print("load_proc_devfs\n");
+  FILE* initrd=fopen("/dev/initrd","r");
+  elf_header header;
+  fseek(initrd,datapos,SEEK_SET);
+  serial_print("HERE1\n");
+  fread(&header,sizeof(elf_header),1,initrd);
+  if (header.magic!=ELF_MAGIC) {
+    serial_print("Bad magic number (");
+    char str[32];
+    hex_to_ascii(header.magic,str);
+    serial_print(str);
+    serial_print(")\n");
+    return 0;
+  } else {
+    serial_print("HERE2\n");
+    void* address_space=new_address_space();
+    for (int i=0;i<header.pheader_ent_nm;i++) {
+      elf_pheader pheader;
+      fseek(initrd,(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos,SEEK_SET);
+      fread(&pheader,sizeof(elf_pheader),1,initrd);
+      serial_print("pheader.memsz=");
+      char str[256];
+      hex_to_ascii(pheader.memsz,str);
+      serial_print(str);
+      serial_print("\n");
+      char* ptr=alloc_memory(((pheader.memsz)/4096)+1);
+      memset(ptr,0,pheader.memsz);
+      if (pheader.filesz>0) {
+        fseek(initrd,pheader.offset+datapos,SEEK_SET);
+        fread(ptr,sizeof(char),pheader.filesz,initrd);
+      }
+      copy_data(address_space,ptr,pheader.memsz,(void*)pheader.vaddr);
+    }
+    create_proc((void*)header.entry,address_space,NULL,NULL);
+  }
+  return 1;
 }
 
 int main() {
-  serial_print("IN INIT\n");
+  serial_print("Init running\n");
   long size=initrd_sz();
   char* initrd=malloc(size);
   initrd_get(initrd);
-  size_t datapos=find_loc("rpctest",initrd);
+  size_t datapos=find_loc("vfs",initrd);
   load_proc(datapos,initrd);
-  void* retbuf=rpc_call(2,"rpctestfunc","Buffer test\n",strlen("Buffer test\n")+1);
-  serial_print(retbuf);
-  rpc_deallocate_buf(retbuf,strlen(retbuf)+1);
-  serial_print(retbuf);
-  // yield();
-  // pthread_t thread;
-  // pthread_create(&thread,NULL,thread_func,NULL);
-  // blockThread(THREAD_BLOCKED);
-  // for (int i=0;i<5;i++) {
-  //   serial_print("YIELDING\n");
-  //   yield();
-  //   serial_print("YIELDED\n");
-  // }
-  // serial_print("EXITING\n");
-  exit(0);
-  // long size=initrd_sz();
-  // char* initrd=malloc(size);
-  // initrd_get(initrd);
-  // exit(0);
-  // size_t datapos=find_loc("vfs",initrd);
-  // load_proc(datapos,initrd);
-  // yield(); // Bochs fails here
-  // rescan_vfs();
-  // datapos=find_loc("devfs",initrd);
-  // load_proc(datapos,initrd);
-  // yieldToPID(3);
-  // datapos=find_loc("initrd_drv",initrd);
-  // load_proc(datapos,initrd);
-  // yieldToPID(4);
-  // mount("","devfs","/dev/");
-  // datapos=find_loc("vga_drv",initrd);
-  // serial_print("Making vga process\n");
-  // load_proc_devfs(datapos);
-  // serial_print("Made vga process\n");
-  // yieldToPID(5);
-  // FILE* file;
-  // do {
-  //   file=fopen("/dev/vga","w");
-  // } while(file==NULL);
-  // do {
-  //   file=fopen("/dev/vga","w");
-  // } while(file==NULL);
-  // datapos=find_loc("pci",initrd);
-  // load_proc(datapos,initrd);
-  // free(initrd);
-  // yieldToPID(4);
-  // fputs("FPUTS String\n",file);
-  // char str[3]={0,0,0};
-  // fgets(str,2,stdin);
-  // char str2[3]={0,0,0};
-  // fgets(str2,2,stdin);
-  // printf("Printf %s,%s\n",str,str2);
+  datapos=find_loc("devfs",initrd);
+  load_proc(datapos,initrd);
+  int err=mount("","devfs","/dev");
+  if (err) {
+    serial_print("Failed to mount devfs\n");
+    exit(1);
+  }
+  datapos=find_loc("initrd_drv",initrd);
+  load_proc(datapos,initrd);
+  for(int i=0;i<10000000;i++);
+  serial_print("Loading VGA driver\n");
+  datapos=find_loc("vga_drv",initrd);
+  load_proc_devfs(datapos);
+  for(int i=0;i<10000000;i++);
+  serial_print("Opening /dev/vga\n");
+  stdout=fopen("/dev/vga","w");
+  if (!stdout) {
+    serial_print("Could not open /dev/vga\n");
+    exit(1);
+  }
+  serial_print("Writing to screen\n");
+  puts("Puts test");
+  printf("Printf test with file opened to %s\n","/dev/vga");
 }

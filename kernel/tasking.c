@@ -66,11 +66,14 @@ static void unmark_proc_scheduled(pid_t index) {
 */
 void schedule_thread(Thread* thread) {
   if(!is_proc_scheduled(thread->process->pid)) {
-    if (ready_to_run_tail) {
+    if (ready_to_run_head) {
       thread->state=THREAD_READY;
-      ready_to_run_tail->next_ready_to_run=thread;
-      thread->prev_ready_to_run=ready_to_run_tail;
-      ready_to_run_tail=thread;
+      // ready_to_run_tail->next_ready_to_run=thread;
+      // thread->prev_ready_to_run=ready_to_run_tail;
+      // ready_to_run_tail=thread;
+      thread->next_ready_to_run=ready_to_run_head;
+      ready_to_run_head->prev_ready_to_run=thread;
+      ready_to_run_head=thread;
       mark_proc_scheduled(thread->process->pid);
     } else if (current_thread) {
       thread->state=THREAD_READY;
@@ -114,7 +117,7 @@ void tasking_create_task(void* eip,void* address_space,char kmode,void* param1,v
   proc->first_thread=thread;
   setup_kstack(thread,param1,param2,kmode,eip);
   schedule_thread(thread);
-  serial_printf("Created thread with PID %d and TID %d.\n",proc->pid,thread->tid);
+  // serial_printf("Created thread with PID %d and TID %d.\n",proc->pid,thread->tid);
 }
 
 void tasking_init() {
@@ -204,13 +207,13 @@ void switch_to_thread(Thread* thread) {
     schedule_thread(current_thread_next_ready);
   }
   thread->state=THREAD_RUNNING;
-  serial_printf("Switching to PID %d TID %d.\n",thread->process->pid,thread->tid);
+  // serial_printf("Switching to PID %d TID %d.\n",thread->process->pid,thread->tid);
   switch_to_thread_asm(thread);
 }
 
 void tasking_yield() {
   if (ready_to_run_head) {
-    serial_printf("Attempting to switch to PID %d TID %d\n",ready_to_run_head->process->pid,ready_to_run_head->tid);
+    // serial_printf("Attempting to switch to PID %d TID %d\n",ready_to_run_head->process->pid,ready_to_run_head->tid);
     switch_to_thread(ready_to_run_head);
   } else {
     if (NUM_UNBLOCKED_THREADS(current_thread->process)>1) {
@@ -224,13 +227,15 @@ void tasking_yield() {
     } else {
       if (num_procs==0) {
         serial_printf("All processes exited, halting\n");
+        asm volatile("cli");
+        for(;;);
         halt();
       } else {
-        serial_printf("All threads in all processes blocked, waiting for an IRQ which unblocks a thread\n");
+        // serial_printf("All threads in all processes blocked, waiting for an IRQ which unblocks a thread\n");
         // All threads in all processes blocked, so wait for an IRQ whose handler unblocks a thread.
         do { wait_for_unblocked_thread_asm(); } while (ready_to_run_head==NULL);
       }
-      serial_printf("Attempting to switch to PID %d TID %d\n",ready_to_run_head->process->pid,ready_to_run_head->tid);
+      // serial_printf("Attempting to switch to PID %d TID %d\n",ready_to_run_head->process->pid,ready_to_run_head->tid);
       switch_to_thread(ready_to_run_head);
     }
   }
@@ -299,7 +304,7 @@ static Thread* get_thread(pid_t pid,pid_t tid) {
 }
 
 void tasking_unblock(pid_t pid,pid_t tid) {
-    serial_printf("Unblocking PID %d TID %d\n",pid,tid);
+    // serial_printf("Unblocking PID %d TID %d\n",pid,tid);
     Thread* thread=get_thread(pid,tid);
     if (thread==NULL) {
       return;
@@ -314,7 +319,7 @@ void tasking_unblock(pid_t pid,pid_t tid) {
 }
 
 void tasking_exit(int code) {
-  serial_printf("PID %d is exiting with code %d.\n",current_thread->process->pid,code);
+  // serial_printf("PID %d is exiting with code %d.\n",current_thread->process->pid,code);
   if (ready_to_run_head&&SAME_PROC(ready_to_run_head,current_thread)) {
     ready_to_run_head=ready_to_run_head->next_ready_to_run;
     if (ready_to_run_head==NULL) {

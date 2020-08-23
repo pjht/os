@@ -15,4 +15,3 @@ MAN_EXTENSION          = .3
 MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = YES
 PREDEFINED             = __attribute__(x)= DOXYGEN_SHOULD_SKIP_THIS=
-HAVE_DOT               = YES
