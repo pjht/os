@@ -1,4 +1,6 @@
 var annotated_dup =
 [
-    [ "heap_block", "structheap__block.html", "structheap__block" ]
+    [ "FILE", "structFILE.html", "structFILE" ],
+    [ "heap_block", "structheap__block.html", "structheap__block" ],
+    [ "serdes_state", "structserdes__state.html", "structserdes__state" ]
 ];

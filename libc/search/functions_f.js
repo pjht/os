@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['yield_124',['yield',['../tasking_8h.html#a58c8b2ad0ea491a6642e5e1cbd358c89',1,'tasking.c']]]
+  ['vfprintf_192',['vfprintf',['../stdio_8c.html#a238ba3ae728d117984e087d9db33cd13',1,'vfprintf(FILE *stream, const char *format, va_list arg):&#160;stdio.c'],['../stdio_8h.html#a238ba3ae728d117984e087d9db33cd13',1,'vfprintf(FILE *stream, const char *format, va_list arg):&#160;stdio.c']]]
 ];

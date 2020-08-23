@@ -25,6 +25,7 @@
 var NAVTREE =
 [
   [ "MyOS Libc", "index.html", [
+    [ "Deprecated List", "deprecated.html", null ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
       [ "Data Structure Index", "classes.html", null ],

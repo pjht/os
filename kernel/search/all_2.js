@@ -4,14 +4,13 @@ var searchData=
   ['cachetype_20',['cachetype',['../structpg__struct__entry.html#a3a2b57d68ca662f901ccb0820ae479dc',1,'pg_struct_entry']]],
   ['chksum_21',['chksum',['../structtar__header.html#a050e232fc9ed4ca3a22c0ce9c5b7748d',1,'tar_header']]],
   ['clear_5fbmap_5fbit_22',['clear_bmap_bit',['../kmalloc_8c.html#a5ecbd230a1da28644f56c5af47904855',1,'clear_bmap_bit(size_t index):&#160;kmalloc.c'],['../pmem_8c.html#ab5b67f20de16b28be3a3d7a6bd81c65b',1,'clear_bmap_bit(int index):&#160;pmem.c']]],
-  ['clear_5finit_23',['clear_init',['../rpc_8c.html#a7ec2cef5f8d21f0619667dc89ace164c',1,'rpc.c']]],
-  ['code_24',['code',['../structrpc__func__info.html#a8f8e6c3e4a96f3ea02c05029a507b1d2',1,'rpc_func_info']]],
-  ['configure_25',['configure',['../serial_8c.html#af048fb49b855f8c5b78534b90cde6ffb',1,'serial.c']]],
-  ['configured_26',['configured',['../serial_8c.html#a17305d9bc2b84f3812f054da9f17a858',1,'serial.c']]],
-  ['cpu_5finit_27',['cpu_init',['../cpu__init_8h.html#a9c0cf32265079b4a876b8a963437d2dd',1,'cpu_init():&#160;cpu_init.c'],['../cpu__init_8c.html#a9c0cf32265079b4a876b8a963437d2dd',1,'cpu_init():&#160;cpu_init.c']]],
-  ['cpu_5finit_2ec_28',['cpu_init.c',['../cpu__init_8c.html',1,'']]],
-  ['cpu_5finit_2eh_29',['cpu_init.h',['../cpu__init_8h.html',1,'']]],
-  ['cr3_30',['cr3',['../structtss__entry.html#aa9928bf54ab675027f1587cfd430086a',1,'tss_entry']]],
-  ['cs_31',['cs',['../structtss__entry.html#a33c9606d477c18ae57ca3916a206cb68',1,'tss_entry::cs()'],['../structregisters__t.html#a2fd90ea98c1435017c17c924f580c089',1,'registers_t::cs()']]],
-  ['current_5fthread_32',['current_thread',['../tasking_8c.html#aac59f73081d1aff0293b54c543b552ca',1,'current_thread():&#160;tasking.c'],['../tasking_8h.html#aac59f73081d1aff0293b54c543b552ca',1,'current_thread():&#160;tasking.c']]]
+  ['code_23',['code',['../structrpc__func__info.html#a8f8e6c3e4a96f3ea02c05029a507b1d2',1,'rpc_func_info']]],
+  ['configure_24',['configure',['../serial_8c.html#af048fb49b855f8c5b78534b90cde6ffb',1,'serial.c']]],
+  ['configured_25',['configured',['../serial_8c.html#a17305d9bc2b84f3812f054da9f17a858',1,'serial.c']]],
+  ['cpu_5finit_26',['cpu_init',['../cpu__init_8h.html#a9c0cf32265079b4a876b8a963437d2dd',1,'cpu_init():&#160;cpu_init.c'],['../cpu__init_8c.html#a9c0cf32265079b4a876b8a963437d2dd',1,'cpu_init():&#160;cpu_init.c']]],
+  ['cpu_5finit_2ec_27',['cpu_init.c',['../cpu__init_8c.html',1,'']]],
+  ['cpu_5finit_2eh_28',['cpu_init.h',['../cpu__init_8h.html',1,'']]],
+  ['cr3_29',['cr3',['../structtss__entry.html#aa9928bf54ab675027f1587cfd430086a',1,'tss_entry']]],
+  ['cs_30',['cs',['../structtss__entry.html#a33c9606d477c18ae57ca3916a206cb68',1,'tss_entry::cs()'],['../structregisters__t.html#a2fd90ea98c1435017c17c924f580c089',1,'registers_t::cs()']]],
+  ['current_5fthread_31',['current_thread',['../tasking_8c.html#aac59f73081d1aff0293b54c543b552ca',1,'current_thread():&#160;tasking.c'],['../tasking_8h.html#aac59f73081d1aff0293b54c543b552ca',1,'current_thread():&#160;tasking.c']]]
 ];

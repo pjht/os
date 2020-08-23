@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['max_5fprocs_555',['MAX_PROCS',['../tasking_8c.html#a0e92bfcd9e51ca39bbebc3dfb9c16014',1,'tasking.c']]],
-  ['modem_5fcmd_5fport_556',['MODEM_CMD_PORT',['../serial_8c.html#ac82e8d558a9c66a32295fefde9f515c7',1,'serial.c']]]
+  ['max_5fprocs_553',['MAX_PROCS',['../tasking_8c.html#a0e92bfcd9e51ca39bbebc3dfb9c16014',1,'tasking.c']]],
+  ['modem_5fcmd_5fport_554',['MODEM_CMD_PORT',['../serial_8c.html#ac82e8d558a9c66a32295fefde9f515c7',1,'serial.c']]]
 ];
