@@ -19,13 +19,7 @@ void read(void* args) {
   rpc_deallocate_buf(args,state.sizeorpos);
   long max_data=initrd_size-pos;
   if (size>max_data) {
-    serial_print("Reading too much data from initrd\n");
-    state.buf=NULL;
-    state.sizeorpos=0;
-    serialize_int(0,&state);
-    rpc_return(state.buf,state.sizeorpos);
-    free(state.buf);
-    pthread_exit(NULL);
+    size=max_data;
   }
   char* data=malloc(sizeof(char)*size);
   for (long i=0;i<size;i++) {
