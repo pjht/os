@@ -290,6 +290,9 @@ void isr_handler(registers_t* r) {
       case SYSCALL_RPC_MARK_AS_INIT:
         kernel_rpc_mark_as_init();
         break;
+      case SYSCALL_RPC_IS_INIT:
+        r->ecx=kernel_rpc_is_init((pid_t)r->ebx);
+        break;
       default:
         break;
       } 

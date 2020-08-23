@@ -43,4 +43,11 @@ void rpc_return(void* buf,size_t size);
 */
 void rpc_mark_as_init();
 
+/**
+ * Check if a process is ready to accept RPC calls
+ * \param pid The pid to check
+ * \return whether the process is ready
+*/
+char rpc_is_init(pid_t pid);
+
 #endif

@@ -48,13 +48,7 @@ static void clear_init(pid_t pid) {
   process_ready_bmap[byte]=process_ready_bmap[byte]&(~(1<<bit));
 }
 
-
-/**
- * Check if a process is ready to accept RPC calls
- * \param pid The pid to check
- * \return whether the process is ready
-*/
-static char is_init(pid_t pid) {
+char kernel_rpc_is_init(pid_t pid) {
   size_t byte=pid/8;
   size_t bit=pid%8;
   char entry=process_ready_bmap[byte];
@@ -63,7 +57,7 @@ static char is_init(pid_t pid) {
 
 void* kernel_rpc_call(pid_t pid,char* name,void* buf,size_t size) {
   //serial_printf("PID %d calling %s on PID %d\n",tasking_get_PID(),name,pid);
-  if (is_init(pid)==0) {
+  if (kernel_rpc_is_init(pid)==0) {
     rpc_waiting_thread* waiting_thread=kmalloc(sizeof(rpc_waiting_thread));
     if (waiting_thread==NULL) {
       serial_printf("Kmalloc unable to allocate waiting_thread\n");

@@ -59,4 +59,12 @@ size_t kernel_get_num_rpc_funcs(pid_t pid);
  * Mark the current process as ready to accept RPC calls
 */
 void kernel_rpc_mark_as_init();
+
+/**
+ * Check if a process is ready to accept RPC calls
+ * \param pid The pid to check
+ * \return whether the process is ready
+*/
+char kernel_rpc_is_init(pid_t pid);
+
 #endif

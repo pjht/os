@@ -129,8 +129,10 @@ int main() {
   initrd_get(initrd);
   size_t datapos=find_loc("vfs",initrd);
   load_proc(datapos,initrd);
+  while(rpc_is_init(2)==0);
   datapos=find_loc("devfs",initrd);
   load_proc(datapos,initrd);
+  while(rpc_is_init(3)==0);
   int err=mount("","devfs","/dev");
   if (err) {
     serial_print("Failed to mount devfs\n");
@@ -138,11 +140,11 @@ int main() {
   }
   datapos=find_loc("initrd_drv",initrd);
   load_proc(datapos,initrd);
-  for(int i=0;i<10000000;i++);
+  while(rpc_is_init(4)==0);
   serial_print("Loading VGA driver\n");
   datapos=find_loc("vga_drv",initrd);
   load_proc_devfs(datapos);
-  for(int i=0;i<10000000;i++);
+  while(rpc_is_init(5)==0);
   serial_print("Opening /dev/vga\n");
   stdout=fopen("/dev/vga","w");
   if (!stdout) {

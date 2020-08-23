@@ -41,3 +41,11 @@ void rpc_mark_as_init() {
     int $80; \
   "::);
 }
+char rpc_is_init(pid_t pid) {
+  char is_init;
+  asm volatile("  \
+    mov $" QU(SYSCALL_RPC_IS_INIT) ", %%eax; \
+    int $80; \
+  ":"=c"(is_init):"b"(pid));
+  return is_init;
+}
