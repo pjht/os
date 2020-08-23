@@ -26,6 +26,7 @@ void open(void* args) {
   serdes_state state;
   start_deserialize(args,&state);
   char* path=deserialize_str(&state);
+  deserialize_ptr(&state);
   rpc_deallocate_buf(args,state.sizeorpos);
   int i;
   char found=0;

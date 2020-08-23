@@ -9,6 +9,7 @@
 #include <tasking.h>
 #include <rpc.h>
 #include <serdes.h>
+#include <spawn.h>
 
 typedef struct {
   char filename[100];
@@ -91,36 +92,6 @@ char load_proc(size_t datapos,char* initrd) {
   return 1;
 }
 
-char load_proc_devfs(size_t datapos) {
-  FILE* initrd=fopen("/dev/initrd","r");
-  elf_header header;
-  fseek(initrd,datapos,SEEK_SET);
-  fread(&header,sizeof(elf_header),1,initrd);
-  if (header.magic!=ELF_MAGIC) {
-    serial_print("Bad magic number (");
-    char str[32];
-    hex_to_ascii(header.magic,str);
-    serial_print(str);
-    serial_print(")\n");
-    return 0;
-  } else {
-    void* address_space=new_address_space();
-    for (int i=0;i<header.pheader_ent_nm;i++) {
-      elf_pheader pheader;
-      fseek(initrd,(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos,SEEK_SET);
-      fread(&pheader,sizeof(elf_pheader),1,initrd);
-      char* ptr=alloc_memory(((pheader.memsz)/4096)+1);
-      memset(ptr,0,pheader.memsz);
-      if (pheader.filesz>0) {
-        fseek(initrd,pheader.offset+datapos,SEEK_SET);
-        fread(ptr,sizeof(char),pheader.filesz,initrd);
-      }
-      copy_data(address_space,ptr,pheader.memsz,(void*)pheader.vaddr);
-    }
-    create_proc((void*)header.entry,address_space,NULL,NULL);
-  }
-  return 1;
-}
 
 int main() {
   serial_print("Init running\n");
@@ -141,10 +112,15 @@ int main() {
   datapos=find_loc("initrd_drv",initrd);
   load_proc(datapos,initrd);
   while(rpc_is_init(4)==0);
-  serial_print("Loading VGA driver\n");
-  datapos=find_loc("vga_drv",initrd);
-  load_proc_devfs(datapos);
+  serial_print("Loading tar_fs\n");
+  datapos=find_loc("tar_fs",initrd);
+  load_proc(datapos,initrd);
   while(rpc_is_init(5)==0);
+  serial_print("Mounting initrd\n");
+  mount("/dev/initrd","tarfs","/initrd");
+  serial_print("Loading VGA driver\n");
+  posix_spawn(NULL,"/initrd/vga_drv",NULL,NULL,NULL,NULL);
+  while(rpc_is_init(6)==0);
   serial_print("Opening /dev/vga\n");
   stdout=fopen("/dev/vga","w");
   if (!stdout) {

@@ -142,8 +142,11 @@ size_t fwrite(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
 
 void register_fs(const char* name,pid_t pid) {
   serdes_state state={0};
+  serial_print("libc register fs 1\n");
   serialize_str((char*)name,&state);
+  serial_print("libc register fs 2\n");
   serialize_int(pid,&state);
+  serial_print("libc register fs 3\n");
   rpc_call(2,"register_fs",state.buf,state.sizeorpos);
 }
 

@@ -74,6 +74,7 @@ void vfs_mount(void* args) {
 }
 
 void vfs_register_fs(void* args) {
+  serial_print("register fs\n");
   serdes_state state;
   start_deserialize(args,&state);
   char* name=deserialize_str(&state);
@@ -119,6 +120,7 @@ void open(void* args) {
   state.buf=NULL;
   state.sizeorpos=0;
   serialize_str(path+(strlen(mnt_pnt->path)+1),&state);
+  serialize_ptr(mnt_pnt->fs_data,&state);
   char* retbuf=rpc_call(mnt_pnt->fs_pid,"open",state.buf,state.sizeorpos);
   free(state.buf);
   start_deserialize(retbuf,&state);

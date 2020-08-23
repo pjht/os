@@ -156,7 +156,7 @@ void* realloc(void *mem, size_t new_sz) {
   }
   size_t num_4b_grps=*((size_t*)((char*)mem-12));
   memcpy(ptr,mem,num_4b_grps*4);
-  free(mem);
+  //free(mem);
   mem=ptr;
   return ptr;
 }
