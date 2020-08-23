@@ -92,11 +92,9 @@ char load_proc(size_t datapos,char* initrd) {
 }
 
 char load_proc_devfs(size_t datapos) {
-  serial_print("load_proc_devfs\n");
   FILE* initrd=fopen("/dev/initrd","r");
   elf_header header;
   fseek(initrd,datapos,SEEK_SET);
-  serial_print("HERE1\n");
   fread(&header,sizeof(elf_header),1,initrd);
   if (header.magic!=ELF_MAGIC) {
     serial_print("Bad magic number (");
@@ -106,17 +104,11 @@ char load_proc_devfs(size_t datapos) {
     serial_print(")\n");
     return 0;
   } else {
-    serial_print("HERE2\n");
     void* address_space=new_address_space();
     for (int i=0;i<header.pheader_ent_nm;i++) {
       elf_pheader pheader;
       fseek(initrd,(header.prog_hdr)+(header.pheader_ent_sz*i)+datapos,SEEK_SET);
       fread(&pheader,sizeof(elf_pheader),1,initrd);
-      serial_print("pheader.memsz=");
-      char str[256];
-      hex_to_ascii(pheader.memsz,str);
-      serial_print(str);
-      serial_print("\n");
       char* ptr=alloc_memory(((pheader.memsz)/4096)+1);
       memset(ptr,0,pheader.memsz);
       if (pheader.filesz>0) {
