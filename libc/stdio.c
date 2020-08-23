@@ -82,7 +82,22 @@ char* gets(char* s) {
 }
 
 char* fgets(char* str,int count,FILE* stream) {
-  fread(str,1,count,stream);
+  count=fread(str,1,count-1,stream)+1;
+  if (count==0) {
+    return NULL;
+  }
+  str[count]='\0';
+  int newlinepos=-1;
+  for (int i=0;i<(count-1);i++) {
+    if (str[i]=='\n') {
+      newlinepos=i;
+      break;
+    }
+  }
+  if (newlinepos) {
+    stream->pos-=(count-1);
+    stream->pos+=newlinepos;
+  }
   return str;
 }
 
@@ -119,9 +134,9 @@ int puts(const char *s) {
 int fputs(const char* s, FILE* stream) {
   size_t retval=fwrite((void*)s,strlen(s),1,stream);
   if (retval==0) {
-    return 0;
-  } else {
     return EOF;
+  } else {
+    return 0;
   }
 }
 

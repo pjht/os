@@ -130,4 +130,8 @@ int main() {
   serial_print("Writing to screen\n");
   puts("Puts test");
   printf("Printf test with file opened to %s\n","/dev/vga");
+  FILE* file=fopen("/initrd/hi","r");
+  char str[64];
+  fgets(str,64,file);
+  printf("Read %s from /initrd/hi\n", str);
 }
