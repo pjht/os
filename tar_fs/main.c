@@ -123,6 +123,7 @@ void read(void* args) {
   state.sizeorpos=0;
   serialize_int(size,&state);
   serialize_ary(data,size,&state);
+  free(data);
   rpc_return(state.buf,state.sizeorpos);
   free(state.buf);
   pthread_exit(NULL);

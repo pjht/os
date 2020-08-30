@@ -39,10 +39,8 @@ void* deserialize_ptr(serdes_state* state) {
 }
 
 void* deserialize_ary(size_t len,serdes_state* state) {
-  void* ary_in_buf=((void*)(state->buf+state->sizeorpos));
+  void* ary=((void*)(state->buf+state->sizeorpos));
   state->sizeorpos+=len;
-  void* ary=malloc(len);
-  memcpy(ary,ary_in_buf,len);
   return ary;
 }
 
