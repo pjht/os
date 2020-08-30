@@ -3,10 +3,12 @@
 #include <tasking.h>
 #include <memory.h>
 #include <stdio.h>
+#include <string.h>
+#include <dbg.h>
 
 int posix_spawn(pid_t* pid, const char* path, const posix_spawn_file_actions_t* file_actions, const posix_spawnattr_t* attrp,
 char* const argv[], char* const envp[]) {
-  FILE* image=fopen(path,"r");
+  FILE* image=fopen((char*)path,"r");
   elf_header header;
   fread(&header,sizeof(elf_header),1,image);
   if (header.magic!=ELF_MAGIC) {
