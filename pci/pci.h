@@ -1,6 +1,7 @@
 #ifndef PCI_H
 #define PCI_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #define PCI_CONFIG_ADDRESS 0xCF8
@@ -67,9 +68,9 @@ typedef enum {
 } pci_class;
 
 extern pci_dev_common_info** pci_devs;
-extern uint32_t pci_num_devs;
+extern size_t pci_num_devs;
 
-pci_dev_common_info* pci_get_dev_info(uint8_t bus,uint8_t device,uint8_t func);
+pci_dev_common_info* pci_get_dev_info(int bus,int device,int func);
 void pci_set_dev_info(pci_dev_common_info* inf);
 void pci_init();
 

@@ -134,4 +134,6 @@ int main() {
   char str[64];
   fgets(str,64,file);
   printf("Read %s from /initrd/hi\n", str);
+  serial_print("Loading PCI driver\n");
+  posix_spawn(NULL,"/initrd/pci",NULL,NULL,NULL,NULL);
 }

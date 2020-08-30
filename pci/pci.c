@@ -1,5 +1,5 @@
 #include "pci.h"
-#include <sys/ports.h>
+#include <cpu/ports.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
