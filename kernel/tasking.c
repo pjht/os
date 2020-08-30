@@ -15,7 +15,6 @@
 #define HAS_UNBLOCKED_THREADS(proc) (proc->num_threads!=proc->num_threads_blocked) //!< Macro to check whethe a process has unblocked threads
 #define NUM_UNBLOCKED_THREADS(proc) (proc->num_threads-proc->num_threads_blocked) //!< Macro to get the number of unblocked threads for a process
 #define SAME_PROC(thread1,thread2) (thread1->process->pid==thread2->process->pid) //!< Macro to check whether two threads have the same PID
-#define SAME_THREAD(thread1,thread2) (thread1->process->pid==thread2->process->pid&&thread1->tid==thread2->tid) //!< Macro to check whether two threads have the same PID and TID
 pid_t next_pid=0; //!< PID to use for the next created process
 size_t num_procs=0; //!< Number of non-exited processes
 Process processes[MAX_PROCS]; //!< Array pf processes by PID
@@ -158,7 +157,7 @@ pid_t tasking_new_thread(void* start,pid_t pid,void* param) {
 static Thread* get_next_ready_thread(Thread* thread,Thread* thread_to_skip) {
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   #define HELPER \
-  while (thread&&(thread->state!=THREAD_READY||SAME_THREAD(thread,thread_to_skip))) { \
+  while (thread&&(thread->state!=THREAD_READY||thread==thread_to_skip)) { \
     thread=thread->next_thread_in_process; \
   }
   //end define
@@ -242,13 +241,13 @@ void tasking_yield() {
 }
 
 void tasking_block(thread_state newstate) {
-  if (ready_to_run_head&&SAME_THREAD(ready_to_run_head,current_thread)) {
+  if (ready_to_run_head==current_thread) {
     ready_to_run_head=ready_to_run_head->next_ready_to_run;
     if (ready_to_run_head==NULL) {
       ready_to_run_tail=NULL;
     }
   }
-  if (ready_to_run_tail&&SAME_THREAD(ready_to_run_tail,current_thread)) {
+  if (ready_to_run_tail==current_thread) {
     ready_to_run_tail=ready_to_run_tail->prev_ready_to_run;
     if (ready_to_run_tail==NULL) {
       ready_to_run_head=NULL;
@@ -256,7 +255,7 @@ void tasking_block(thread_state newstate) {
   }
   if (ready_to_run_head&&ready_to_run_head->next_ready_to_run) {
     for (Thread* thread=ready_to_run_head->next_ready_to_run;thread!=NULL;thread=thread->next_ready_to_run) {
-      if (SAME_THREAD(thread,current_thread)) {
+      if (thread==current_thread) {
         thread->prev_ready_to_run->next_ready_to_run=thread->next_ready_to_run;
         if (thread->next_ready_to_run) {
           thread->next_ready_to_run->prev_ready_to_run=thread->prev_ready_to_run;
