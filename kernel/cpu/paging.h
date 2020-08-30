@@ -32,8 +32,9 @@ void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,ch
  * Unmap virtual pages,
  * \param start_virt The start of the virtual range to unmap.
  * \param num_pages The number of pages to map.
+ * \param free_phys Also free the physical pages the virtual pages are mapped to.
 */
-void unmap_pages(void* start_virt,int num_pages);
+void unmap_pages(void* start_virt,int num_pages, int free_phys);
 /**
  * Allocate virtual pages & map them to newly allocated physical memory.
  * \param num_pages The number of pages to allocate.

@@ -88,7 +88,7 @@ void* kernel_rpc_call(pid_t pid,char* name,void* buf,size_t size) {
     virtaddr=alloc_pages((size/PAGE_SZ)+1);
     void* physaddr=virt_to_phys(virtaddr);
     memcpy(virtaddr,buf,size);
-    unmap_pages(virtaddr,(size/PAGE_SZ)+1);
+    unmap_pages(virtaddr,(size/PAGE_SZ)+1,0);
     RUN_IN_ADDRESS_SPACE(tasking_get_address_space(pid),{
       virtaddr=find_free_pages((size/PAGE_SZ)+1);
       map_pages(virtaddr,physaddr,(size/PAGE_SZ)+1,1,1);
@@ -130,7 +130,7 @@ void kernel_rpc_return(void* buf,size_t size) {
     virtaddr=alloc_pages((size/PAGE_SZ)+1);
     void* physaddr=virt_to_phys(virtaddr);
     memcpy(virtaddr,buf,size);
-    unmap_pages(virtaddr,(size/PAGE_SZ)+1);
+    unmap_pages(virtaddr,(size/PAGE_SZ)+1,0);
     RUN_IN_ADDRESS_SPACE(tasking_get_address_space(pid),{
       virtaddr=find_free_pages((size/PAGE_SZ)+1);
       map_pages(virtaddr,physaddr,(size/PAGE_SZ)+1,1,1);
@@ -153,9 +153,11 @@ void kernel_rpc_mark_as_init() {
         tasking_unblock(waiting_thread->waiting_pid,waiting_thread->waiting_tid);
         if (waiting_thread==waiting_thread_list) {
           waiting_thread_list=waiting_thread_list->next;
-        } else {
+        } else if (prev) {
           prev->next=waiting_thread->next;
         }
+        kfree(waiting_thread);
+      } else {
         prev=waiting_thread;
       }
     }

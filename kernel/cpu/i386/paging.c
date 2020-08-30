@@ -61,6 +61,9 @@ void map_pages(void* virt_addr_ptr,void* phys_addr_ptr,int num_pages,char usr,ch
       entry->wr=wr;
     }
     pg_struct_entry* entry=&page_table_map[table_entry+1024*dir_entry];
+    if (phys_addr_ptr==NULL) {
+      phys_addr=(uint32_t)pmem_alloc(1);
+    }
     entry->pgno=phys_addr>>12;
     entry->pres=1;
     entry->usr=usr;
@@ -120,9 +123,8 @@ void* find_free_pages(int num_pages) {
 }
 
 void* alloc_pages(int num_pages) {
-  void* phys_addr=pmem_alloc(num_pages);
   void* addr=find_free_pages(num_pages);
-  map_pages(addr,phys_addr,num_pages,1,1);
+  map_pages(addr,NULL,num_pages,1,1);
   return addr;
 }
 
@@ -141,8 +143,7 @@ void* virt_to_phys(void* virt_addr_arg) {
 
 
 void alloc_pages_virt(int num_pages,void* addr) {
-  void* phys_addr=pmem_alloc(num_pages);
-  map_pages(addr,phys_addr,num_pages,1,1);
+  map_pages(addr,NULL,num_pages,1,1);
 }
 
 /**
@@ -164,7 +165,7 @@ void* paging_new_address_space() {
   entry->pres=1;
   entry->wr=1;
   entry->pgno=(uint32_t)dir>>12;
-  unmap_pages(freepg,1);
+  unmap_pages(freepg,1,0);
   return dir;
 }
 
@@ -172,7 +173,7 @@ void load_address_space(void* address_space) {
   asm volatile("movl %0, %%eax; movl %%eax, %%cr3;":"=m"(address_space)::"%eax");
 }
 
-void unmap_pages(void* start_virt,int num_pages) {
+void unmap_pages(void* start_virt,int num_pages,int free_phys) {
   uint32_t virt_addr=(uint32_t)start_virt;
   int dir_entry=(virt_addr&0xFFC00000)>>22;
   int table_entry=(virt_addr&0x3FF000)>>12;
@@ -180,6 +181,9 @@ void unmap_pages(void* start_virt,int num_pages) {
     if (page_table_map[dir_entry].pres) {
       pg_struct_entry* entry=&page_table_map[table_entry+1024*dir_entry];
       entry->pres=0;
+      if (free_phys) {
+        pmem_free((void*)(entry->pgno<<12),1);
+      }
       invl_page(start_virt+(i*4096));
       table_entry++;
       if (table_entry==1024) {
@@ -214,7 +218,6 @@ void paging_init() {
     entry->wr=1;
     entry->pgno=((uint32_t)entry_virt-0xC0000000)>>12;
   }
-  // page_directory[985]=(uint32_t)(pmem_alloc(1024))|0x83;
   for (size_t i=0;i<4;i++) {
     uint32_t entry_virt=(uint32_t)&(kmalloc_page_tables[i*1024]);
     pg_struct_entry* entry=&page_directory[i+1018];
@@ -237,5 +240,5 @@ void* get_address_space() {
 
 void dealloc_pages(int num_pages,void* addr) {
   pmem_free((void*)((uint32_t)virt_to_phys(addr)>>12),num_pages);
-  unmap_pages(addr,num_pages);
+  unmap_pages(addr,num_pages,1);
 }
