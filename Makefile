@@ -5,11 +5,13 @@ C_HEADERS = $(wildcard kernel/*.h kernel/cpu/$(PLAT)/*.h kernel/cpu/*.h kernel/t
 ASM = $(wildcard kernel/cpu/$(PLAT)/*.asm)
 S_ASM = $(wildcard kernel/cpu/$(PLAT)/*.s)
 LIBC_SOURCES = $(wildcard libc/*.c libc/*/*.c)
+LIBC_ASM_SOURCES = $(wildcard libc/*.asm libc/*/*.asm)
 LIBC_HEADERS = $(wildcard libc/*.h libc/*/*.h)
 OBJ = $(C_SOURCES:.c=.o kernel/cpu/$(PLAT)/boot.o)
 ASM_OBJ = $(S_ASM:.s=.o)
 S_ASM_OBJ = $(ASM:.asm=.o)
 LIBC_OBJ = $(LIBC_SOURCES:.c=.o)
+LIBC_ASM_OBJ = $(LIBC_ASM_SOURCES:.asm=.o)
 CC = $(shell cat psinfo/$(PLAT)/cc.txt)
 AS = $(shell cat psinfo/$(PLAT)/as.txt)
 AR = $(shell cat psinfo/$(PLAT)/ar.txt)
@@ -75,7 +77,7 @@ kernel/kernel.elf: $(OBJ) $(ASM_OBJ) $(S_ASM_OBJ) sysroot/usr/lib/libc.a
 
 libc: sysroot/usr/lib/libc.a
 
-sysroot/usr/lib/libc.a: $(LIBC_OBJ)
+sysroot/usr/lib/libc.a: $(LIBC_OBJ) $(LIBC_ASM_OBJ)
 	@$(AR) rcs $@ $^
 
 sysroot/usr/share/man: doc

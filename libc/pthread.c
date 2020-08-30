@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <stddef.h>
 #include <sys/syscalls.h>
+#include <__helpers.h>
 
 #define QUAUX(X) #X
 #define QU(X) QUAUX(X)
@@ -20,4 +21,23 @@ void pthread_exit(void *value_ptr) {
   asm volatile("  \
     mov $" QU(SYSCALL_THREAD_EXIT) ", %eax; \
     int $80;");
+}
+
+int pthread_spin_init(pthread_spinlock_t *lock, int pshared) {
+  *lock=0;
+  return 0;
+}
+
+int pthread_spin_lock(pthread_spinlock_t *lock) {
+  __pthread_spin_lock_helper(lock);
+  return 0;
+}
+
+int pthread_spin_unlock(pthread_spinlock_t *lock) {
+  *lock=0;
+  return 0;
+}
+
+int pthread_spin_destroy(pthread_spinlock_t *lock) {
+  return 0;
 }

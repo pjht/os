@@ -9,6 +9,7 @@
 
 typedef pid_t pthread_t; //!< Represents a thread
 typedef int pthread_attr_t; //!< Created as dummy
+typedef int pthread_spinlock_t; //!< Represents a spinlock
 
 /**
  * Create a thread in the current process
@@ -27,5 +28,36 @@ int pthread_create(pthread_t *restrict thread,
  * \param value_ptr A pointer that when other threads in the process join on the current thread, they will recieve. (not implemented)
 */
 void pthread_exit(void *value_ptr);
+
+/**
+ * Initializes a spin lock
+ * \param lock The spinlock to initialize
+ * \param pshared Unused
+ * \returns 0 on success, 1 on failure
+*/
+int pthread_spin_init(pthread_spinlock_t *lock, int pshared);
+
+/**
+ * Locks a spin lock
+ * \param lock The spinlock to lock
+ * \returns 0 on success, 1 on failure
+*/
+int pthread_spin_lock(pthread_spinlock_t *lock);
+
+/**
+ * Unlocks a spin lock
+ * \param lock The spinlock to unlock
+ * \returns 0 on success, 1 on failure
+*/
+int pthread_spin_unlock(pthread_spinlock_t *lock);
+
+/**
+ * Destroys a spin lock
+ * \param lock The spinlock to destroy
+ * \returns 0 on success, 1 on failure
+*/
+int pthread_spin_destroy(pthread_spinlock_t *lock);
+
+
 
 #endif
