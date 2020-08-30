@@ -70,6 +70,10 @@ void schedule_thread(Thread* thread) {
       // ready_to_run_tail->next_ready_to_run=thread;
       // thread->prev_ready_to_run=ready_to_run_tail;
       // ready_to_run_tail=thread;
+      if (thread==ready_to_run_head) {
+        serial_printf("TASKING DATA STRUCTURES CORRUPT!!!!\n");
+        halt();
+      }
       thread->next_ready_to_run=ready_to_run_head;
       ready_to_run_head->prev_ready_to_run=thread;
       ready_to_run_head=thread;
@@ -270,7 +274,6 @@ void tasking_block(thread_state newstate) {
     }
   }
   current_thread->process->num_threads_blocked++;
-  unmark_proc_scheduled(current_thread->process->pid);
   tasking_yield();
 }
 
