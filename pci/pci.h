@@ -20,9 +20,6 @@ typedef struct {
   uint8_t lat_timer;
   uint8_t header_type;
   uint8_t bist;
-  uint16_t bus;
-  uint8_t device;
-  uint8_t func;
 } __attribute__((packed)) pci_dev_common_info;
 
 typedef struct {
@@ -71,7 +68,7 @@ extern pci_dev_common_info** pci_devs;
 extern size_t pci_num_devs;
 
 pci_dev_common_info* pci_get_dev_info(int bus,int device,int func);
-void pci_set_dev_info(pci_dev_common_info* inf);
+void pci_set_dev_info(int bus,int device,int func,pci_dev_common_info* inf);
 void pci_init();
 
 #endif

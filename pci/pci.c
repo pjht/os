@@ -36,39 +36,36 @@ pci_dev_common_info* pci_get_dev_info(int bus,int device,int func) {
   info[2]=read_config(bus,device,func,8);
   info[3]=read_config(bus,device,func,0xC);
   pci_dev_common_info* pci_info=(pci_dev_common_info*)info;
-  pci_info->bus=bus;
-  pci_info->device=device;
-  pci_info->func=func;
   return pci_info;
 }
 
-void pci_set_dev_info(pci_dev_common_info* inf) {
+void pci_set_dev_info(int bus,int device,int func, pci_dev_common_info* inf) {
   uint32_t* info=(uint32_t*)inf;
-  write_config(inf->bus,inf->device,inf->func,0,info[0]);
-  write_config(inf->bus,inf->device,inf->func,4,info[1]);
-  write_config(inf->bus,inf->device,inf->func,8,info[2]);
-  write_config(inf->bus,inf->device,inf->func,0xC,info[3]);
+  write_config(bus,device,func,0,info[0]);
+  write_config(bus,device,func,4,info[1]);
+  write_config(bus,device,func,8,info[2]);
+  write_config(bus,device,func,0xC,info[3]);
 }
 
-static void checkFunction(pci_dev_common_info* info);
+static void checkFunction(int bus,int device,int func, pci_dev_common_info* info);
 
 static void checkDevice(int bus, int device) {
   pci_dev_common_info* info=pci_get_dev_info(bus,device,0);
   if(info->vend_id==0xFFFF||info->class_code==0xFF) {
     return;
   }
-  checkFunction(info);
+  checkFunction(bus, device, 0, info);
   if((info->header_type&0x80)!=0) {
     for(int function=1;function<8;function++) {
       pci_dev_common_info* info=pci_get_dev_info(bus,device,function);
       if(info->vend_id!=0xFFFF&&info->class_code!=0xFF) {
-        checkFunction(info);
+        checkFunction(bus,device,function,info);
       }
     }
   }
 }
 
-static void printBAR(pci_dev_common_info* info,uint32_t bar,int num) {
+static void printBAR(uint32_t bar,int num) {
   if (bar!=0) {
     if (bar&0x1) {
       printf("[INFO] IO BAR%d:%x\n",num,bar&0xFFFFFFFC);
@@ -78,7 +75,7 @@ static void printBAR(pci_dev_common_info* info,uint32_t bar,int num) {
   }
 }
 
-static void checkFunction(pci_dev_common_info* info) {
+static void checkFunction(int bus,int device,int func,pci_dev_common_info* info) {
   if (pci_num_devs==max_devs) {
     max_devs+=32;
     pci_devs=malloc(sizeof(pci_dev_common_info)*max_devs);
@@ -87,8 +84,8 @@ static void checkFunction(pci_dev_common_info* info) {
   if ((info->header_type&0x7f)==0) {
     pci_dev_type0* dev=realloc(info,sizeof(pci_dev_type0));
     uint32_t* dev_word_array=(uint32_t*)dev;
-    for (int i=5;i<17;i++) {
-      dev_word_array[i]=read_config(info->bus,info->device,info->func,i*4);
+    for (int i=0;i<16;i++) {
+      dev_word_array[i]=read_config(bus,device,func,i*4);
     }
     pci_devs[pci_num_devs]=(pci_dev_common_info*)dev;
   }
@@ -110,12 +107,12 @@ void pci_init() {
     printf("[INFO] Vendor ID:%x, Device ID:%x\n",info->vend_id,info->dev_id);
     if ((info->header_type&0x7f)==0) {
       pci_dev_type0* dev=(pci_dev_type0*)info;
-      printBAR(info,dev->bar0,0);
-      printBAR(info,dev->bar1,1);
-      printBAR(info,dev->bar2,2);
-      printBAR(info,dev->bar3,3);
-      printBAR(info,dev->bar4,4);
-      printBAR(info,dev->bar5,5);
+      printBAR(dev->bar0,0);
+      printBAR(dev->bar1,1);
+      printBAR(dev->bar2,2);
+      printBAR(dev->bar3,3);
+      printBAR(dev->bar4,4);
+      printBAR(dev->bar5,5);
     }
   }
 }
