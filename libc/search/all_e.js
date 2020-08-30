@@ -1,24 +1,6 @@
 var searchData=
 [
-  ['seek_5fcur_82',['SEEK_CUR',['../stdio_8h.html#a4c8d0b76b470ba65a43ca46a88320f39',1,'stdio.h']]],
-  ['seek_5fend_83',['SEEK_END',['../stdio_8h.html#ad2a2e6c114780c3071efd24f16c7f7d8',1,'stdio.h']]],
-  ['seek_5fset_84',['SEEK_SET',['../stdio_8h.html#a0d112bae8fd35be772185b6ec6bcbe64',1,'stdio.h']]],
-  ['serdes_5fstate_85',['serdes_state',['../structserdes__state.html',1,'']]],
-  ['serial_5fprint_86',['serial_print',['../dbg_8h.html#a207c751afcb99c49e305307d66bd4e67',1,'dbg.c']]],
-  ['set_5fbmap_5fbit_87',['set_bmap_bit',['../stdlib_8c.html#a2f82b087d6d6f75d548ce8508d06d5f3',1,'stdlib.c']]],
-  ['setbuf_88',['setbuf',['../stdio_8h.html#afcfb798c05a334776428f56d2d24ceb9',1,'stdio.h']]],
-  ['sizeorpos_89',['sizeorpos',['../structserdes__state.html#a85ff277eda0150e7b9b698af2eea10fa',1,'serdes_state']]],
-  ['stderr_90',['stderr',['../stdio_8c.html#ac9e47c346a25e2e7edd2c9b4ca5d0262',1,'stderr():&#160;stdio.c'],['../stdio_8h.html#ac9e47c346a25e2e7edd2c9b4ca5d0262',1,'stderr():&#160;stdio.c']]],
-  ['stdin_91',['stdin',['../stdio_8c.html#acab9c1fe2a80b10e01858bda28a04244',1,'stdin():&#160;stdio.c'],['../stdio_8h.html#acab9c1fe2a80b10e01858bda28a04244',1,'stdin():&#160;stdio.c']]],
-  ['stdio_2ec_92',['stdio.c',['../stdio_8c.html',1,'']]],
-  ['stdio_2eh_93',['stdio.h',['../stdio_8h.html',1,'']]],
-  ['stdlib_2ec_94',['stdlib.c',['../stdlib_8c.html',1,'']]],
-  ['stdlib_2eh_95',['stdlib.h',['../stdlib_8h.html',1,'']]],
-  ['stdout_96',['stdout',['../stdio_8c.html#ac80f4484175bf6c48d7b7ca4e9897ae6',1,'stdout():&#160;stdio.c'],['../stdio_8h.html#ac80f4484175bf6c48d7b7ca4e9897ae6',1,'stdout():&#160;stdio.c']]],
-  ['strcmp_97',['strcmp',['../string_8h.html#a11bd144d7d44914099a3aeddf1c8567d',1,'string.c']]],
-  ['strcpy_98',['strcpy',['../string_8h.html#a7a82515b5d377be04817715c5465b647',1,'string.c']]],
-  ['string_2eh_99',['string.h',['../string_8h.html',1,'']]],
-  ['strlen_100',['strlen',['../string_8h.html#a008e171a518fe0e0352f31b245e03875',1,'string.c']]],
-  ['strrev_101',['strrev',['../string_8h.html#a44060611134f89c400f1a05962f23350',1,'string.c']]],
-  ['strtok_102',['strtok',['../string_8h.html#afbb5f38c3cea2b0d6bea6e2d48627e27',1,'string.c']]]
+  ['realloc_81',['realloc',['../stdlib_8h.html#a73641674e6fc6d3916dd8e8c8588cf82',1,'liballoc.c']]],
+  ['register_5ffs_82',['register_fs',['../stdio_8c.html#a94b40743c479bf76b0198ad06b434ae4',1,'register_fs(const char *name, pid_t pid):&#160;stdio.c'],['../stdio_8h.html#a94b40743c479bf76b0198ad06b434ae4',1,'register_fs(const char *name, pid_t pid):&#160;stdio.c']]],
+  ['req_5fsize_83',['req_size',['../structliballoc__minor.html#a0e798303ee8177899564e567fea41d3f',1,'liballoc_minor']]]
 ];

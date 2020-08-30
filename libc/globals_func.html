@@ -126,9 +126,6 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>check_proc_exists()
 : <a class="el" href="tasking_8h.html#a99fbf41bdff7b11f1e440dc4dff67565">tasking.h</a>
 </li>
-<li>clear_bmap_bit()
-: <a class="el" href="stdlib_8c.html#a7728201712dbe9c5f63cf9cfa223bf31">stdlib.c</a>
-</li>
 <li>copy_data()
 : <a class="el" href="memory_8h.html#a889941922d37e8707ab3ab8b02821599">memory.h</a>
 </li>
@@ -179,8 +176,8 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 , <a class="el" href="stdio_8h.html#abe6299d5823dd023e610aaa619735a3f">stdio.h</a>
 </li>
 <li>fputs()
-: <a class="el" href="stdio_8h.html#a68236e664c1f0da049b25fba1c1695f6">stdio.h</a>
-, <a class="el" href="stdio_8c.html#a68236e664c1f0da049b25fba1c1695f6">stdio.c</a>
+: <a class="el" href="stdio_8c.html#a68236e664c1f0da049b25fba1c1695f6">stdio.c</a>
+, <a class="el" href="stdio_8h.html#a68236e664c1f0da049b25fba1c1695f6">stdio.h</a>
 </li>
 <li>fread()
 : <a class="el" href="stdio_8c.html#a3fb733036d2387ccd7c14f166a97f814">stdio.c</a>
@@ -188,26 +185,22 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 </li>
 <li>free()
 : <a class="el" href="stdlib_8h.html#aa4dd569304291049ea4bfa331d750bac">stdlib.h</a>
-, <a class="el" href="stdlib_8c.html#aa4dd569304291049ea4bfa331d750bac">stdlib.c</a>
 </li>
 <li>fseek()
-: <a class="el" href="stdio_8h.html#a82b8f8886100499da342a39a7e1d70dd">stdio.h</a>
-, <a class="el" href="stdio_8c.html#a82b8f8886100499da342a39a7e1d70dd">stdio.c</a>
+: <a class="el" href="stdio_8c.html#a82b8f8886100499da342a39a7e1d70dd">stdio.c</a>
+, <a class="el" href="stdio_8h.html#a82b8f8886100499da342a39a7e1d70dd">stdio.h</a>
 </li>
 <li>ftell()
 : <a class="el" href="stdio_8h.html#a5a002ad43f113e8c634d284ee34d1d53">stdio.h</a>
 </li>
 <li>fwrite()
-: <a class="el" href="stdio_8c.html#a6539f6bd21e2d253cac3231cb1fb98b8">stdio.c</a>
-, <a class="el" href="stdio_8h.html#a6539f6bd21e2d253cac3231cb1fb98b8">stdio.h</a>
+: <a class="el" href="stdio_8h.html#a6539f6bd21e2d253cac3231cb1fb98b8">stdio.h</a>
+, <a class="el" href="stdio_8c.html#a6539f6bd21e2d253cac3231cb1fb98b8">stdio.c</a>
 </li>
 </ul>
 
 
 <h3><a id="index_g"></a>- g -</h3><ul>
-<li>get_bmap_bit()
-: <a class="el" href="stdlib_8c.html#a234f99d188c3e6458e49bc557a136473">stdlib.c</a>
-</li>
 <li>getc()
 : <a class="el" href="stdio_8c.html#ad5a0ea2c21a23a380b7c30fe35fa9456">stdio.c</a>
 , <a class="el" href="stdio_8h.html#ad5a0ea2c21a23a380b7c30fe35fa9456">stdio.h</a>
@@ -247,8 +240,7 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 
 <h3><a id="index_m"></a>- m -</h3><ul>
 <li>malloc()
-: <a class="el" href="stdlib_8c.html#a7ac38fce3243a7dcf448301ee9ffd392">stdlib.c</a>
-, <a class="el" href="stdlib_8h.html#a7ac38fce3243a7dcf448301ee9ffd392">stdlib.h</a>
+: <a class="el" href="stdlib_8h.html#a7ac38fce3243a7dcf448301ee9ffd392">stdlib.h</a>
 </li>
 <li>map_phys()
 : <a class="el" href="memory_8h.html#a8574f73293d7e67e3b38b382e859a133">memory.h</a>
@@ -284,6 +276,18 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>pthread_exit()
 : <a class="el" href="pthread_8h.html#a090bdc13141e76205fab4cb3c5fab0e4">pthread.h</a>
 </li>
+<li>pthread_spin_destroy()
+: <a class="el" href="pthread_8h.html#a87f8f1b6530c064af125525668de7573">pthread.h</a>
+</li>
+<li>pthread_spin_init()
+: <a class="el" href="pthread_8h.html#aa35638e0561b356d978095ebb3ca6401">pthread.h</a>
+</li>
+<li>pthread_spin_lock()
+: <a class="el" href="pthread_8h.html#a5a807aedbbb69d36163c9fd6fa661f69">pthread.h</a>
+</li>
+<li>pthread_spin_unlock()
+: <a class="el" href="pthread_8h.html#a3aff65ef8d5fb28a7be0403661724eee">pthread.h</a>
+</li>
 <li>put_data()
 : <a class="el" href="memory_8h.html#a1442348c154270ebc120e51a0bf81c06">memory.h</a>
 </li>
@@ -300,15 +304,11 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 
 <h3><a id="index_r"></a>- r -</h3><ul>
 <li>realloc()
-: <a class="el" href="stdlib_8c.html#a73641674e6fc6d3916dd8e8c8588cf82">stdlib.c</a>
-, <a class="el" href="stdlib_8h.html#a73641674e6fc6d3916dd8e8c8588cf82">stdlib.h</a>
+: <a class="el" href="stdlib_8h.html#a73641674e6fc6d3916dd8e8c8588cf82">stdlib.h</a>
 </li>
 <li>register_fs()
 : <a class="el" href="stdio_8h.html#a94b40743c479bf76b0198ad06b434ae4">stdio.h</a>
 , <a class="el" href="stdio_8c.html#a94b40743c479bf76b0198ad06b434ae4">stdio.c</a>
-</li>
-<li>reserve_block()
-: <a class="el" href="stdlib_8c.html#a7d85819a47d0c8d5dbe096ca4e003cfd">stdlib.c</a>
 </li>
 </ul>
 
@@ -316,9 +316,6 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <h3><a id="index_s"></a>- s -</h3><ul>
 <li>serial_print()
 : <a class="el" href="dbg_8h.html#a207c751afcb99c49e305307d66bd4e67">dbg.h</a>
-</li>
-<li>set_bmap_bit()
-: <a class="el" href="stdlib_8c.html#a2f82b087d6d6f75d548ce8508d06d5f3">stdlib.c</a>
 </li>
 <li>setbuf()
 : <a class="el" href="stdio_8h.html#afcfb798c05a334776428f56d2d24ceb9">stdio.h</a>

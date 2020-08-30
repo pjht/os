@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['avail_5fdata_5fsize_194',['avail_data_size',['../structheap__block.html#a5d7769918c1b85e3c6577796d3c84697',1,'heap_block']]]
+  ['block_196',['block',['../structliballoc__minor.html#a013d59e9528555a0c80853e286d5cf83',1,'liballoc_minor']]],
+  ['buf_197',['buf',['../structserdes__state.html#a0ffe2b922400986732021b5b90617930',1,'serdes_state']]]
 ];

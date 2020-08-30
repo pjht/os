@@ -4,7 +4,6 @@ var tasking_8c =
     [ "MAX_PROCS", "tasking_8c.html#a0e92bfcd9e51ca39bbebc3dfb9c16014", null ],
     [ "NUM_UNBLOCKED_THREADS", "tasking_8c.html#ac4810428cfd4d217c8c07e8d7142509f", null ],
     [ "SAME_PROC", "tasking_8c.html#ad274a1a236e5a5d3a1be62f9d1f6eeec", null ],
-    [ "SAME_THREAD", "tasking_8c.html#af8b29f74b3134b814dd82f5e36871627", null ],
     [ "get_next_ready_thread", "tasking_8c.html#a8054e242e219d682141e4acfef861e93", null ],
     [ "get_thread", "tasking_8c.html#a2ff7ab6dd99a247d27e5d3b1d9d45556", null ],
     [ "is_proc_scheduled", "tasking_8c.html#a4fe00345b6be4d48d67c8d07112fd3a1", null ],

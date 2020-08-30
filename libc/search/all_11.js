@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['vfprintf_111',['vfprintf',['../stdio_8c.html#a238ba3ae728d117984e087d9db33cd13',1,'vfprintf(FILE *stream, const char *format, va_list arg):&#160;stdio.c'],['../stdio_8h.html#a238ba3ae728d117984e087d9db33cd13',1,'vfprintf(FILE *stream, const char *format, va_list arg):&#160;stdio.c']]]
+  ['unblock_5fthread_110',['unblock_thread',['../tasking_8h.html#a008779a4224d51ad434bccded6e2a7fb',1,'tasking.c']]],
+  ['unistd_2eh_111',['unistd.h',['../unistd_8h.html',1,'']]],
+  ['usage_112',['usage',['../structliballoc__major.html#ab4d9c00c552e0ddd4997a91966bfc4f4',1,'liballoc_major']]]
 ];

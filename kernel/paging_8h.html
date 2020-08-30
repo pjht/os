@@ -100,8 +100,8 @@ Macros</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a2370886c08cc1b84fa1d81fc8022db9b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a2370886c08cc1b84fa1d81fc8022db9b">map_pages</a> (void *virt_addr_ptr, void *phys_addr_ptr, int num_pages, char usr, char wr)</td></tr>
 <tr class="separator:a2370886c08cc1b84fa1d81fc8022db9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c15ffa3d18088ca41f78d5c632f6b02"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a8c15ffa3d18088ca41f78d5c632f6b02">unmap_pages</a> (void *start_virt, int num_pages)</td></tr>
-<tr class="separator:a8c15ffa3d18088ca41f78d5c632f6b02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b40f4b94c1ee447f4f59b8e1c7d7227"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a8b40f4b94c1ee447f4f59b8e1c7d7227">unmap_pages</a> (void *start_virt, int num_pages, int free_phys)</td></tr>
+<tr class="separator:a8b40f4b94c1ee447f4f59b8e1c7d7227"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64db1d6c4d8861128d9e6e7f671213d8"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a64db1d6c4d8861128d9e6e7f671213d8">alloc_pages</a> (int num_pages)</td></tr>
 <tr class="separator:a64db1d6c4d8861128d9e6e7f671213d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f831aadf41672c296645a7b0df4a5c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8h.html#a0f831aadf41672c296645a7b0df4a5c6">alloc_pages_virt</a> (int num_pages, void *addr)</td></tr>
@@ -418,8 +418,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a8c15ffa3d18088ca41f78d5c632f6b02"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c15ffa3d18088ca41f78d5c632f6b02">&#9670;&nbsp;</a></span>unmap_pages()</h2>
+<a id="a8b40f4b94c1ee447f4f59b8e1c7d7227"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b40f4b94c1ee447f4f59b8e1c7d7227">&#9670;&nbsp;</a></span>unmap_pages()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -434,7 +434,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>num_pages</em>&#160;</td>
+          <td class="paramname"><em>num_pages</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>free_phys</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -447,6 +453,7 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">start_virt</td><td>The start of the virtual range to unmap. </td></tr>
     <tr><td class="paramname">num_pages</td><td>The number of pages to map. </td></tr>
+    <tr><td class="paramname">free_phys</td><td>Also free the physical pages the virtual pages are mapped to. </td></tr>
   </table>
   </dd>
 </dl>
@@ -480,7 +487,7 @@ Functions</h2></td></tr>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="apaging_8h_html_a7554d075a99f52e3303d1ffd90d8c166"><div class="ttname"><a href="paging_8h.html#a7554d075a99f52e3303d1ffd90d8c166">get_address_space</a></div><div class="ttdeci">void * get_address_space()</div><div class="ttdef"><b>Definition:</b> paging.c:232</div></div>
+<div class="ttc" id="apaging_8h_html_a7554d075a99f52e3303d1ffd90d8c166"><div class="ttname"><a href="paging_8h.html#a7554d075a99f52e3303d1ffd90d8c166">get_address_space</a></div><div class="ttdeci">void * get_address_space()</div><div class="ttdef"><b>Definition:</b> paging.c:235</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

@@ -12,7 +12,7 @@ var paging_8c =
     [ "map_pages", "paging_8c.html#a2370886c08cc1b84fa1d81fc8022db9b", null ],
     [ "paging_init", "paging_8c.html#a569adfd13ea3c63741f64108821b1712", null ],
     [ "paging_new_address_space", "paging_8c.html#a8b1cb213f5783b7137f40279db762ffc", null ],
-    [ "unmap_pages", "paging_8c.html#a8c15ffa3d18088ca41f78d5c632f6b02", null ],
+    [ "unmap_pages", "paging_8c.html#a8b40f4b94c1ee447f4f59b8e1c7d7227", null ],
     [ "virt_to_phys", "paging_8c.html#a65a7667a1f8f74a06df63ece822c70d2", null ],
     [ "kern_page_tables", "paging_8c.html#a98670d5ebec84e70de69dde9a247304c", null ],
     [ "kmalloc_page_tables", "paging_8c.html#af5bb44d01ce436047dece3cb3cd589bc", null ],

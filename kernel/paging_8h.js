@@ -10,6 +10,6 @@ var paging_8h =
     [ "map_pages", "paging_8h.html#a2370886c08cc1b84fa1d81fc8022db9b", null ],
     [ "paging_init", "paging_8h.html#a569adfd13ea3c63741f64108821b1712", null ],
     [ "paging_new_address_space", "paging_8h.html#a8b1cb213f5783b7137f40279db762ffc", null ],
-    [ "unmap_pages", "paging_8h.html#a8c15ffa3d18088ca41f78d5c632f6b02", null ],
+    [ "unmap_pages", "paging_8h.html#a8b40f4b94c1ee447f4f59b8e1c7d7227", null ],
     [ "virt_to_phys", "paging_8h.html#af473eee5243c70174a1245d70a5c16fa", null ]
 ];

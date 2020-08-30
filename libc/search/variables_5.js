@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['num_5fused_5fentries_203',['num_used_entries',['../stdlib_8c.html#af94a408d512ca6c20aa336a8d1e12375',1,'stdlib.c']]]
+  ['req_5fsize_206',['req_size',['../structliballoc__minor.html#a0e798303ee8177899564e567fea41d3f',1,'liballoc_minor']]]
 ];
