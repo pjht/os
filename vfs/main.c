@@ -74,7 +74,6 @@ void vfs_mount(void* args) {
 }
 
 void vfs_register_fs(void* args) {
-  serial_print("register fs\n");
   serdes_state state;
   start_deserialize(args,&state);
   char* name=deserialize_str(&state);

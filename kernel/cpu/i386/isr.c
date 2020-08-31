@@ -243,23 +243,19 @@ void isr_handler(registers_t* r) {
         r->ebx=(uint32_t)paging_new_address_space();
         break;
       case SYSCALL_ADDR_SPACES_COPY_DATA:
-        //serial_printf("address_spaces_copy_data(0x%x,0x%x,0x%x,0x%x);\n",(void*)r->ebx,(void*)r->ecx,r->edx,(void*)r->esi);
         if ((void*)r->esi!=NULL) {
           address_spaces_copy_data((void*)r->ebx,(void*)r->ecx,r->edx,(void*)r->esi);
         } else {
           r->ebx=(uint32_t)address_spaces_put_data((void*)r->ebx,(void*)r->ecx,r->edx);
         }
-        //serial_printf("sycall done\n");
         break;
       case SYSCALL_SERIAL_PRINT:
         serial_write_string((char*)r->ebx);
         break;
       case SYSCALL_GET_INITRD_SZ:
-        serial_printf("Initrd size is %d bytes\n",initrd_sz);
         r->ebx=initrd_sz;
         break;
       case SYSCALL_COPY_INITRD:
-        serial_printf("Copying initrd\n");
         memcpy((char*)r->ebx,initrd,initrd_sz);
         break;
       case SYSCALL_NEW_THREAD: {

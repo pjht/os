@@ -121,19 +121,11 @@ int main() {
   serial_print("Loading VGA driver\n");
   posix_spawn(NULL,"/initrd/vga_drv",NULL,NULL,NULL,NULL);
   while(rpc_is_init(6)==0);
-  serial_print("Opening /dev/vga\n");
   stdout=fopen("/dev/vga","w");
   if (!stdout) {
-    serial_print("Could not open /dev/vga\n");
+    serial_print("Could not open the VGA file! \n");
     exit(1);
   }
-  serial_print("Writing to screen\n");
-  puts("Puts test");
-  printf("Printf test with file opened to %s\n","/dev/vga");
-  FILE* file=fopen("/initrd/hi","r");
-  char str[64];
-  fgets(str,64,file);
-  printf("Read %s from /initrd/hi\n", str);
   serial_print("Loading PCI driver\n");
   posix_spawn(NULL,"/initrd/pci",NULL,NULL,NULL,NULL);
 }
