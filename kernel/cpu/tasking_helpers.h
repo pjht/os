@@ -34,4 +34,10 @@ void wait_for_unblocked_thread_asm();
 */
 void setup_kstack(Thread* thread,void* param1,void* param2,char kmode,void* eip);
 
+/**
+ * Frees a kernel stack so it can be used again
+ * \param stack_ptr The kernel stack to free
+*/
+void free_kstack(void* stack_ptr);
+
 #endif

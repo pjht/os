@@ -274,6 +274,9 @@ void tasking_block(thread_state newstate) {
     }
   }
   current_thread->process->num_threads_blocked++;
+  if (current_thread->process->num_threads_blocked==current_thread->process->num_threads) {
+    unmark_proc_scheduled(current_thread->process->pid);
+  }
   tasking_yield();
 }
 
@@ -332,7 +335,7 @@ void tasking_exit(int code) {
     ready_to_run_tail=ready_to_run_tail->prev_ready_to_run;
     if (ready_to_run_tail==NULL) {
       ready_to_run_head=NULL;
-      
+
     }
   }
   if (ready_to_run_head&&ready_to_run_head->next_ready_to_run) {
@@ -348,7 +351,10 @@ void tasking_exit(int code) {
   }
   unmark_proc_scheduled(current_thread->process->pid);
   for (Thread* thread=current_thread->process->first_thread;thread!=NULL;thread=thread->next_thread_in_process) {
-    thread->state=THREAD_EXITED;
+    if (thread->state!=THREAD_EXITED) {
+      thread->state=THREAD_EXITED;
+      free_kstack(thread->kernel_esp_top);
+    }
   }
   current_thread->process->num_threads_blocked=current_thread->process->num_threads;
   num_procs--;
@@ -383,6 +389,7 @@ void* tasking_get_rpc_ret_buf() {
 
 void tasking_thread_exit() {
   tasking_block(THREAD_EXITED);
+  free_kstack(current_thread->kernel_esp_top);
 }
 
 char tasking_check_proc_exists(pid_t pid) {

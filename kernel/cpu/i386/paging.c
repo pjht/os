@@ -33,12 +33,8 @@ static pg_struct_entry kstack_page_tables[218*1024] __attribute__((aligned(4096)
 static pg_struct_entry kmalloc_page_tables[4*1024] __attribute__((aligned(4096))); //!< Page tables for the kmalloc heap
 static pg_struct_entry* pagdirmap=(pg_struct_entry*)0xFFFFF000; //!< Pointer to the page directory entries in the recursive mapping
 static pg_struct_entry* page_table_map=(pg_struct_entry*)0xFFC00000; //!< Pointer to the page table entries in the recursive mapping
-/**
- * Checks whether a page is present
- * \param page The page number to check
- * \return Whether the page is present
-*/
-static char is_page_present(size_t page) {
+
+char is_page_present(size_t page) {
    int table=page>>10;
    page=page&0x3FF;
    if (!pagdirmap[table].pres) {

@@ -7,6 +7,7 @@
 #include "../tasking_helpers.h"
 #include "../../pmem.h"
 #include <stddef.h>
+#include <stdint.h>
 
 static void** kstacks=(void*)0xC8000000; //!< Pointer to all the thread kernel stacks
 static char kstack_bmap[(218*1024)/8]={0}; //!< Bitmap of what kernel stacks have been allocated
@@ -49,7 +50,9 @@ static int new_kstack() {
     return -1;
   }
   mark_kstack_allocated(num);
-  map_pages(((char*)kstacks+num*0x1000),pmem_alloc(1),1,1,1);
+  if (!is_page_present(((uint32_t)((char*)kstacks+num*0x1000))>>12)) {
+    map_pages(((char*)kstacks+num*0x1000),pmem_alloc(1),1,1,1);
+  }
   return num;
 }
 
@@ -75,4 +78,13 @@ void setup_kstack(Thread* thread,void* param1,void* param2,char kmode,void* eip)
     kstacks[top_idx-2]=(void*)user_stack;
     kstacks[top_idx-1]=(void*)eip;
   }
+}
+
+void free_kstack(void* stack_ptr) {
+  uint32_t stack=(uint32_t)stack_ptr;
+  stack-=0xC8000000;
+  stack=stack>>12;
+  size_t byte=stack/8;
+  size_t bit=stack%8;
+  kstack_bmap[byte]=kstack_bmap[byte]&(~(1<<bit));
 }

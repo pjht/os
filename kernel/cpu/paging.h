@@ -5,6 +5,7 @@
 #ifndef PAGING_H
 #define PAGING_H
 
+#include <stddef.h>
 
 /**
  * Run a block of code in a different address space
@@ -86,5 +87,12 @@ void* find_free_pages(int num_pages);
  * \return a pointer to the current address space in physical memory.
 */
 void* get_address_space();
+
+/**
+ * Checks whether a page is present
+ * \param page The page number to check
+ * \return Whether the page is present
+*/
+char is_page_present(size_t page);
 
 #endif
