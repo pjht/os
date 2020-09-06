@@ -82,7 +82,7 @@ int main() {
   rpc_register_func("open",&open);
   rpc_register_func("register_dev",&register_dev);
   register_fs("devfs",getpid());
-  serial_print("Initialized devfs\n");
+  serial_print("Devfs initialized\n");
   rpc_mark_as_init();
 }
 

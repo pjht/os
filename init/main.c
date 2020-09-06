@@ -94,7 +94,6 @@ char load_proc(size_t datapos,char* initrd) {
 
 
 int main() {
-  serial_print("Init running\n");
   long size=initrd_sz();
   char* initrd=malloc(size);
   initrd_get(initrd);
@@ -112,20 +111,17 @@ int main() {
   datapos=find_loc("initrd_drv",initrd);
   load_proc(datapos,initrd);
   while(rpc_is_init(4)==0);
-  serial_print("Loading tar_fs\n");
   datapos=find_loc("tar_fs",initrd);
   load_proc(datapos,initrd);
   while(rpc_is_init(5)==0);
   serial_print("Mounting initrd\n");
   mount("/dev/initrd","tarfs","/initrd");
-  serial_print("Loading VGA driver\n");
   posix_spawn(NULL,"/initrd/vga_drv",NULL,NULL,NULL,NULL);
   while(rpc_is_init(6)==0);
   stdout=fopen("/dev/vga","w");
   if (!stdout) {
-    serial_print("Could not open the VGA file! \n");
+    serial_print("Could not open the VGA device file!\n");
     exit(1);
   }
-  serial_print("Loading PCI driver\n");
   posix_spawn(NULL,"/initrd/pci",NULL,NULL,NULL,NULL);
 }

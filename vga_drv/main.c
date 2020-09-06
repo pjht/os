@@ -31,6 +31,6 @@ int main() {
   serialize_int(getpid(),&state);
   rpc_call(3,"register_dev",state.buf,state.sizeorpos);
   free(state.buf);
-  serial_print("VGA driver initialized\n");
+  vga_write_string("[INFO] VGA driver initialized\n");
   rpc_mark_as_init();
 }

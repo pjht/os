@@ -133,8 +133,7 @@ int main() {
   rpc_register_func("mount",&tar_fs_mount);
   rpc_register_func("open",&open);
   rpc_register_func("read",&read);
-  serial_print("Registering tarfs filesystem\n");
   register_fs("tarfs",getpid());
-  serial_print("Initialized tarfs\n");
+  serial_print("Tarfs initialized\n");
   rpc_mark_as_init();
 }
