@@ -12,15 +12,9 @@ It currently supports:
 7. A working VFS and devfs
 8. VGA text mode
 
-## Building (on Linux or Mac)
+## Building
 
-To build the OS, you will need a custom patched GCC cross-compiler targeted for my OS, and GRUB.
-Installing GRUB on:
-
-1. Ubuntu. GRUB is already installed.
-2. Arch. If you have choses GRUB as your bootloader, run `sudo pacman -S dosfstools libisoburn` as arch by default does not have the necessary tools for grub-mkrescue to work, otherwise run `sudo pacman -S grub dosfstools libisoburn`
-3. Another linux distro. GRUB is likely already installed, but if it is not, you will need to use your distribution's package manager to install GRUB.
-4. Mac. You will need to install Homebrew, then install the formula i386-elf-grub.
+To build the OS, you will need custom patched versions of GCC and Binutils targeted for my OS.
 
 ### Building the cross-compiler
 
@@ -34,9 +28,16 @@ Otherwise, the build is as normal.
 
 Once the cross-compiler is built, the OS can be built by simply typing `make`.
 
-## Additional setup for development
+## Additional setup (on Linux or Mac)
 
-To properly develop the OS, you willl need to install QEMU and GDB.
+To run & debug the OS, you willl need to install QEMU, GRUB, and GDB.
+
+Installing GRUB on:
+
+1. Ubuntu. GRUB is already installed.
+2. Arch. If you have chosen GRUB as your bootloader, run `sudo pacman -S dosfstools libisoburn`, as arch by default does not have the necessary tools for grub-mkrescue to work, otherwise run `sudo pacman -S grub dosfstools libisoburn`
+3. Another linux distro. GRUB is likely already installed, but if it is not, you will need to use your distribution's package manager to install GRUB.
+4. Mac. You will need to install Homebrew, then install the formula i386-elf-grub.
 
 Installing QEMU on
 
