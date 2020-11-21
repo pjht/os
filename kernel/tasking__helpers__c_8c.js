@@ -1,5 +1,6 @@
 var tasking__helpers__c_8c =
 [
+    [ "free_kstack", "tasking__helpers__c_8c.html#a2c17ce64badaff8e3336b2c86b36f223", null ],
     [ "is_kstack_allocated", "tasking__helpers__c_8c.html#ad0b18511b18e15f6fe983d69ef962559", null ],
     [ "mark_kstack_allocated", "tasking__helpers__c_8c.html#ac190e8293f01180f04c1797d3a91a8d8", null ],
     [ "new_kstack", "tasking__helpers__c_8c.html#a493a7988310576d931585548e8cf71cb", null ],

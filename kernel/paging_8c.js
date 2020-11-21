@@ -7,7 +7,7 @@ var paging_8c =
     [ "find_free_pages", "paging_8c.html#a1675ea0f8e4994b4fbbbe3984ca522b1", null ],
     [ "get_address_space", "paging_8c.html#a7554d075a99f52e3303d1ffd90d8c166", null ],
     [ "invl_page", "paging_8c.html#abaa0040e698c54cc890b55894bbff094", null ],
-    [ "is_page_present", "paging_8c.html#a7fb8d280bc19b061f91b82733932c94f", null ],
+    [ "is_page_present", "paging_8c.html#a348bcf40a7b8895924343598c3bf5f23", null ],
     [ "load_address_space", "paging_8c.html#aee63ef1cb665a5aa68a15ab2461d20cd", null ],
     [ "map_pages", "paging_8c.html#a2370886c08cc1b84fa1d81fc8022db9b", null ],
     [ "paging_init", "paging_8c.html#a569adfd13ea3c63741f64108821b1712", null ],

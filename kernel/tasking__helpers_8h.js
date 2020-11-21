@@ -1,5 +1,6 @@
 var tasking__helpers_8h =
 [
+    [ "free_kstack", "tasking__helpers_8h.html#a2c17ce64badaff8e3336b2c86b36f223", null ],
     [ "setup_kstack", "tasking__helpers_8h.html#a2d68a91a4777142a51990297666cf05a", null ],
     [ "switch_to_thread_asm", "tasking__helpers_8h.html#aa90e4e41b72e63004f85e8663d382596", null ],
     [ "task_init", "tasking__helpers_8h.html#a0dd765564611ce3bf2bd466fe2ca4ae5", null ],
