@@ -18,8 +18,9 @@ To build the OS, you will need a custom patched GCC cross-compiler targeted for 
 Installing GRUB on:
 
 1. Ubuntu. GRUB is already installed.
-2. Another linux distro. GRUB is likely already installed, but if it is not, you will need to use your distribution's package manager to install GRUB.
-3. Mac. You will need to install Homebrew, then install the formula i386-elf-grub.
+2. Arch. If you have choses GRUB as your bootloader, run `sudo pacman -S dosfstools libisoburn` as arch by default does not have the necessary tools for grub-mkrescue to work, otherwise run `sudo pacman -S grub dosfstools libisoburn`
+3. Another linux distro. GRUB is likely already installed, but if it is not, you will need to use your distribution's package manager to install GRUB.
+4. Mac. You will need to install Homebrew, then install the formula i386-elf-grub.
 
 ### Building the cross-compiler
 
@@ -40,14 +41,16 @@ To properly develop the OS, you willl need to install QEMU and GDB.
 Installing QEMU on
 
 1. Ubuntu. Run `sudo apt get install qemu`
-2. Another linux distro. Use your distribution's package manager to install QEMU.
-3. Mac. Run `brew install qemu`
+2. Arch. Run `sudo pacman -S qemu qemu-arch-extra`
+3. Another linux distro. Use your distribution's package manager to install QEMU.
+4. Mac. Run `brew install qemu`
 
 Installing GDB on
 
 1. Ubuntu. Run `sudo apt get install gdb`
-2. Another linux distro. Use your distribution's package manager to install GDB.
-3. Mac. Run `brew install gdb` (Note: It will warn about an unsigned binary, but this will have no impact on debugging the OS)
+2. Arch. Run `sudo pacman -S install gdb`
+3. Another linux distro. Use your distribution's package manager to install GDB.
+4. Mac. Run `brew install gdb` (Note: It will warn about an unsigned binary, but this will have no impact on debugging the OS)
 
 After this, you can run the OS in QEMU by typing `make run`, and start a remote debugging session by typing `make debug`.
 The serial port output of the OS is redirected to a file callled serout in the main directory.
