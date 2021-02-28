@@ -6,6 +6,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include "cpu/serial.h"
+#include "cpu/halt.h"
 
 #define KMALLOC_BMAP_SZ (((KMALLOC_SZ*1024)/4)/8) //!< The size of the kmalloc bitmap
 
@@ -85,6 +87,8 @@ void* kmalloc(size_t size) {
     }
   }
   if (remaining_blks!=0) {
+    serial_printf("Kmalloc fail!\n");
+    halt();
     return NULL;
   }
   for (size_t i=0;i<num_4b_grps;i++) {

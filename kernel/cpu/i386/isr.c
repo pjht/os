@@ -6,7 +6,6 @@
 #include "../../vga_err.h"
 #include "../../address_spaces.h"
 #include "../halt.h"
-#include "../isr.h"
 #include "../paging.h"
 #include "../serial.h"
 //#include "../../rpc.h"
@@ -20,8 +19,15 @@
 #include <sys/syscalls.h>
 #include <sys/types.h>
 
-void irq_handler(registers_t* r);
-static isr_t irq_handlers[16]; //!< Handlers for the PIC interrupts
+/** 
+ * Represents a registeted interrupt handler
+*/
+typedef struct {
+  pid_t pid; //!< The PID thast registered the handler, or 0 if it it a kernel handler
+  void* handler; //!< The address of the handler
+} isr_handler_info;
+
+static isr_handler_info irq_handlers[16]={0}; //!< Handlers for the PIC interrupts
 
 void isr_install() {
     idt_set_gate(0,(uint32_t)isr0);
@@ -203,7 +209,7 @@ void isr_handler(registers_t* r) {
     case 80:
       switch (r->eax) {
       case SYSCALL_CREATEPROC:
-        tasking_create_task((void*)r->ebx,(void*)r->ecx,0,(void*)r->edx,(void*)r->esi,0);
+        tasking_create_task((void*)r->ebx,(void*)r->ecx,0,(void*)r->edx,(void*)r->esi,0,0);
         break;
       case SYSCALL_YIELD:
         tasking_yield();
@@ -259,7 +265,7 @@ void isr_handler(registers_t* r) {
         memcpy((char*)r->ebx,initrd,initrd_sz);
         break;
       case SYSCALL_NEW_THREAD: {
-        uint32_t tid=tasking_new_thread((void*)r->ebx,tasking_get_PID(),(void*)r->edx);
+        uint32_t tid=tasking_new_thread((void*)r->ebx,tasking_get_PID(),(void*)r->edx,0);
         if ((uint32_t*)r->ecx!=NULL) {
           *((uint32_t*)r->ecx)=tid;
         }
@@ -289,7 +295,8 @@ void isr_handler(registers_t* r) {
       case SYSCALL_RPC_IS_INIT:
         r->ecx=kernel_rpc_is_init((pid_t)r->ebx);
         break;
-      default:
+      case SYSCALL_REGISTER_IRQ_HANDLER:
+        isr_register_handler((int)r->ebx,tasking_get_PID(),(void*)r->ecx);
         break;
       }
       break;
@@ -298,11 +305,12 @@ void isr_handler(registers_t* r) {
 }
 
 
-void isr_register_handler(int n,isr_t handler) {
+void isr_register_handler(int n,pid_t pid,void* handler) {
     if (n>16) {
       return;
     }
-    irq_handlers[n] = handler;
+    irq_handlers[n].pid = pid;
+    irq_handlers[n].handler = handler;
 }
 
 /**
@@ -315,12 +323,12 @@ void irq_handler(registers_t* r) {
   if (r->int_no >= 40) port_byte_out(0xA0,0x20); /* slave */
   port_byte_out(0x20,0x20); /* master */
   /* Handle the interrupt in a more modular way */
-  if (irq_handlers[r->int_no-32] != NULL) {
-    isr_t handler = irq_handlers[r->int_no-32];
-    if((uint32_t)handler<32768) {
-      kernel_rpc_call((pid_t)handler,"irq_handler",NULL,NULL);
+  if (irq_handlers[r->int_no-32].handler!=NULL) {
+    isr_handler_info info = irq_handlers[r->int_no-32];
+    if(info.pid==0) {
+      ((isr_t)info.handler)(r);
     } else {
-      handler(r);
+      tasking_new_thread(info.handler,info.pid,(void*)(r->int_no-32),1);
     }
   }
 }

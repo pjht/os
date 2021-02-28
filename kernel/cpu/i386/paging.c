@@ -190,6 +190,18 @@ void unmap_pages(void* start_virt,int num_pages,int free_phys) {
   }
 }
 
+extern int idt;
+
+/**
+ * Makes the IDT readonly
+*/
+void paging_readonly_idt() {
+  void* idt_addr=&idt;
+  void* idt_phys=virt_to_phys(idt_addr);
+  map_pages(idt_addr,idt_phys,1,0,0);
+  invl_page(idt_addr);
+}
+
 void paging_init() {
   for (size_t i=0;i<NUM_KERN_FRAMES;i++) {
     pg_struct_entry* entry=&kern_page_tables[i];

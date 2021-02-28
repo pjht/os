@@ -90,7 +90,7 @@ void schedule_thread(Thread* thread) {
   }
 }
 
-void tasking_create_task(void* eip,void* address_space,char kmode,void* param1,void* param2,char isThread) {
+void tasking_create_task(void* eip,void* address_space,char kmode,void* param1,void* param2,char isThread,char is_irq_handler) {
   if (next_pid>MAX_PROCS && !isThread) {
     serial_printf("Failed to create a process, as 32k processes have been created already.\n");
     halt(); //Cannot ever create more than 32k processes, as I don't currently reuse PIDs.
@@ -118,9 +118,19 @@ void tasking_create_task(void* eip,void* address_space,char kmode,void* param1,v
     num_procs++;
   }
   proc->first_thread=thread;
-  setup_kstack(thread,param1,param2,kmode,eip);
+  setup_kstack(thread,param1,param2,kmode,eip,is_irq_handler);
   schedule_thread(thread);
-  // serial_printf("Created thread with PID %d and TID %d.\n",proc->pid,thread->tid);
+  serial_printf("Created thread with PID %d and TID %d.\n",proc->pid,thread->tid);
+  serial_printf("Structure values:\n");
+  serial_printf("kernel_esp=%x\n",thread->kernel_esp);
+  serial_printf("kernel_esp_top=%x\n",thread->kernel_esp_top);
+  serial_printf("address_space=%x\n",thread->address_space);
+  serial_printf("tid=%d\n",thread->tid);
+  serial_printf("state=%d\n",thread->state);
+  serial_printf("next_thread_in_process=%x\n",thread->next_thread_in_process);
+  serial_printf("next_ready_to_run=%x\n",thread->next_ready_to_run);
+  serial_printf("prev_ready_to_run=%x\n",thread->prev_ready_to_run);
+  serial_printf("process=%x\n",thread->process);
 }
 
 void tasking_init() {
@@ -128,7 +138,7 @@ void tasking_init() {
     memset(&processes[i],0,sizeof(Process));
   }
   
-  tasking_create_task(NULL,get_address_space(),1,NULL,NULL,0);
+  tasking_create_task(NULL,get_address_space(),1,NULL,NULL,0,0);
 }
 
 char tasking_is_privleged() {
@@ -147,8 +157,8 @@ int* tasking_get_errno_address() {
   return &current_thread->errno;
 }
 
-pid_t tasking_new_thread(void* start,pid_t pid,void* param) {
-  tasking_create_task(start,NULL,0,param,(void*)pid,1);
+pid_t tasking_new_thread(void* start,pid_t pid,void* param,char is_irq_handler) {
+  tasking_create_task(start,NULL,0,param,(void*)pid,1,is_irq_handler);
   return processes[pid].first_thread->tid;
 }
 
@@ -389,7 +399,6 @@ void* tasking_get_rpc_ret_buf() {
 
 void tasking_thread_exit() {
   tasking_block(THREAD_EXITED);
-  free_kstack(current_thread->kernel_esp_top);
 }
 
 char tasking_check_proc_exists(pid_t pid) {

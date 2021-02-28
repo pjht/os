@@ -18,7 +18,7 @@ AR = $(shell cat psinfo/$(PLAT)/ar.txt)
 NASM = $(shell cat psinfo/$(PLAT)/nasm.txt)
 EMU = $(shell cat psinfo/$(PLAT)/emu.txt)
 CFLAGS =  -Isysroot/usr/include -Wextra -Wall -Wno-unused-parameter -g -ffreestanding
-QFLAGS =  -hda ext2.img -m 2G -boot d -cdrom os.iso -serial file:serout #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
+QFLAGS =  -m 2G -boot d -cdrom os.iso -serial file:serout #-chardev socket,id=s1,port=3000,host=localhost -serial chardev:s1
 CWD = $(shell pwd)
 
 .PHONY: sysroot
@@ -31,18 +31,28 @@ run: os.iso
 	@$(EMU) $(QFLAGS) &
 	tail -f serout
 
+run_nobuild:
+	rm -f serout
+	touch serout
+	@$(EMU) $(QFLAGS) &
+	tail -f serout
+
 debug: os.iso kernel/kernel.elf
 	@$(EMU) -s $(QFLAGS) &
 	gdb
 	#gdbgui -g i386-elf-gdb --project $(CWD)
 
-os.iso: kernel/kernel.elf init vfs devfs vga_drv initrd_drv tar_fs pci sysroot/usr/share/man # vfs devfs initrd vga_drv initrd_drv pci
+os.iso: kernel/kernel.elf init vfs devfs vga_drv initrd_drv tar_fs pci ps2 sysroot/usr/share/man # vfs devfs initrd vga_drv initrd_drv pci
 	@cp kernel/kernel.elf sysroot/boot
 	@cd initrd; tar -f ../sysroot/boot/initrd.tar -c *
-	@grub-mkrescue -o $@ sysroot >/dev/null 2>/dev/null
+	@grub-mkrescue -o $@ sysroot 
 
 crts: kernel/crt0.o
 	@cp $^ sysroot/usr/lib
+
+ps2: crts libc
+	@cd $@ && make
+	@cp $@/$@ initrd/$@
 
 init: crts libc
 	@cd $@ && make
@@ -107,3 +117,8 @@ clean:
 doc: $(C_SOURCES) $(C_HEADERS)
 	@doxygen kernel/Doxyfile > /dev/null
 	@doxygen libc/Doxyfile > /dev/null
+
+install:
+	@echo Path to flash drive?; \
+	read drive; \
+	echo $$(drive);

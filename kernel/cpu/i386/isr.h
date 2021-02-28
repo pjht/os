@@ -6,6 +6,7 @@
 #define ISR_H
 
 #include <stdint.h>
+#include <sys/types.h>
 
 /** 
  * Saved state of the CPU when an interrupt occurs
@@ -38,9 +39,12 @@ void isr_install();
 
 /**
  * Register an IRQ handler
- * \param n the IRQ to register a handler for
- * \param handler the handler to register
+ * 
+ * If the PID is 0, the handler will be called directly, otherwise a thread will be made in the PID starting at the handler's address.
+ * \param n The IRQ to register a handler for
+ * \param pid The PID that will handle the interrupt. 
+ * \param handler The address of the handler.
 */
-void isr_register_handler(int n,isr_t handler);
+void isr_register_handler(int n,pid_t pid,void* handler);
 
 #endif

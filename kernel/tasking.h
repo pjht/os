@@ -57,7 +57,7 @@ typedef struct Thread {
   pid_t rpc_calling_pid; //!< The PID of the thread that called this RPC (only used for RPC handler threads)
   pid_t rpc_calling_tid; //!< The TID of the thread that called this RPC (only used for RPC handler threads)
   void* rpc_ret_buf; //!< The return buffer of the RPC call that the thread made
-} Thread;
+} __attribute__((packed)) Thread;
 
 extern Thread* current_thread;
 
@@ -69,8 +69,9 @@ extern Thread* current_thread;
  * \param param1 The thread's start function first parameter
  * \param param2 The thread's start function second parameter
  * \param isThread Whether we are creating a new process or a thread in a process. If we are creating a theead, param2_arg becomes the PID for the newly created thread.
+ * \param is_irq_handler Whether the new task is an irq handler task
 */
-void tasking_create_task(void* eip,void* address_space,char kmode,void* param1,void* param2,char isThread);
+void tasking_create_task(void* eip,void* address_space,char kmode,void* param1,void* param2,char isThread,char is_irq_handler);
 /**
  * Initialize tasking
 */
@@ -100,9 +101,10 @@ int* tasking_get_errno_address();
  * \param start The start address of the task
  * \param pid The PID that gets the new thread
  * \param param The thread's start function parameter
+ * \param is_irq_handler Whether the new thread is an irq handler thread
  * \return the TID of the thread
 */
-pid_t tasking_new_thread(void* start,pid_t pid,void* param);
+pid_t tasking_new_thread(void* start,pid_t pid,void* param,char is_irq_handler);
 
 /**
  * Terminate the current thread

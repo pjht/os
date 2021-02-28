@@ -94,7 +94,7 @@ void* kernel_rpc_call(pid_t pid,char* name,void* buf,size_t size) {
       map_pages(virtaddr,physaddr,(size/PAGE_SZ)+1,1,1);
     });
   }
-  pid_t tid=tasking_new_thread(func->code,pid,virtaddr);
+  pid_t tid=tasking_new_thread(func->code,pid,virtaddr,0);
   tasking_set_rpc_calling_thread(pid,tid);
   // Block the thread and wait for an unblock from rpc_return
   tasking_block(THREAD_WAITING_FOR_RPC);

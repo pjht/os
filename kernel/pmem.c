@@ -123,6 +123,8 @@ void* pmem_alloc(int num_pages) {
     }
   }
   if (remaining_blks!=0) {
+    serial_printf("Out of memory! Halting!\n");
+    halt();
     return NULL;
   }
   for (int i=0;i<num_pages;i++) {

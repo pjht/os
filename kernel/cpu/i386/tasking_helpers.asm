@@ -49,7 +49,7 @@ switch_to_thread_asm:
 
 global task_init
 
-; Switch to usermode, given a usermode stack and EIP to switch to
+; Switch to usermode and enable interrupts, given a usermode stack and EIP to switch to
 
 task_init:
   pop ecx ; ecx = user ESP
@@ -65,6 +65,26 @@ task_init:
   pop eax ; pop flags into eax
   or eax, 0x200 ; enable interrupts when iret runs 
   push eax ; push modified flags
+  push 0x1B ; push CS
+  push ebx ; push user EIP
+  iret
+
+
+global task_init_no_int
+
+; Switch to usermode, given a usermode stack and EIP to switch to
+
+task_init_no_int:
+  pop ecx ; ecx = user ESP
+  pop ebx ; ebx = user EIP
+  mov ax, 0x23 ; Load data segment selectors with the usermode data segment
+  mov ds, ax
+  mov es, ax
+  mov fs, ax
+  mov gs, ax
+  push 0x23 ; Push SS
+  push ecx ; push user ESP
+  pushf ; push flagstrew
   push 0x1B ; push CS
   push ebx ; push user EIP
   iret

@@ -19,6 +19,11 @@ void switch_to_thread_asm(Thread* thread);
 void task_init();
 
 /**
+ * Initializes a usermode task without interrupts enabled
+*/
+void task_init_no_int();
+
+/**
  * An assembly helper for waiting for an unblocked thread
  * Starts interrupts, halts, then clears interrupts.
 */
@@ -31,8 +36,9 @@ void wait_for_unblocked_thread_asm();
  * \param param2 The thread's start function second parameter
  * \param kmode Whether the thread is a kernel mode thread
  * \param eip The start address of the thread
+ * \param is_irq_handler Whether the kernel stack is for an interrupt handler thread
 */
-void setup_kstack(Thread* thread,void* param1,void* param2,char kmode,void* eip);
+void setup_kstack(Thread* thread,void* param1,void* param2,char kmode,void* eip,char is_irq_handler);
 
 /**
  * Frees a kernel stack so it can be used again

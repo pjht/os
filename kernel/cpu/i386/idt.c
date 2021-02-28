@@ -34,7 +34,7 @@ typedef struct {
 
 #define IDT_ENTRIES 256 //!< Number of entries in the IDT
 
-static idt_gate_t idt[IDT_ENTRIES]; //!< The IDT
+idt_gate_t idt[IDT_ENTRIES] __attribute__((aligned(4096))); //!< The IDT
 static idt_register_t idt_reg; //!< The value to load into the IDTR
 
 #define LOW_16(address) (uint16_t)((address) & 0xFFFF) //!< Macro to get the low 16 bits of an address

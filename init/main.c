@@ -123,5 +123,7 @@ int main() {
     serial_print("Could not open the VGA device file!\n");
     exit(1);
   }
-  posix_spawn(NULL,"/initrd/pci",NULL,NULL,NULL,NULL);
+  posix_spawn(NULL,"/initrd/ps2",NULL,NULL,NULL,NULL);
+  // posix_spawn(NULL,"/initrd/pci",NULL,NULL,NULL,NULL);
+  for(;;);
 }
