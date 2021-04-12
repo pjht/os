@@ -12,7 +12,7 @@ var searchData=
   ['pid_166',['pid',['../structProcess.html#a2097d5c8b6b2049b837d9e8f37b7176f',1,'Process']]],
   ['pmem_2ec_167',['pmem.c',['../pmem_8c.html',1,'']]],
   ['pmem_2eh_168',['pmem.h',['../pmem_8h.html',1,'']]],
-  ['pmem_5falloc_169',['pmem_alloc',['../pmem_8c.html#a8b873206647239e8d86cb97a81b9e390',1,'pmem_alloc(int num_pages):&#160;pmem.c'],['../pmem_8h.html#a8b873206647239e8d86cb97a81b9e390',1,'pmem_alloc(int num_pages):&#160;pmem.c']]],
+  ['pmem_5falloc_169',['pmem_alloc',['../pmem_8h.html#a8b873206647239e8d86cb97a81b9e390',1,'pmem_alloc(int num_pages):&#160;pmem.c'],['../pmem_8c.html#a8b873206647239e8d86cb97a81b9e390',1,'pmem_alloc(int num_pages):&#160;pmem.c']]],
   ['pmem_5ffree_170',['pmem_free',['../pmem_8c.html#a6c39d363ae2c8f18ada3e9919075e9d3',1,'pmem_free(void *start, int num_pages):&#160;pmem.c'],['../pmem_8h.html#a6c39d363ae2c8f18ada3e9919075e9d3',1,'pmem_free(void *start, int num_pages):&#160;pmem.c']]],
   ['pmem_5finit_171',['pmem_init',['../pmem_8c.html#a26e65460b81ea0f98525b78008ffc68a',1,'pmem_init(struct multiboot_boot_header_tag *tags):&#160;pmem.c'],['../pmem_8h.html#a26e65460b81ea0f98525b78008ffc68a',1,'pmem_init(struct multiboot_boot_header_tag *tags):&#160;pmem.c']]],
   ['pres_172',['pres',['../structpg__struct__entry.html#a6e42c92441dd05ad59c97d50db12aad8',1,'pg_struct_entry']]],
@@ -21,10 +21,11 @@ var searchData=
   ['prev_5ftss_175',['prev_tss',['../structtss__entry.html#acf85f88e08563f2f47a4e2ff5a8caf37',1,'tss_entry']]],
   ['priv_176',['priv',['../structProcess.html#af6d80a830e83c92cf1524041130ecda8',1,'Process']]],
   ['proc_5fschedule_5fbmap_177',['proc_schedule_bmap',['../tasking_8c.html#a2f20bcee38d64c49d899e11e09e8ac1c',1,'tasking.c']]],
-  ['process_178',['Process',['../structProcess.html',1,'Process'],['../structThread.html#a13b09b855703f94e0431cb650ce50161',1,'Thread::process()']]],
-  ['process_5ffuncs_179',['process_funcs',['../rpc_8c.html#a84d551307ccd273cdb22c56186760fba',1,'rpc.c']]],
-  ['process_5fnum_5ffuncs_180',['process_num_funcs',['../rpc_8c.html#aed432a13dd7e36b2e948dcc8bdabe16e',1,'rpc.c']]],
-  ['process_5fready_5fbmap_181',['process_ready_bmap',['../rpc_8c.html#a9fbb13d494c19846cac7b78c32365450',1,'rpc.c']]],
-  ['process_5fwaiting_5fon_182',['process_waiting_on',['../structrpc__waiting__thread.html#a679f36c47373a42fff7fb346e5c2ee03',1,'rpc_waiting_thread']]],
-  ['processes_183',['processes',['../tasking_8c.html#a2056bd87e9f442ca57362f1fde5a6fcb',1,'tasking.c']]]
+  ['process_178',['Process',['../structProcess.html',1,'']]],
+  ['process_179',['process',['../structThread.html#a13b09b855703f94e0431cb650ce50161',1,'Thread']]],
+  ['process_5ffuncs_180',['process_funcs',['../rpc_8c.html#a84d551307ccd273cdb22c56186760fba',1,'rpc.c']]],
+  ['process_5fnum_5ffuncs_181',['process_num_funcs',['../rpc_8c.html#aed432a13dd7e36b2e948dcc8bdabe16e',1,'rpc.c']]],
+  ['process_5fready_5fbmap_182',['process_ready_bmap',['../rpc_8c.html#a9fbb13d494c19846cac7b78c32365450',1,'rpc.c']]],
+  ['process_5fwaiting_5fon_183',['process_waiting_on',['../structrpc__waiting__thread.html#a679f36c47373a42fff7fb346e5c2ee03',1,'rpc_waiting_thread']]],
+  ['processes_184',['processes',['../tasking_8c.html#a2056bd87e9f442ca57362f1fde5a6fcb',1,'tasking.c']]]
 ];
