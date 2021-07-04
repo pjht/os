@@ -119,8 +119,8 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ac90817d992a64d95d80e4505343ed13c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#ac90817d992a64d95d80e4505343ed13c">tasking_create_task</a> (void *eip, void *address_space, char kmode, void *param1, void *param2, char isThread)</td></tr>
-<tr class="separator:ac90817d992a64d95d80e4505343ed13c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b70c95e2ee64b696503918ee28b2ab6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#a1b70c95e2ee64b696503918ee28b2ab6">tasking_create_task</a> (void *eip, void *address_space, char kmode, void *param1, void *param2, char isThread, char is_irq_handler)</td></tr>
+<tr class="separator:a1b70c95e2ee64b696503918ee28b2ab6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45f6d4112f15e33ba7a0e356f821d056"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#a45f6d4112f15e33ba7a0e356f821d056">tasking_init</a> ()</td></tr>
 <tr class="separator:a45f6d4112f15e33ba7a0e356f821d056"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47f424f3474f4298f1d6b65eeee5d0f6"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#a47f424f3474f4298f1d6b65eeee5d0f6">tasking_is_privleged</a> ()</td></tr>
@@ -131,8 +131,8 @@ Functions</h2></td></tr>
 <tr class="separator:a579bdf6585f7b466257320a1ad51429a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a347fac6db01ff796e5dc6d1fc44c2eef"><td class="memItemLeft" align="right" valign="top">int *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#a347fac6db01ff796e5dc6d1fc44c2eef">tasking_get_errno_address</a> ()</td></tr>
 <tr class="separator:a347fac6db01ff796e5dc6d1fc44c2eef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a911d2c94f4a15da6dbbf9fdccdda7e"><td class="memItemLeft" align="right" valign="top">pid_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#a8a911d2c94f4a15da6dbbf9fdccdda7e">tasking_new_thread</a> (void *start, pid_t pid, void *param)</td></tr>
-<tr class="separator:a8a911d2c94f4a15da6dbbf9fdccdda7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28d33bc02b444fc89bfcd849cb5cbeaf"><td class="memItemLeft" align="right" valign="top">pid_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#a28d33bc02b444fc89bfcd849cb5cbeaf">tasking_new_thread</a> (void *start, pid_t pid, void *param, char is_irq_handler)</td></tr>
+<tr class="separator:a28d33bc02b444fc89bfcd849cb5cbeaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf62dd83316df4b63f4a93587c9b791e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#acf62dd83316df4b63f4a93587c9b791e">tasking_exit</a> (int code)</td></tr>
 <tr class="separator:acf62dd83316df4b63f4a93587c9b791e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a021c821360fc28b1a509b585f8d21769"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking_8h.html#a021c821360fc28b1a509b585f8d21769">tasking_block</a> (<a class="el" href="tasking_8h.html#a4b1b32c1fc744438f665f0f1932dd207">thread_state</a> newstate)</td></tr>
@@ -243,8 +243,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ac90817d992a64d95d80e4505343ed13c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac90817d992a64d95d80e4505343ed13c">&#9670;&nbsp;</a></span>tasking_create_task()</h2>
+<a id="a1b70c95e2ee64b696503918ee28b2ab6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b70c95e2ee64b696503918ee28b2ab6">&#9670;&nbsp;</a></span>tasking_create_task()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -283,7 +283,13 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">char&#160;</td>
-          <td class="paramname"><em>isThread</em>&#160;</td>
+          <td class="paramname"><em>isThread</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char&#160;</td>
+          <td class="paramname"><em>is_irq_handler</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -300,6 +306,7 @@ Variables</h2></td></tr>
     <tr><td class="paramname">param1</td><td>The thread's start function first parameter </td></tr>
     <tr><td class="paramname">param2</td><td>The thread's start function second parameter </td></tr>
     <tr><td class="paramname">isThread</td><td>Whether we are creating a new process or a thread in a process. If we are creating a theead, param2_arg becomes the PID for the newly created thread. </td></tr>
+    <tr><td class="paramname">is_irq_handler</td><td>Whether the new task is an irq handler task </td></tr>
   </table>
   </dd>
 </dl>
@@ -490,8 +497,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a8a911d2c94f4a15da6dbbf9fdccdda7e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8a911d2c94f4a15da6dbbf9fdccdda7e">&#9670;&nbsp;</a></span>tasking_new_thread()</h2>
+<a id="a28d33bc02b444fc89bfcd849cb5cbeaf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28d33bc02b444fc89bfcd849cb5cbeaf">&#9670;&nbsp;</a></span>tasking_new_thread()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -512,7 +519,13 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>param</em>&#160;</td>
+          <td class="paramname"><em>param</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char&#160;</td>
+          <td class="paramname"><em>is_irq_handler</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -526,6 +539,7 @@ Variables</h2></td></tr>
     <tr><td class="paramname">start</td><td>The start address of the task </td></tr>
     <tr><td class="paramname">pid</td><td>The PID that gets the new thread </td></tr>
     <tr><td class="paramname">param</td><td>The thread's start function parameter </td></tr>
+    <tr><td class="paramname">is_irq_handler</td><td>Whether the new thread is an irq handler thread </td></tr>
   </table>
   </dd>
 </dl>

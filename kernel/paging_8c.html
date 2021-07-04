@@ -124,6 +124,8 @@ Functions</h2></td></tr>
 <tr class="separator:aee63ef1cb665a5aa68a15ab2461d20cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b40f4b94c1ee447f4f59b8e1c7d7227"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a8b40f4b94c1ee447f4f59b8e1c7d7227">unmap_pages</a> (void *start_virt, int num_pages, int free_phys)</td></tr>
 <tr class="separator:a8b40f4b94c1ee447f4f59b8e1c7d7227"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6cbf8d2d6dda9cd2b2b7ac50cf0b106b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a6cbf8d2d6dda9cd2b2b7ac50cf0b106b">paging_readonly_idt</a> ()</td></tr>
+<tr class="separator:a6cbf8d2d6dda9cd2b2b7ac50cf0b106b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a569adfd13ea3c63741f64108821b1712"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a569adfd13ea3c63741f64108821b1712">paging_init</a> ()</td></tr>
 <tr class="separator:a569adfd13ea3c63741f64108821b1712"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7554d075a99f52e3303d1ffd90d8c166"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a7554d075a99f52e3303d1ffd90d8c166">get_address_space</a> ()</td></tr>
@@ -157,6 +159,10 @@ static <a class="el" href="structpg__struct__entry.html">pg_struct_entry</a> *&#
 static <a class="el" href="structpg__struct__entry.html">pg_struct_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#adbd791d7bd73da84723b77373c041a88">page_table_map</a> =(<a class="el" href="structpg__struct__entry.html">pg_struct_entry</a>*)0xFFC00000</td></tr>
 <tr class="memdesc:adbd791d7bd73da84723b77373c041a88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the page table entries in the recursive mapping. <br /></td></tr>
 <tr class="separator:adbd791d7bd73da84723b77373c041a88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6dbcdc03540625d72072d4bc7e62af53"><td class="memItemLeft" align="right" valign="top"><a id="a6dbcdc03540625d72072d4bc7e62af53"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="paging_8c.html#a6dbcdc03540625d72072d4bc7e62af53">idt</a></td></tr>
+<tr class="memdesc:a6dbcdc03540625d72072d4bc7e62af53"><td class="mdescLeft">&#160;</td><td class="mdescRight">The IDT. <br /></td></tr>
+<tr class="separator:a6dbcdc03540625d72072d4bc7e62af53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a64db1d6c4d8861128d9e6e7f671213d8"></a>
@@ -467,6 +473,24 @@ static <a class="el" href="structpg__struct__entry.html">pg_struct_entry</a> *&#
       </table>
 </div><div class="memdoc">
 <p>Create a new address space </p><dl class="section return"><dt>Returns</dt><dd>a pointer to the new address space in physical memory. </dd></dl>
+
+</div>
+</div>
+<a id="a6cbf8d2d6dda9cd2b2b7ac50cf0b106b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6cbf8d2d6dda9cd2b2b7ac50cf0b106b">&#9670;&nbsp;</a></span>paging_readonly_idt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void paging_readonly_idt </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Makes the IDT readonly </p>
 
 </div>
 </div>

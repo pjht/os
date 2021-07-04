@@ -103,8 +103,8 @@ Functions</h2></td></tr>
 <tr class="separator:ac190e8293f01180f04c1797d3a91a8d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a493a7988310576d931585548e8cf71cb"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking__helpers__c_8c.html#a493a7988310576d931585548e8cf71cb">new_kstack</a> ()</td></tr>
 <tr class="separator:a493a7988310576d931585548e8cf71cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d68a91a4777142a51990297666cf05a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking__helpers__c_8c.html#a2d68a91a4777142a51990297666cf05a">setup_kstack</a> (<a class="el" href="structThread.html">Thread</a> *thread, void *param1, void *param2, char kmode, void *eip)</td></tr>
-<tr class="separator:a2d68a91a4777142a51990297666cf05a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab369c08c39318b05d807ff660189a0eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking__helpers__c_8c.html#ab369c08c39318b05d807ff660189a0eb">setup_kstack</a> (<a class="el" href="structThread.html">Thread</a> *thread, void *param1, void *param2, char kmode, void *eip, char is_irq_handler)</td></tr>
+<tr class="separator:ab369c08c39318b05d807ff660189a0eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c17ce64badaff8e3336b2c86b36f223"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking__helpers__c_8c.html#a2c17ce64badaff8e3336b2c86b36f223">free_kstack</a> (void *stack_ptr)</td></tr>
 <tr class="separator:a2c17ce64badaff8e3336b2c86b36f223"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -235,8 +235,8 @@ static char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 </div>
 </div>
-<a id="a2d68a91a4777142a51990297666cf05a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2d68a91a4777142a51990297666cf05a">&#9670;&nbsp;</a></span>setup_kstack()</h2>
+<a id="ab369c08c39318b05d807ff660189a0eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab369c08c39318b05d807ff660189a0eb">&#9670;&nbsp;</a></span>setup_kstack()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -269,7 +269,13 @@ static char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>eip</em>&#160;</td>
+          <td class="paramname"><em>eip</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char&#160;</td>
+          <td class="paramname"><em>is_irq_handler</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -285,6 +291,7 @@ static char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
     <tr><td class="paramname">param2</td><td>The thread's start function second parameter </td></tr>
     <tr><td class="paramname">kmode</td><td>Whether the thread is a kernel mode thread </td></tr>
     <tr><td class="paramname">eip</td><td>The start address of the thread </td></tr>
+    <tr><td class="paramname">is_irq_handler</td><td>Whether the kernel stack is for an interrupt handler thread </td></tr>
   </table>
   </dd>
 </dl>

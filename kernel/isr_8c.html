@@ -82,6 +82,7 @@ $(document).ready(function(){initNavTree('isr_8c.html',''); initResizable(); });
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
@@ -93,7 +94,6 @@ $(document).ready(function(){initNavTree('isr_8c.html',''); initResizable(); });
 <code>#include &quot;<a class="el" href="vga__err_8h_source.html">../../vga_err.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="address__spaces_8h_source.html">../../address_spaces.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="halt_8h_source.html">../halt.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="isr_8h_source.html">../isr.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="paging_8h_source.html">../paging.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="serial_8h_source.html">../serial.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="gdt_8h_source.html">gdt.h</a>&quot;</code><br />
@@ -106,23 +106,28 @@ $(document).ready(function(){initNavTree('isr_8c.html',''); initResizable(); });
 <code>#include &lt;sys/syscalls.h&gt;</code><br />
 <code>#include &lt;sys/types.h&gt;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisr__handler__info.html">isr_handler_info</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a2127468804d6c8a288db9388f8f5d684"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="isr_8c.html#a2127468804d6c8a288db9388f8f5d684">irq_handler</a> (<a class="el" href="structregisters__t.html">registers_t</a> *r)</td></tr>
-<tr class="separator:a2127468804d6c8a288db9388f8f5d684"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed0ecf87a0ed3270ce0e9c68cd01a946"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="isr_8c.html#aed0ecf87a0ed3270ce0e9c68cd01a946">isr_install</a> ()</td></tr>
 <tr class="separator:aed0ecf87a0ed3270ce0e9c68cd01a946"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aadec5105d6190a106710e70e76b7c5b6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="isr_8c.html#aadec5105d6190a106710e70e76b7c5b6">isr_handler</a> (<a class="el" href="structregisters__t.html">registers_t</a> *r)</td></tr>
 <tr class="separator:aadec5105d6190a106710e70e76b7c5b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add073e14261bb5f977abc321d03f809b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="isr_8c.html#add073e14261bb5f977abc321d03f809b">isr_register_handler</a> (int n, <a class="el" href="isr_8h.html#a2ae93e6d11fda68bd746e046e2411a90">isr_t</a> handler)</td></tr>
-<tr class="separator:add073e14261bb5f977abc321d03f809b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7c7f85bc1f0476e9b2cd83d7248cf54"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="isr_8c.html#ae7c7f85bc1f0476e9b2cd83d7248cf54">isr_register_handler</a> (int n, pid_t pid, void *handler)</td></tr>
+<tr class="separator:ae7c7f85bc1f0476e9b2cd83d7248cf54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2127468804d6c8a288db9388f8f5d684"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="isr_8c.html#a2127468804d6c8a288db9388f8f5d684">irq_handler</a> (<a class="el" href="structregisters__t.html">registers_t</a> *r)</td></tr>
+<tr class="separator:a2127468804d6c8a288db9388f8f5d684"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a484241268f0a389560492a2ace986fed"><td class="memItemLeft" align="right" valign="top"><a id="a484241268f0a389560492a2ace986fed"></a>
-static <a class="el" href="isr_8h.html#a2ae93e6d11fda68bd746e046e2411a90">isr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="isr_8c.html#a484241268f0a389560492a2ace986fed">irq_handlers</a> [16]</td></tr>
-<tr class="memdesc:a484241268f0a389560492a2ace986fed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handlers for the PIC interrupts. <br /></td></tr>
-<tr class="separator:a484241268f0a389560492a2ace986fed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae824ce2bb54bc0afe2d1a84e80642b33"><td class="memItemLeft" align="right" valign="top"><a id="ae824ce2bb54bc0afe2d1a84e80642b33"></a>
+static <a class="el" href="structisr__handler__info.html">isr_handler_info</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="isr_8c.html#ae824ce2bb54bc0afe2d1a84e80642b33">irq_handlers</a> [16] ={0}</td></tr>
+<tr class="memdesc:ae824ce2bb54bc0afe2d1a84e80642b33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handlers for the PIC interrupts. <br /></td></tr>
+<tr class="separator:ae824ce2bb54bc0afe2d1a84e80642b33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79c9f7d90e19dbcd570e013274d75bc1"><td class="memItemLeft" align="right" valign="top"><a id="a79c9f7d90e19dbcd570e013274d75bc1"></a>
 static char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="isr_8c.html#a79c9f7d90e19dbcd570e013274d75bc1">exception_messages</a> []</td></tr>
 <tr class="memdesc:a79c9f7d90e19dbcd570e013274d75bc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">List of messages for each exception. <br /></td></tr>
@@ -195,8 +200,8 @@ static char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 
 </div>
 </div>
-<a id="add073e14261bb5f977abc321d03f809b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#add073e14261bb5f977abc321d03f809b">&#9670;&nbsp;</a></span>isr_register_handler()</h2>
+<a id="ae7c7f85bc1f0476e9b2cd83d7248cf54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7c7f85bc1f0476e9b2cd83d7248cf54">&#9670;&nbsp;</a></span>isr_register_handler()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -210,7 +215,13 @@ static char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="isr_8h.html#a2ae93e6d11fda68bd746e046e2411a90">isr_t</a>&#160;</td>
+          <td class="paramtype">pid_t&#160;</td>
+          <td class="paramname"><em>pid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>handler</em>&#160;</td>
         </tr>
         <tr>
@@ -220,10 +231,12 @@ static char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Register an IRQ handler </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Register an IRQ handler</p>
+<p>If the PID is 0, the handler will be called directly, otherwise a thread will be made in the PID starting at the handler's address. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">n</td><td>the IRQ to register a handler for </td></tr>
-    <tr><td class="paramname">handler</td><td>the handler to register </td></tr>
+    <tr><td class="paramname">n</td><td>The IRQ to register a handler for </td></tr>
+    <tr><td class="paramname">pid</td><td>The PID that will handle the interrupt. </td></tr>
+    <tr><td class="paramname">handler</td><td>The address of the handler. </td></tr>
   </table>
   </dd>
 </dl>

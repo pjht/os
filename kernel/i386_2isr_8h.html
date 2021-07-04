@@ -90,6 +90,7 @@ $(document).ready(function(){initNavTree('i386_2isr_8h.html',''); initResizable(
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
+<code>#include &lt;sys/types.h&gt;</code><br />
 </div>
 <p><a href="i386_2isr_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -109,8 +110,8 @@ typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 Functions</h2></td></tr>
 <tr class="memitem:aed0ecf87a0ed3270ce0e9c68cd01a946"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="i386_2isr_8h.html#aed0ecf87a0ed3270ce0e9c68cd01a946">isr_install</a> ()</td></tr>
 <tr class="separator:aed0ecf87a0ed3270ce0e9c68cd01a946"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add073e14261bb5f977abc321d03f809b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="i386_2isr_8h.html#add073e14261bb5f977abc321d03f809b">isr_register_handler</a> (int n, <a class="el" href="isr_8h.html#a2ae93e6d11fda68bd746e046e2411a90">isr_t</a> handler)</td></tr>
-<tr class="separator:add073e14261bb5f977abc321d03f809b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7c7f85bc1f0476e9b2cd83d7248cf54"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="i386_2isr_8h.html#ae7c7f85bc1f0476e9b2cd83d7248cf54">isr_register_handler</a> (int n, pid_t pid, void *handler)</td></tr>
+<tr class="separator:ae7c7f85bc1f0476e9b2cd83d7248cf54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="aed0ecf87a0ed3270ce0e9c68cd01a946"></a>
@@ -131,8 +132,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="add073e14261bb5f977abc321d03f809b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#add073e14261bb5f977abc321d03f809b">&#9670;&nbsp;</a></span>isr_register_handler()</h2>
+<a id="ae7c7f85bc1f0476e9b2cd83d7248cf54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7c7f85bc1f0476e9b2cd83d7248cf54">&#9670;&nbsp;</a></span>isr_register_handler()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -146,7 +147,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="isr_8h.html#a2ae93e6d11fda68bd746e046e2411a90">isr_t</a>&#160;</td>
+          <td class="paramtype">pid_t&#160;</td>
+          <td class="paramname"><em>pid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>handler</em>&#160;</td>
         </tr>
         <tr>
@@ -156,10 +163,12 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Register an IRQ handler </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Register an IRQ handler</p>
+<p>If the PID is 0, the handler will be called directly, otherwise a thread will be made in the PID starting at the handler's address. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">n</td><td>the IRQ to register a handler for </td></tr>
-    <tr><td class="paramname">handler</td><td>the handler to register </td></tr>
+    <tr><td class="paramname">n</td><td>The IRQ to register a handler for </td></tr>
+    <tr><td class="paramname">pid</td><td>The PID that will handle the interrupt. </td></tr>
+    <tr><td class="paramname">handler</td><td>The address of the handler. </td></tr>
   </table>
   </dd>
 </dl>

@@ -97,10 +97,12 @@ Functions</h2></td></tr>
 <tr class="separator:aa90e4e41b72e63004f85e8663d382596"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0dd765564611ce3bf2bd466fe2ca4ae5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking__helpers_8h.html#a0dd765564611ce3bf2bd466fe2ca4ae5">task_init</a> ()</td></tr>
 <tr class="separator:a0dd765564611ce3bf2bd466fe2ca4ae5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49ba76c3c9c807482cde7bec9d06e9e7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking__helpers_8h.html#a49ba76c3c9c807482cde7bec9d06e9e7">task_init_no_int</a> ()</td></tr>
+<tr class="separator:a49ba76c3c9c807482cde7bec9d06e9e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f1038b75eee81b791a9ebadefe432b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking__helpers_8h.html#a9f1038b75eee81b791a9ebadefe432b5">wait_for_unblocked_thread_asm</a> ()</td></tr>
 <tr class="separator:a9f1038b75eee81b791a9ebadefe432b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d68a91a4777142a51990297666cf05a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking__helpers_8h.html#a2d68a91a4777142a51990297666cf05a">setup_kstack</a> (<a class="el" href="structThread.html">Thread</a> *thread, void *param1, void *param2, char kmode, void *eip)</td></tr>
-<tr class="separator:a2d68a91a4777142a51990297666cf05a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab369c08c39318b05d807ff660189a0eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking__helpers_8h.html#ab369c08c39318b05d807ff660189a0eb">setup_kstack</a> (<a class="el" href="structThread.html">Thread</a> *thread, void *param1, void *param2, char kmode, void *eip, char is_irq_handler)</td></tr>
+<tr class="separator:ab369c08c39318b05d807ff660189a0eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c17ce64badaff8e3336b2c86b36f223"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tasking__helpers_8h.html#a2c17ce64badaff8e3336b2c86b36f223">free_kstack</a> (void *stack_ptr)</td></tr>
 <tr class="separator:a2c17ce64badaff8e3336b2c86b36f223"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -129,8 +131,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a2d68a91a4777142a51990297666cf05a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2d68a91a4777142a51990297666cf05a">&#9670;&nbsp;</a></span>setup_kstack()</h2>
+<a id="ab369c08c39318b05d807ff660189a0eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab369c08c39318b05d807ff660189a0eb">&#9670;&nbsp;</a></span>setup_kstack()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -163,7 +165,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>eip</em>&#160;</td>
+          <td class="paramname"><em>eip</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char&#160;</td>
+          <td class="paramname"><em>is_irq_handler</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -179,6 +187,7 @@ Functions</h2></td></tr>
     <tr><td class="paramname">param2</td><td>The thread's start function second parameter </td></tr>
     <tr><td class="paramname">kmode</td><td>Whether the thread is a kernel mode thread </td></tr>
     <tr><td class="paramname">eip</td><td>The start address of the thread </td></tr>
+    <tr><td class="paramname">is_irq_handler</td><td>Whether the kernel stack is for an interrupt handler thread </td></tr>
   </table>
   </dd>
 </dl>
@@ -224,6 +233,24 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Initializes a usermode task </p>
+
+</div>
+</div>
+<a id="a49ba76c3c9c807482cde7bec9d06e9e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49ba76c3c9c807482cde7bec9d06e9e7">&#9670;&nbsp;</a></span>task_init_no_int()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void task_init_no_int </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Initializes a usermode task without interrupts enabled </p>
 
 </div>
 </div>

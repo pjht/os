@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MyOS Kernel: Globals</title>
+<title>MyOS Kernel: isr_handler_info Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
-$(document).ready(function(){initNavTree('globals_s.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('structisr__handler__info.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -80,62 +80,36 @@ $(document).ready(function(){initNavTree('globals_s.html',''); initResizable(); 
 </iframe>
 </div>
 
+<div class="header">
+  <div class="summary">
+<a href="#pub-attribs">Data Fields</a>  </div>
+  <div class="headertitle">
+<div class="title">isr_handler_info Struct Reference</div>  </div>
+</div><!--header-->
 <div class="contents">
-<div class="textblock">Here is a list of all documented functions, variables, defines, enums, and typedefs with links to the documentation:</div>
-
-<h3><a id="index_s"></a>- s -</h3><ul>
-<li>SAME_PROC
-: <a class="el" href="tasking_8c.html#ad274a1a236e5a5d3a1be62f9d1f6eeec">tasking.c</a>
-</li>
-<li>schedule_thread()
-: <a class="el" href="tasking_8c.html#a2aa9c7df01f34c332d0357417bca9359">tasking.c</a>
-</li>
-<li>SCRATCH_PORT
-: <a class="el" href="serial_8c.html#a33869476648347ff4dbf5ea3c5eb32a0">serial.c</a>
-</li>
-<li>screen
-: <a class="el" href="vga__err_8c.html#af6fd1d4385a8b51f8ea5ce1d06fb97fd">vga_err.c</a>
-</li>
-<li>serial_init()
-: <a class="el" href="serial_8c.html#a8b17b137d175d09afe7cb07684f82e5d">serial.c</a>
-, <a class="el" href="serial_8h.html#a8b17b137d175d09afe7cb07684f82e5d">serial.h</a>
-</li>
-<li>serial_printf()
-: <a class="el" href="serial_8h.html#ae4f545d29e1faa30e5b27be12d4286d0">serial.h</a>
-</li>
-<li>serial_putc()
-: <a class="el" href="serial_8c.html#a9c751f48f189bdf68240e476f01ea070">serial.c</a>
-, <a class="el" href="serial_8h.html#a9c751f48f189bdf68240e476f01ea070">serial.h</a>
-</li>
-<li>serial_write_string()
-: <a class="el" href="serial_8h.html#a33e382fceb1f650af5229aaa40e47600">serial.h</a>
-</li>
-<li>set_bmap_bit()
-: <a class="el" href="kmalloc_8c.html#a9374790c8f20fb22e7b04472e67df7b5">kmalloc.c</a>
-, <a class="el" href="pmem_8c.html#a11ed75ad6967efb05a974760be595f28">pmem.c</a>
-</li>
-<li>set_char()
-: <a class="el" href="vga__err_8c.html#aa89efa21241581e8ccb810e286a49bcb">vga_err.c</a>
-</li>
-<li>set_entry()
-: <a class="el" href="gdt_8c.html#a8ecb0e32b56815d5bd60db521567f471">gdt.c</a>
-</li>
-<li>setup_kstack()
-: <a class="el" href="tasking__helpers__c_8c.html#ab369c08c39318b05d807ff660189a0eb">tasking_helpers_c.c</a>
-, <a class="el" href="tasking__helpers_8h.html#ab369c08c39318b05d807ff660189a0eb">tasking_helpers.h</a>
-</li>
-<li>switch_to_thread()
-: <a class="el" href="tasking_8c.html#a92bbbaf5a589e3717ba7f91deaae0071">tasking.c</a>
-</li>
-<li>switch_to_thread_asm()
-: <a class="el" href="tasking__helpers_8h.html#aa90e4e41b72e63004f85e8663d382596">tasking_helpers.h</a>
-</li>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Data Fields</h2></td></tr>
+<tr class="memitem:a1ffb63badc775f974f53ea0613cc0578"><td class="memItemLeft" align="right" valign="top"><a id="a1ffb63badc775f974f53ea0613cc0578"></a>
+pid_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisr__handler__info.html#a1ffb63badc775f974f53ea0613cc0578">pid</a></td></tr>
+<tr class="memdesc:a1ffb63badc775f974f53ea0613cc0578"><td class="mdescLeft">&#160;</td><td class="mdescRight">The PID thast registered the handler, or 0 if it it a kernel handler. <br /></td></tr>
+<tr class="separator:a1ffb63badc775f974f53ea0613cc0578"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a127e9f088ffb6e306c02522014de4c20"><td class="memItemLeft" align="right" valign="top"><a id="a127e9f088ffb6e306c02522014de4c20"></a>
+void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structisr__handler__info.html#a127e9f088ffb6e306c02522014de4c20">handler</a></td></tr>
+<tr class="memdesc:a127e9f088ffb6e306c02522014de4c20"><td class="mdescLeft">&#160;</td><td class="mdescRight">The address of the handler. <br /></td></tr>
+<tr class="separator:a127e9f088ffb6e306c02522014de4c20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Represents a registeted interrupt handler </p>
+</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<li>kernel/cpu/i386/<a class="el" href="isr_8c.html">isr.c</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
+    <li class="navelem"><a class="el" href="structisr__handler__info.html">isr_handler_info</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
