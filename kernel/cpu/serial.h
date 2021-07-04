@@ -11,10 +11,30 @@
 void serial_init();
 
 /**
- * Write a character to the serial port
+ * Write a character to serial port 0
  * \param c The character to write
 */
 void serial_putc(char c);
+
+/**
+ * Read a character from serial port 0
+ * \return The character read from the serial port
+*/
+char serial_getc();
+
+/**
+ * Write a character to the specified serial port
+ * \param c The character to write
+ * \param port The port number to write to
+*/
+void serial_putc_port(char c, int port);
+
+/**
+ * Read a character from the specified serial port
+ * \return The character read from the serial port
+ * \param port The port number to read from
+*/
+char serial_getc_port(int port);
 
 /**
  * Write a string to the serial port

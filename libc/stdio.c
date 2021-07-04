@@ -1,6 +1,6 @@
 /**
  * \file
-*/
+ */
 
 #include <stdio.h>
 #include <serdes.h>
@@ -17,7 +17,7 @@ FILE* stderr=NULL; //!< Standard error
 /** 
  * Initialize stdio.
  * Must not be called by user code.
-*/
+ */
 void __stdio_init() {
 }
 
@@ -47,7 +47,7 @@ FILE* fopen(char* filename,char* mode) {
  * \param c The character to write
  * \param stream The stream to write to
  * \returns the written character, or EOF on failure
-*/
+ */
 int putc(int c, FILE* stream) __attribute__ ((alias ("fputc")));
 
 int fputc(int c, FILE* stream) {
@@ -64,7 +64,7 @@ int fputc(int c, FILE* stream) {
  * Gets a character from a file
  * \param stream The file to read from
  * \returns the read character, or EOF if the read fails
-*/
+ */
 int getc(FILE* stream) __attribute__ ((alias ("fgetc"))); 
 
 int fgetc(FILE* stream) {
@@ -141,6 +141,8 @@ int fputs(const char* s, FILE* stream) {
 }
 
 size_t fwrite(void* buffer_ptr,size_t size,size_t count,FILE* stream) {
+  /* serial_print(buffer_ptr); */
+  /* return size*count; */
   serdes_state state={0};
   serialize_ptr(stream->fs_data,&state);
   serialize_int(size*count,&state);
@@ -173,61 +175,61 @@ int mount(char* file,char* type,char* path) {
 
 int vfprintf(FILE* stream,const char* format,va_list arg) {
   int c;
-	for(;*format!='\0';format++) {
+  for(;*format!='\0';format++) {
     if(*format!='%') {
-  		c=fputc(*format,stream);
+      c=fputc(*format,stream);
       continue;
-  	}
+    }
     format++;
-		switch(*format) {
-			case 'c': {
-        int i=va_arg(arg,int);
-				c=fputc(i,stream);
-        if (c==EOF) {
-          return EOF;
-        }
-				break;
-      }
-			case 'd': {
-        int i=va_arg(arg,int); 		//Fetch Decimal/Integer argument
-				if(i<0) {
-					i=-i;
-					fputc('-',stream);
-				}
-        char str[11];
-        int_to_ascii(i,str);
-				c=fputs(str,stream);
-        if (c==EOF) {
-          return EOF;
-        }
-				break;
-      }
-			// case 'o': {
-      //   int i=va_arg(arg,unsigned int); //Fetch Octal representation
-			// 	puts(convert(i,8));
-			// 	break;
-      // }
-			case 's': {
-        char* s=va_arg(arg,char*);
-				c=fputs(s,stream);
-        if (c==EOF) {
-          return EOF;
-        }
-				break;
-      }
-			case 'x': {
-        unsigned int i=va_arg(arg, unsigned int);
-        char str[11];
-        str[0]='\0';
-        hex_to_ascii(i,str);
-				c=fputs(str,stream);
-        if (c==EOF) {
-          return EOF;
-        }
-				break;
-      }
-		}
-	}
+    switch(*format) {
+      case 'c': {
+                  int i=va_arg(arg,int);
+                  c=fputc(i,stream);
+                  if (c==EOF) {
+                    return EOF;
+                  }
+                  break;
+                }
+      case 'd': {
+                  int i=va_arg(arg,int); 		//Fetch Decimal/Integer argument
+                  if(i<0) {
+                    i=-i;
+                    fputc('-',stream);
+                  }
+                  char str[11];
+                  int_to_ascii(i,str);
+                  c=fputs(str,stream);
+                  if (c==EOF) {
+                    return EOF;
+                  }
+                  break;
+                }
+                // case 'o': {
+                //   int i=va_arg(arg,unsigned int); //Fetch Octal representation
+                // 	puts(convert(i,8));
+                // 	break;
+                // }
+      case 's': {
+                  char* s=va_arg(arg,char*);
+                  c=fputs(s,stream);
+                  if (c==EOF) {
+                    return EOF;
+                  }
+                  break;
+                }
+      case 'x': {
+                  unsigned int i=va_arg(arg, unsigned int);
+                  char str[11];
+                  str[0]='\0';
+                  hex_to_ascii(i,str);
+                  c=fputs(str,stream);
+                  if (c==EOF) {
+                    return EOF;
+                  }
+                  break;
+                }
+    }
+  }
   return 1;
 }
 
@@ -259,16 +261,16 @@ int printf(const char* format,...) {
 
 int fseek(FILE* stream,long offset,int origin) {
   switch (origin) {
-  case SEEK_SET:
-    stream->pos=offset;
-    break;
-  case SEEK_CUR:
-    stream->pos+=offset;
-    break;
-  case SEEK_END:
-    break;
-  default:
-    break;
+    case SEEK_SET:
+      stream->pos=offset;
+      break;
+    case SEEK_CUR:
+      stream->pos+=offset;
+      break;
+    case SEEK_END:
+      break;
+    default:
+      break;
   }
   return 0;
 }

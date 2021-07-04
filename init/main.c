@@ -22,6 +22,30 @@ typedef struct {
   char typeflag[1];
 } tar_header;
 
+extern int registers[16];
+
+/** 
+ * Saved state of the CPU when an interrupt occurs
+*/
+typedef struct {
+   uint32_t ds; //!< Data segment selector
+   uint32_t edi; //!< Pushed by pusha.
+   uint32_t esi; //!< Pushed by pusha.
+   uint32_t ebp; //!< Pushed by pusha.
+   uint32_t esp; //!< Pushed by pusha.
+   uint32_t ebx; //!< Pushed by pusha.
+   uint32_t edx; //!< Pushed by pusha.
+   uint32_t ecx; //!< Pushed by pusha.
+   uint32_t eax; //!< Pushed by pusha.
+   uint32_t int_no; //!< Interrupt number
+   uint32_t err_code; //!< Error code (if applicable)
+   uint32_t eip; //!< Pushed by the processor automatically
+   uint32_t cs; //!< Pushed by the processor automatically
+   uint32_t eflags; //!< Pushed by the processor automatically
+   uint32_t useresp; //!< Pushed by the processor automatically
+   uint32_t ss; //!< Pushed by the processor automatically
+} registers_t;
+
 size_t getsize(const char *in) {
     size_t size=0;
     size_t j;
@@ -92,8 +116,50 @@ char load_proc(size_t datapos,char* initrd) {
   return 1;
 }
 
+char getDebugChar() {
+  return user_serial_getc(1);
+}
+
+void putDebugChar(char c) {
+  user_serial_putc(c, 1);
+}
+
+void exceptionHandler(int exception_number, void *exception_address) {
+  
+
+}
+
+/* void user_handler(registers_t* r) { */
+/*   serial_print("USER EXCEPTION HANDLER\n"); */
+/*   registers[0]=r->eax; */
+/*   registers[1]=r->ecx; */
+/*   registers[2]=r->edx; */
+/*   registers[3]=r->ebx; */
+/*   registers[4]=r->esp; */
+/*   registers[5]=r->ebp; */
+/*   registers[6]=r->esi; */
+/*   registers[7]=r->edi; */
+/*   registers[8]=r->eip; */
+/*   registers[9]=r->eflags; */
+/*   registers[10]=0x8; */
+/*   registers[11]=0x10; */
+/*   registers[12]=0x10; */
+/*   registers[13]=0x10; */
+/*   registers[14]=0x10; */
+/*   registers[15]=0x10; */
+/*   handle_exception(r->int_no); */
+/*   exception_return(); */
+/* } */
 
 int main() {
+  /* set_debug_traps();   setup exception handlers*/
+  /* char buf[3]; */
+  /* buf[0]=user_serial_getc(1); */
+  /* buf[1]=user_serial_getc(1); */
+  /* buf[2]='\0'; */
+  /* serial_print(buf); */
+  /* register_exception_handler(user_handler); */
+  /* breakpoint(); */
   long size=initrd_sz();
   char* initrd=malloc(size);
   initrd_get(initrd);
@@ -122,6 +188,8 @@ int main() {
   if (!stdout) {
     serial_print("Could not open the VGA device file!\n");
     exit(1);
+  } else {
+    printf("VGA OK\n");
   }
   posix_spawn(NULL,"/initrd/ps2",NULL,NULL,NULL,NULL);
   // posix_spawn(NULL,"/initrd/pci",NULL,NULL,NULL,NULL);

@@ -10,6 +10,7 @@ int posix_spawn(pid_t* pid, const char* path, const posix_spawn_file_actions_t* 
 char* const argv[], char* const envp[]) {
   FILE* image=fopen((char*)path,"r");
   elf_header header;
+  serial_print("Read magic number\n");
   fread(&header,sizeof(elf_header),1,image);
   if (header.magic!=ELF_MAGIC) {
     serial_print("Bad magic number (");

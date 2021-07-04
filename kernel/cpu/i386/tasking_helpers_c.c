@@ -57,6 +57,7 @@ static int new_kstack() {
 }
 
 void setup_kstack(Thread* thread,void* param1,void* param2,char kmode,void* eip,char is_irq_handler) {
+  /* serial_printf("Setup kstack for TID %d, PID %d\n", thread->tid, thread->process->pid); */
   size_t kstack_num=new_kstack();
   if (kmode) {
     size_t top_idx=(1024*(kstack_num+1));
@@ -73,12 +74,14 @@ void setup_kstack(Thread* thread,void* param1,void* param2,char kmode,void* eip,
       user_stack-=2;
       user_stack[0]=param2;
       user_stack[1]=param1;
+      /* serial_printf("User stack in address space: %x\n", user_stack); */
     });
     if (is_irq_handler) {
       kstacks[top_idx-3]=(void*)task_init_no_int;
     } else {
     kstacks[top_idx-3]=(void*)task_init;
     }
+    /* serial_printf("User stack outside space: %x\n", user_stack); */
     kstacks[top_idx-2]=(void*)user_stack;
     kstacks[top_idx-1]=(void*)eip;
   }

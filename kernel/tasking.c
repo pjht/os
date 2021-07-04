@@ -1,7 +1,3 @@
-/**
- * \file 
-*/
-
 #include "cpu/halt.h"
 #include "cpu/paging.h"
 #include "cpu/serial.h"
@@ -10,6 +6,7 @@
 #include "tasking.h"
 #include <sys/types.h>
 #include <string.h>
+#include "rpc.h"
 
 #define MAX_PROCS 32768 //!< Maximum number of processes that can be running at a time
 #define HAS_UNBLOCKED_THREADS(proc) (proc->num_threads!=proc->num_threads_blocked) //!< Macro to check whethe a process has unblocked threads
@@ -22,12 +19,13 @@ char proc_schedule_bmap[MAX_PROCS/8]; //!< Bitmap of what processes are schedule
 Thread* current_thread; //!< Currently running thread
 static Thread* ready_to_run_head=NULL; //!< Head of the linked list of ready to run threads
 static Thread* ready_to_run_tail=NULL; //!< Tail of the linked list of ready to run threads
+static Thread* thread_to_be_freed; //!< Thread that exited and needs to be freed
 
 /**
  * Check whether a process is scheduled
  * \param index The PID to check
  * \return whether the process is scheduled
-*/
+ */
 static char is_proc_scheduled(pid_t index) {
   size_t byte=index/8;
   size_t bit=index%8;
@@ -38,7 +36,7 @@ static char is_proc_scheduled(pid_t index) {
 /**
  * Mark a process as scheduled
  * \param index The PID to mark
-*/
+ */
 static void mark_proc_scheduled(pid_t index) {
   if (is_proc_scheduled(index)) {
     serial_printf("Attempt to schedule a thread in a process with a scheduled thread! (PID %d)\n",index);
@@ -52,7 +50,7 @@ static void mark_proc_scheduled(pid_t index) {
 /**
  * Unmark a process as scheduled
  * \param index The PID to unmark
-*/
+ */
 static void unmark_proc_scheduled(pid_t index) {
   size_t byte=index/8;
   size_t bit=index%8;
@@ -62,7 +60,7 @@ static void unmark_proc_scheduled(pid_t index) {
 /**
  * Schedules a thread if the thread's prcess does not have a scheduled thread
  * \param thread The thread to schedule
-*/
+ */
 void schedule_thread(Thread* thread) {
   if(!is_proc_scheduled(thread->process->pid)) {
     if (ready_to_run_head) {
@@ -120,24 +118,24 @@ void tasking_create_task(void* eip,void* address_space,char kmode,void* param1,v
   proc->first_thread=thread;
   setup_kstack(thread,param1,param2,kmode,eip,is_irq_handler);
   schedule_thread(thread);
-  serial_printf("Created thread with PID %d and TID %d.\n",proc->pid,thread->tid);
-  serial_printf("Structure values:\n");
-  serial_printf("kernel_esp=%x\n",thread->kernel_esp);
-  serial_printf("kernel_esp_top=%x\n",thread->kernel_esp_top);
-  serial_printf("address_space=%x\n",thread->address_space);
-  serial_printf("tid=%d\n",thread->tid);
-  serial_printf("state=%d\n",thread->state);
-  serial_printf("next_thread_in_process=%x\n",thread->next_thread_in_process);
-  serial_printf("next_ready_to_run=%x\n",thread->next_ready_to_run);
-  serial_printf("prev_ready_to_run=%x\n",thread->prev_ready_to_run);
-  serial_printf("process=%x\n",thread->process);
+  /* serial_printf("Created thread with PID %d and TID %d.\n",proc->pid,thread->tid); */
+  /* serial_printf("Structure values:\n"); */
+  /* serial_printf("kernel_esp=%x\n",thread->kernel_esp); */
+  /* serial_printf("kernel_esp_top=%x\n",thread->kernel_esp_top); */
+  /* serial_printf("address_space=%x\n",thread->address_space); */
+  /* serial_printf("tid=%d\n",thread->tid); */
+  /* serial_printf("state=%d\n",thread->state); */
+  /* serial_printf("next_thread_in_process=%x\n",thread->next_thread_in_process); */
+  /* serial_printf("next_ready_to_run=%x\n",thread->next_ready_to_run); */
+  /* serial_printf("prev_ready_to_run=%x\n",thread->prev_ready_to_run); */
+  /* serial_printf("process=%x\n",thread->process); */
 }
 
 void tasking_init() {
   for (size_t i = 0; i < MAX_PROCS; i++) {
     memset(&processes[i],0,sizeof(Process));
   }
-  
+
   tasking_create_task(NULL,get_address_space(),1,NULL,NULL,0,0);
 }
 
@@ -167,15 +165,15 @@ pid_t tasking_new_thread(void* start,pid_t pid,void* param,char is_irq_handler) 
  * \param thread The start thread
  * \param thread_to_skip A thread to skip even if it's ready
  * \return the next ready thread
-*/
+ */
 static Thread* get_next_ready_thread(Thread* thread,Thread* thread_to_skip) {
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  #define HELPER \
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+#define HELPER \
   while (thread&&(thread->state!=THREAD_READY||thread==thread_to_skip)) { \
     thread=thread->next_thread_in_process; \
   }
   //end define
-  #endif
+#endif
   Thread* start_of_list=thread->process->first_thread;
   thread=thread->next_thread_in_process;
   HELPER;
@@ -184,13 +182,13 @@ static Thread* get_next_ready_thread(Thread* thread,Thread* thread_to_skip) {
     HELPER;
   }
   return thread;
-  #undef HELPER
+#undef HELPER
 }
 
 /**
  * Switch to a thread and schedule the next ready thread in the current process, if there is one.
  * \param thread The thread to switch to
-*/
+ */
 void switch_to_thread(Thread* thread) {
   // Unlink the thread from the list of ready-to-run threads
   if (thread!=ready_to_run_head) {
@@ -220,13 +218,24 @@ void switch_to_thread(Thread* thread) {
     schedule_thread(current_thread_next_ready);
   }
   thread->state=THREAD_RUNNING;
-  // serial_printf("Switching to PID %d TID %d.\n",thread->process->pid,thread->tid);
+  serial_printf("Switching to PID %d TID %d.\n",thread->process->pid,thread->tid);
   switch_to_thread_asm(thread);
+  if (thread_to_be_freed) {
+    serial_printf("Freeing PID %d TID %d.\n",thread_to_be_freed->process->pid,thread_to_be_freed->tid);
+    if (thread_to_be_freed->prev_thread_in_process) {
+      thread_to_be_freed->prev_thread_in_process->next_thread_in_process = thread_to_be_freed->next_thread_in_process;
+    }
+    if (thread_to_be_freed->next_thread_in_process) {
+      thread_to_be_freed->next_thread_in_process->prev_thread_in_process = thread_to_be_freed->prev_thread_in_process;
+    }
+    free_kstack(thread_to_be_freed->kernel_esp);
+    kfree(thread_to_be_freed);
+  }
 }
 
 void tasking_yield() {
   if (ready_to_run_head) {
-    // serial_printf("Attempting to switch to PID %d TID %d\n",ready_to_run_head->process->pid,ready_to_run_head->tid);
+    serial_printf("Attempting to switch to PID %d TID %d\n",ready_to_run_head->process->pid,ready_to_run_head->tid);
     switch_to_thread(ready_to_run_head);
   } else {
     if (NUM_UNBLOCKED_THREADS(current_thread->process)>1) {
@@ -244,11 +253,11 @@ void tasking_yield() {
         for(;;);
         halt();
       } else {
-        // serial_printf("All threads in all processes blocked, waiting for an IRQ which unblocks a thread\n");
+        serial_printf("All threads in all processes blocked, waiting for an IRQ which unblocks a thread\n");
         // All threads in all processes blocked, so wait for an IRQ whose handler unblocks a thread.
         do { wait_for_unblocked_thread_asm(); } while (ready_to_run_head==NULL);
       }
-      // serial_printf("Attempting to switch to PID %d TID %d\n",ready_to_run_head->process->pid,ready_to_run_head->tid);
+      serial_printf("Attempting to switch to PID %d TID %d\n",ready_to_run_head->process->pid,ready_to_run_head->tid);
       switch_to_thread(ready_to_run_head);
     }
   }
@@ -295,7 +304,7 @@ void tasking_block(thread_state newstate) {
  * \param pid The PID of the thread
  * \param tid The TID of the thread
  * \return the thread wih the specified PID and TID
-*/
+ */
 static Thread* get_thread(pid_t pid,pid_t tid) {
   if (processes[pid].num_threads==0) {
     serial_printf("PID %d does not exist!\n",pid);
@@ -319,22 +328,22 @@ static Thread* get_thread(pid_t pid,pid_t tid) {
 }
 
 void tasking_unblock(pid_t pid,pid_t tid) {
-    // serial_printf("Unblocking PID %d TID %d\n",pid,tid);
-    Thread* thread=get_thread(pid,tid);
-    if (thread==NULL) {
-      return;
-    }
-    if (thread->state==THREAD_EXITED||thread->state==THREAD_READY||thread->state==THREAD_RUNNING) {
-      serial_printf("Tried to unblock an exited/ready/running thread!\n");
-      return;
-    }
-    thread->state=THREAD_READY;
-    thread->process->num_threads_blocked--;
-    schedule_thread(thread);
+  serial_printf("Unblocking PID %d TID %d\n",pid,tid);
+  Thread* thread=get_thread(pid,tid);
+  if (thread==NULL) {
+    return;
+  }
+  if (thread->state==THREAD_EXITED||thread->state==THREAD_READY||thread->state==THREAD_RUNNING) {
+    serial_printf("Tried to unblock an exited/ready/running thread!\n");
+    return;
+  }
+  thread->state=THREAD_READY;
+  thread->process->num_threads_blocked--;
+  schedule_thread(thread);
 }
 
 void tasking_exit(int code) {
-  // serial_printf("PID %d is exiting with code %d.\n",current_thread->process->pid,code);
+  serial_printf("PID %d is exiting with code %d.\n",current_thread->process->pid,code);
   if (ready_to_run_head&&SAME_PROC(ready_to_run_head,current_thread)) {
     ready_to_run_head=ready_to_run_head->next_ready_to_run;
     if (ready_to_run_head==NULL) {
@@ -363,7 +372,15 @@ void tasking_exit(int code) {
   for (Thread* thread=current_thread->process->first_thread;thread!=NULL;thread=thread->next_thread_in_process) {
     if (thread->state!=THREAD_EXITED) {
       thread->state=THREAD_EXITED;
-      free_kstack(thread->kernel_esp_top);
+      if (thread==current_thread->process->first_thread && kernel_rpc_is_init(current_thread->process->pid)) {
+        continue;
+      }
+      if (thread!=current_thread) {
+        free_kstack(thread->kernel_esp);
+        kfree(thread);
+      } else {
+        thread_to_be_freed = current_thread;
+      }
     }
   }
   current_thread->process->num_threads_blocked=current_thread->process->num_threads;
@@ -398,7 +415,9 @@ void* tasking_get_rpc_ret_buf() {
 }
 
 void tasking_thread_exit() {
+  serial_printf("PID %d TID %d is exiting\n",current_thread->process->pid,current_thread->tid);
   tasking_block(THREAD_EXITED);
+  thread_to_be_freed=current_thread;
 }
 
 char tasking_check_proc_exists(pid_t pid) {

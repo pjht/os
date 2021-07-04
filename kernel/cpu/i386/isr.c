@@ -29,6 +29,10 @@ typedef struct {
 
 static isr_handler_info irq_handlers[16]={0}; //!< Handlers for the PIC interrupts
 
+static char waiting_for_exception_return[32768]={0};
+static registers_t* exception_return_value[32768]={0};
+static void* exception_handler_address[32768]={NULL};
+
 void isr_install() {
     idt_set_gate(0,(uint32_t)isr0);
     idt_set_gate(1,(uint32_t)isr1);
@@ -157,10 +161,6 @@ void isr_handler(registers_t* r) {
       char str[11];
       int_to_ascii(tasking_get_PID(),str);
       serial_write_string(str);
-      serial_write_string(" and address ");
-      str[0]='\0';
-      hex_to_ascii(r->eip,str);
-      serial_write_string(str);
       if (r->err_code==0) {
         serial_write_string(", kernel process tried to read a non-present page entry at address ");
       } else if (r->err_code==1) {
@@ -181,12 +181,10 @@ void isr_handler(registers_t* r) {
       str[0]='\0';
       hex_to_ascii((unsigned int)addr,str);
       serial_write_string(str);
-      serial_write_string(".");
-      serial_write_string(" Stack is at ");
-      str[0]='\0';
-      hex_to_ascii(r->useresp,str);
-      serial_write_string(str);
       serial_write_string(".\n");
+      serial_printf("EAX: %x EBX: %x ECX: %x EDX: %x\n", r->eax, r->ebx, r->ecx, r->edx);
+      serial_printf("ESI: %x EDI: %x ESP: %x EBP: %x\n", r->esi, r->edi, r->useresp, r->ebp);
+      serial_printf("EIP: %x, EFLAGS: %x", r->eip, r->eflags);
       // if ((r->err_code&1)==0) {
       //   // int dir_entry=(addr&0xFFC00000)>>22;
       //   // int table_entry=(addr&0x3FF000)>12;
@@ -298,10 +296,39 @@ void isr_handler(registers_t* r) {
       case SYSCALL_REGISTER_IRQ_HANDLER:
         isr_register_handler((int)r->ebx,tasking_get_PID(),(void*)r->ecx);
         break;
+      case SYSCALL_SERIAL_PUTC:
+        serial_putc_port((char)r->ebx,(int)r->ecx);
+        break;
+      case SYSCALL_SERIAL_GETC:
+        r->ebx=serial_getc_port((int)r->ebx);
+        break;
+      case SYSCALL_EXCEPTION_RETURN:
+        serial_printf("RETURNING FROM USER EXCEPTION HANDLER\n");
+        waiting_for_exception_return[tasking_get_PID()]=0;
+        break;
+      case SYSCALL_REGISTER_EXCEPTION_HANDLER:
+        serial_printf("REGISTERING USER EXCEPTION HANDLER\n");
+        exception_handler_address[tasking_get_PID()]=(void*)r->ebx;
+        break;
       }
-      break;
     }
   }
+  if (r->int_no!=3 || exception_handler_address[tasking_get_PID()]==NULL) {
+      return;
+  }
+  if (waiting_for_exception_return[tasking_get_PID()]==1) {
+      serial_printf("Exception handler thread had exception!\n");
+      halt();
+  }
+  serial_printf("CALLING USER EXCEPTION HANDLER\n");
+  waiting_for_exception_return[tasking_get_PID()]=1;
+  if (!exception_return_value[tasking_get_PID()]) {
+    exception_return_value[tasking_get_PID()]=alloc_pages(1);
+  }
+  memcpy(exception_return_value[tasking_get_PID()],r,sizeof(registers_t));
+  tasking_new_thread(exception_handler_address[tasking_get_PID()],tasking_get_PID(),exception_return_value[tasking_get_PID()],1);
+  while (waiting_for_exception_return[tasking_get_PID()]==1) { tasking_yield(); }
+  memcpy(r, exception_return_value[tasking_get_PID()], sizeof(registers_t));
 }
 
 
@@ -328,7 +355,9 @@ void irq_handler(registers_t* r) {
     if(info.pid==0) {
       ((isr_t)info.handler)(r);
     } else {
-      tasking_new_thread(info.handler,info.pid,(void*)(r->int_no-32),1);
+      registers_t* user_r=alloc_pages(1);
+      memcpy(user_r,r,sizeof(r));
+      tasking_new_thread(info.handler,info.pid,(void*)(r),1);
     }
   }
 }

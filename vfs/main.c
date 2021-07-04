@@ -31,11 +31,18 @@ mount_point* mount_point_list=NULL;
 fs_type* fs_type_list=NULL;
 
 void vfs_mount(void* args) {
+  serial_print("MOUNT\n");
   serdes_state state;
   start_deserialize(args,&state);
   char* type=deserialize_str(&state);
   char* dev=deserialize_str(&state);
   char* mount_path=deserialize_str(&state);
+  serial_print(type);
+  serial_print("\n");
+  serial_print(dev);
+  serial_print("\n");
+  serial_print(mount_path);
+  serial_print("\n");
   rpc_deallocate_buf(args,state.sizeorpos);
   fs_type* fstype=fs_type_list;
   pid_t fs_pid=0;
@@ -46,6 +53,7 @@ void vfs_mount(void* args) {
     }
   }
   if (!fs_pid) {
+    serial_print("NO FS PID\n");
     int err=1;
     rpc_return(&err,sizeof(int));
     pthread_exit(NULL);
@@ -58,6 +66,7 @@ void vfs_mount(void* args) {
   int* errbuf=malloc(sizeof(int));
   *errbuf=err;
   if (err) {
+    serial_print("MOUNT ERROR\n");
     rpc_return(errbuf,sizeof(int));
     free(errbuf);
     pthread_exit(NULL);
@@ -74,10 +83,13 @@ void vfs_mount(void* args) {
 }
 
 void vfs_register_fs(void* args) {
+  serial_print("REGISTER FS\n");
   serdes_state state;
   start_deserialize(args,&state);
   char* name=deserialize_str(&state);
   pid_t pid=deserialize_int(&state);
+  serial_print(name);
+  serial_print("\n");
   fs_type* type=malloc(sizeof(fs_type));
   rpc_deallocate_buf(args,state.sizeorpos);
   type->name=name;
@@ -89,9 +101,12 @@ void vfs_register_fs(void* args) {
 }
 
 void open(void* args) {
+  serial_print("OPEN\n");
   serdes_state state;
   start_deserialize(args,&state);
   char* path=deserialize_str(&state);
+  serial_print(path);
+  serial_print("\n");
   rpc_deallocate_buf(args,state.sizeorpos);
   mount_point* mnt=mount_point_list;
   mount_point* mnt_pnt=NULL;
